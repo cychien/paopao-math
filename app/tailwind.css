@@ -1,12 +1,95 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-html,
-body {
-  @apply bg-white dark:bg-gray-950;
+@theme {
+  --color-*: initial;
 
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
+  --color-white: #FFFFFF;
+  
+  --color-gray-25: #FCFCFD;
+  --color-gray-50: #F8FAFC;
+  --color-gray-100: #EEF2F6;
+  --color-gray-200: #E3E8EF;
+  --color-gray-300: #CDD5DF;
+  --color-gray-400: #9AA4B2;
+  --color-gray-500: #697586;
+  --color-gray-600: #4B5565;
+  --color-gray-700: #364152;
+  --color-gray-800: #202939;
+  --color-gray-900: #121926;
+  --color-gray-950: #0D121C;
+
+  --color-brand-25: #F3F5F6;
+  --color-brand-50: #E7EEF8;
+  --color-brand-100: #CBDAF1;
+  --color-brand-200: #9BB8E3;
+  --color-brand-300: #6793D5;
+  --color-brand-400: #3771C8;
+  --color-brand-500: #295494;
+  --color-brand-600: #1B3761;
+  --color-brand-700: #142948;
+  --color-brand-800: #0D1B30;
+  --color-brand-900: #070E18;
+  --color-brand-950: #03070C;
+
+  --font-inter: "Inter", sans-serif;
+  --font-sans: "Noto Sans TC", sans-serif;
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
   }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+@theme inline {
+  --color-brand-solid: var(--color-brand-600);
+  --color-brand-solid-hover: var(--color-brand-700);
+  --color-text-brand-secondary: var(--color-brand-700);
+  --color-bg-brand-section: var(--color-brand-800);
+  --color-bg-brand-secondary: var(--color-brand-100);
+  --color-bg-brand-secondary-hover: var(--color-brand-200);
+  --color-text-primary-on-brand: var(--color-white);
+  --color-text-tertiary-on-brand: var(--color-brand-200);
+
+  --color-bg-primary: var(--color-white);
+  --color-bg-primary-hover: var(--color-gray-50);
+  --color-bg-secondary: var(--color-gray-50);
+  --color-bg-quaternary: var(--color-gray-200);
+
+  --color-fg-secondary: var(--color-gray-700);
+  --color-fg-secondary-hover: var(--color-gray-800);
+  --color-fg-quaternary: var(--color-gray-400);
+
+  --color-text-primary: var(--color-gray-900);
+  --color-text-tertiary: var(--color-gray-600);
+  --color-text-quaternary: var(--color-gray-500);
+
+  --color-border-primary: var(--color-gray-300);
+  --color-border-secondary: var(--color-gray-200)
+}
+
+@utility container {
+  @variant xl {
+    padding-inline: 32px;
+  }
+}
+
+body {
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
