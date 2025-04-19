@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { Menu, X } from "lucide-react";
-import logoSrc from "~/assets/logo-with-text.svg";
+import logoSrc from "~/assets/logo-with-text.png";
 import { Button } from "~/components/ui/Button";
 
 function Header() {
