@@ -2,20 +2,20 @@ import featureIconSrc from "~/assets/featured.svg";
 
 function FeaturesSection() {
   return (
-    <section className="bg-bg-secondary py-24">
-      <div className="container mx-auto flex space-x-16">
-        <div className="w-[360px]">
+    <section className="bg-bg-secondary py-16 lg:py-24">
+      <div className="container mx-auto lg:flex lg:space-x-16">
+        <div className="lg:w-[360px]">
           <img src={featureIconSrc} alt="Icon" className="size-14" />
-          <h2 className="text-4xl font-semibold leading-[52px] mt-5">
+          <h2 className="text-3xl lg:text-4xl leading-[38px] font-semibold lg:leading-[52px] mt-5">
             你唯一需要的
-            <br />
+            <br className="hidden lg:inline" />
             總複習教材
           </h2>
-          <p className="mt-5 text-xl leading-[30px] text-text-tertiary">
+          <p className="mt-4 lg:mt-5 text-lg lg:text-xl lg:leading-[30px] text-text-tertiary">
             用最少花費，換取最大收穫，在最短時間迅速提升數學實力，輕鬆邁向夢想學校
           </p>
         </div>
-        <div className="flex-1 grid grid-cols-2 gap-x-16 gap-y-8">
+        <div className="mt-12 lg:mt-0 flex-1 grid gap-y-10 lg:grid-cols-2 lg:gap-x-16 lg:gap-y-8">
           <div className="space-y-1">
             <div className="font-semibold text-lg leading-[28px]">
               重點觀念 + 秒懂例題

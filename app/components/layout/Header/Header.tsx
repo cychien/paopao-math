@@ -38,6 +38,7 @@ function Header() {
             >
               <Dialog.Trigger asChild>
                 <Button
+                  className="translate-x-1"
                   variant="ghost"
                   iconButton
                   onClick={() => {
@@ -59,13 +60,14 @@ function Header() {
               </Dialog.Trigger>
               <Dialog.Portal container={headerRef.current}>
                 <Dialog.Overlay />
+                <Dialog.Title className="sr-only">選單</Dialog.Title>
                 <Dialog.Content asChild>
                   <div className="absolute right-0 flex w-full flex-col bg-white pb-5 pt-2 shadow outline-none data-[state=closed]:duration-100 data-[state=open]:duration-200 data-[state=closed]:ease-in data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 data-[state=open]:ease-slider-in lg:hidden">
                     <NavigationMenu.Root
                       orientation="vertical"
-                      className="container mx-auto divide-y divide-border-secondary"
+                      className="container mx-auto divide-border-secondary"
                     >
-                      <NavigationMenu.List className="space-y-2 pb-6">
+                      <NavigationMenu.List className="space-y-2">
                         {/* Simple item */}
                         <NavigationMenu.Item>
                           <NavigationMenu.Link

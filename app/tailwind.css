@@ -83,6 +83,8 @@
 }
 
 @utility container {
+  padding-inline: 16px;
+  
   @variant xl {
     padding-inline: 32px;
   }

@@ -1,12 +1,16 @@
 function TeacherSection() {
   return (
-    <section className="py-24">
-      <div className="container mx-auto flex space-x-16">
+    <section className="py-16 lg:py-24">
+      <div className="container mx-auto lg:flex lg:space-x-16">
         <div className="flex-1">
-          <h3 className="font-semibold text-text-brand-secondary">你的老師</h3>
-          <div className="mt-3 text-4xl font-semibold">錢寶明 (寶哥)</div>
+          <h3 className="font-semibold text-text-brand-secondary text-sm lg:text-base">
+            你的老師
+          </h3>
+          <div className="mt-3 text-3xl lg:text-4xl font-semibold">
+            錢寶明 (寶哥)
+          </div>
           <div className="mt-12 mb-8 h-px bg-border-secondary" />
-          <div className="text-text-tertiary text-lg space-y-4 font-inter">
+          <div className="text-text-tertiary lg:text-lg space-y-4 font-inter">
             <p>
               Mi tincidunt elit, id quisque ligula ac diam, amet. Vel etiam
               suspendisse morbi eleifend faucibus eget vestibulum felis. Dictum
@@ -30,7 +34,7 @@ function TeacherSection() {
             </p>
           </div>
         </div>
-        <div className="flex-1">
+        <div className="flex-1 mt-12 lg:mt-0">
           <div className="h-[640px] bg-bg-quaternary rounded-md" />
         </div>
       </div>
