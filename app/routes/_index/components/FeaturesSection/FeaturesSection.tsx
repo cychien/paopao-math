@@ -12,10 +12,10 @@ function FeaturesSection() {
             總複習教材
           </h2>
           <p className="mt-4 lg:mt-5 text-lg lg:text-xl lg:leading-[30px] text-text-tertiary">
-            用最少花費，換取最大收穫，在最短時間迅速提升數學實力，輕鬆邁向夢想學校
+            用更彈性的時間與更少的費用，搞懂更多觀念，拿到更高分數
           </p>
         </div>
-        <div className="mt-12 lg:mt-0 flex-1 grid gap-y-10 lg:grid-cols-2 lg:gap-x-16 lg:gap-y-8">
+        <div className="mt-12 lg:mt-0 flex-1 grid gap-y-10 lg:grid-rows-3 lg:gap-x-16 lg:gap-y-8 lg:grid-flow-col">
           <div className="space-y-1">
             <div className="font-semibold text-lg leading-[28px]">
               重點觀念 + 秒懂例題
@@ -26,15 +26,7 @@ function FeaturesSection() {
           </div>
           <div className="space-y-1">
             <div className="font-semibold text-lg leading-[28px]">
-              文字搭配影片，難點秒解
-            </div>
-            <div className="text-text-tertiary">
-              先掃條列重點，不懂即點短片深入，影片輔助難點馬上秒解，徹底避免卡關
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div className="font-semibold text-lg leading-[28px]">
-              200+ 精講影片庫
+              200+ 精講影片
             </div>
             <div className="text-text-tertiary">
               兩百餘支短片逐題解析，倍速播放與索引搜尋，隨時回放強化觀念，深度理解
@@ -42,10 +34,19 @@ function FeaturesSection() {
           </div>
           <div className="space-y-1">
             <div className="font-semibold text-lg leading-[28px]">
-              題庫持續更新
+              模擬測驗及精選試題
             </div>
             <div className="text-text-tertiary">
-              每月新增最新試題與練習卷，附詳解與步驟，演練永遠同步考情，隨時挑戰
+              全真模考 +
+              重點題庫不定期推送，隨時演練考場實戰，持續拓展數學思維與應試實力
+            </div>
+          </div>
+          <div className="space-y-1">
+            <div className="font-semibold text-lg leading-[28px]">
+              更省的價格
+            </div>
+            <div className="text-text-tertiary">
+              不需花上萬元補習，一樣從頭到尾完整複習，知識一次打包帶走
             </div>
           </div>
           <div className="space-y-1">
@@ -53,7 +54,7 @@ function FeaturesSection() {
               隨時隨地自主學習
             </div>
             <div className="text-text-tertiary">
-              全裝置離線支援，自訂進度，零碎時間也能高效複習，隨走隨看，不浪費任何時間
+              支援手機、平板與電腦，自訂進度，零碎時間也能高效複習，隨走隨看，不浪費任何時間
             </div>
           </div>
           <div className="space-y-1">
@@ -61,7 +62,7 @@ function FeaturesSection() {
               名師親授，權威可靠
             </div>
             <div className="text-text-tertiary">
-              暢銷參考書作者授課，精準掌握命題趨勢，考點命中率高，雙重保障成績
+              最懂學測的暢銷參考書作者授課，精準掌握命題趨勢，考點命中率高，雙重保障成績
             </div>
           </div>
         </div>

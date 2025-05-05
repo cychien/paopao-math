@@ -1,7 +1,33 @@
 import checkIconSrc from "~/assets/check.svg";
 import { Button } from "~/components/ui/Button";
+import { useFlash } from "~/context/flash-context";
 
 function PricingCard() {
+  const { flash, targetRef } = useFlash();
+
+  const handleClick = () => {
+    if (!targetRef.current) return;
+
+    // 1️⃣ 監聽目標進入視窗
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => flash(), 120); // 2️⃣ 進入視窗 → 閃一下
+          io.disconnect(); // 只做一次就好
+        }
+      },
+      { threshold: 0.6 } // 區塊 60 % 出現在畫面才算可視
+    );
+
+    io.observe(targetRef.current);
+
+    // 3️⃣ 平滑捲動到目標
+    targetRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "center", // 視窗置中，可按需求改 'nearest'
+    });
+  };
+
   return (
     <div
       className="p-6 lg:p-8 rounded-2xl bg-bg-primary border border-[rgba(0,0,0,0.08)]"
@@ -10,35 +36,53 @@ function PricingCard() {
           "0px 12px 16px -4px var(--Colors-Effects-Shadows-shadow-lg_01, rgba(10, 13, 18, 0.08)), 0px 4px 6px -2px var(--Colors-Effects-Shadows-shadow-lg_02, rgba(10, 13, 18, 0.03)), 0px 2px 2px -1px var(--Colors-Effects-Shadows-shadow-lg_03, rgba(10, 13, 18, 0.04))",
       }}
     >
-      <div className="lg:flex lg:justify-between">
-        <div className="lg:hidden font-inter font-semibold space-x-0.5 flex items-start">
-          <span className="text-4xl pt-1.5 leading-[44px]">NT$</span>
-          <span className="text-5xl leading-[60px]">4999</span>
+      <div className="lg:flex lg:items-center lg:justify-between">
+        <div className="block lg:hidden">
+          <div className="lg:hidden font-inter font-semibold space-x-0.5 flex items-start">
+            <span className="text-4xl pt-1.5 leading-[44px]">NT$</span>
+            <span className="text-5xl leading-[60px]">4,999</span>
+          </div>
+          <div className="text-gray-600 -translate-y-1 line-through">
+            NT$ 7,999
+          </div>
         </div>
         <div className="mt-4 lg:mt-0">
           <div className="flex space-x-2 items-center">
             <div className="text-xl font-semibold leading-[30px]">
-              終身暢學版
+              學測總複習班
             </div>
             <div className="rounded-full bg-[#FEFAF1] border border-[#F7D07D] text-[#825B08] text-sm font-medium py-0.5 px-2.5">
               早鳥價
             </div>
           </div>
           <p className="text-text-tertiary mt-1 lg:mt-0.5">
-            永久解鎖全課程與未來功能更新
+            解鎖全課程與未來功能更新
           </p>
         </div>
-        <div className="hidden lg:flex font-inter font-semibold space-x-0.5">
-          <span className="text-4xl pt-2 leading-[44px]">NT$</span>
-          <span className="text-6xl leading-[72px]">4999</span>
+        <div className="hidden lg:block">
+          <div className="flex font-inter font-semibold space-x-0.5">
+            <span className="text-4xl pt-2 leading-[44px]">NT$</span>
+            <span className="text-6xl leading-[72px]">4,999</span>
+          </div>
+          <div className="text-gray-600 text-right -translate-y-1 line-through">
+            NT$ 7,999
+          </div>
         </div>
       </div>
 
-      <div className="mt-8 mb-8 lg:mt-6 lg:mb-6 h-px bg-border-secondary" />
+      <div className="-mx-6 lg:-mx-8 mt-8 mb-8 lg:mt-6 lg:mb-6 h-px bg-border-secondary" />
 
       <div>
         <div className="font-semibold">解鎖內容</div>
         <div className="mt-6 grid lg:grid-cols-2 lg:gap-x-8 gap-y-4">
+          <div className="flex space-x-3 items-center">
+            <img
+              src={checkIconSrc}
+              alt="check icon"
+              className="w-6 h-6 flex-shrink-0"
+            />
+            <span className="text-text-tertiary">實體學習參考書</span>
+          </div>
           <div className="flex space-x-3 items-center">
             <img
               src={checkIconSrc}
@@ -63,7 +107,7 @@ function PricingCard() {
               alt="check icon"
               className="w-6 h-6 flex-shrink-0"
             />
-            <span className="text-text-tertiary">題庫持續更新</span>
+            <span className="text-text-tertiary">模擬測驗及精選試題</span>
           </div>
           <div className="flex space-x-3 items-center">
             <img
@@ -84,9 +128,11 @@ function PricingCard() {
         </div>
       </div>
 
-      <div className="mt-8 mb-6 lg:mt-10 lg:mb-8 h-px bg-border-secondary" />
+      <div className="-mx-6 lg:-mx-8 mt-8 mb-6 lg:mt-10 lg:mb-8 h-px bg-border-secondary" />
 
-      <Button className="w-full py-3 mb-2">搶先卡位</Button>
+      <Button className="w-full py-3 mb-2" onClick={handleClick}>
+        搶先卡位
+      </Button>
     </div>
   );
 }

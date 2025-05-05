@@ -11,16 +11,14 @@ function FAQ() {
       <AccordionItem value="item-1">
         <AccordionTrigger>課程什麼時候開？</AccordionTrigger>
         <AccordionContent>
-          預計於 <span className="font-semibold">7 月中旬</span>{" "}
-          正式開課，隨時可前往{" "}
-          <span className="font-semibold underline">課程製作進度</span>{" "}
-          頁面查看最新進度
+          課程預計在 <span className="font-semibold">7 月中旬</span>{" "}
+          正式上線，一開課我們就會第一時間通知你，確保你不會錯過
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-2">
         <AccordionTrigger>購買後可以退款嗎？</AccordionTrigger>
         <AccordionContent>
-          目前不提供退款服務，請在購買前確認是否有興趣學習本課程
+          可以的，購買後 7 日內皆可申請全額退款，無需提供任何理由
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-3">
@@ -38,7 +36,7 @@ function FAQ() {
       <AccordionItem value="item-5">
         <AccordionTrigger>遇到技術或學習問題怎麼辦？</AccordionTrigger>
         <AccordionContent>
-          遇到任何問題都可以在「課程討論區」發問，或是加入我們的 Discord
+          遇到任何問題都可以在內部的「精選試題頁」中發問
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-6">

@@ -9,14 +9,14 @@ function PricingSection() {
           收費
         </h3>
         <div className="mt-3 text-3xl lg:text-4xl font-semibold">
-          一次付清，永久解鎖
+          年費買斷，全年暢學與持續更新
         </div>
         <p className="mt-4 lg:mt-5 text-lg text-text-tertiary">
-          只要 <span className="font-inter">NT$4999</span>
-          ，一次買斷即可永久觀看全部內容，無須額外訂閱費用
+          只要 <span className="font-inter">NT$4,999</span> /年 ，買斷全年內容 +
+          更新，無需額外訂閱
         </p>
         <div className="mt-12 lg:mt-16 lg:flex lg:space-x-16">
-          <div className="lg:w-[560px] lg:max-w-[560px] lg:py-8">
+          <div className="lg:w-[400px] lg:max-w-[400px] xl:w-[560px] xl:max-w-[560px] lg:py-8">
             <FAQ />
           </div>
           <div className="flex-1 mt-12 lg:mt-0">

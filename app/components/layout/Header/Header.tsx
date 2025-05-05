@@ -4,10 +4,12 @@ import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { Menu, X } from "lucide-react";
 import logoSrc from "~/assets/logo-with-text.png";
 import { Button } from "~/components/ui/Button";
+import { useFlash } from "~/context/flash-context";
 
 function Header() {
   const [isMenuPoppedOut, setIsMenuPoppedOut] = React.useState(false);
   const headerRef = React.useRef<HTMLDivElement>(null);
+  const { flash } = useFlash();
 
   return (
     <div ref={headerRef} className="relative isolate z-10">
@@ -21,14 +23,16 @@ function Header() {
           </div>
 
           <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-5">
-            <a href="/" className="font-medium text-text-tertiary">
+            {/* <a href="/" className="font-medium text-text-tertiary">
               課程製作進度
-            </a>
-            <Button size="lg">搶先卡位</Button>
+            </a> */}
+            <Button size="lg" onClick={flash}>
+              搶先卡位
+            </Button>
           </div>
 
           {/* Mobile menu */}
-          <div className="flex flex-1 justify-end space-x-3 lg:hidden">
+          {/* <div className="flex flex-1 justify-end space-x-3 lg:hidden">
             <Dialog.Root
               open={isMenuPoppedOut}
               onOpenChange={(open) => {
@@ -68,7 +72,6 @@ function Header() {
                       className="container mx-auto divide-border-secondary"
                     >
                       <NavigationMenu.List className="space-y-2">
-                        {/* Simple item */}
                         <NavigationMenu.Item>
                           <NavigationMenu.Link
                             href="#"
@@ -83,7 +86,7 @@ function Header() {
                 </Dialog.Content>
               </Dialog.Portal>
             </Dialog.Root>
-          </div>
+          </div> */}
         </NavigationMenu.Root>
       </header>
     </div>
