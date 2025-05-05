@@ -26,6 +26,7 @@
     "tailwind-merge": "^3.2.0"
   },
   "devDependencies": {
+    "@flydotio/dockerfile": "^0.7.10",
     "@remix-run/dev": "^2.16.5",
     "@tailwindcss/postcss": "^4.1.4",
     "@types/react": "^18.2.20",
