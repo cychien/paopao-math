@@ -15,7 +15,7 @@ function HeroSection() {
             <div className="mb-5">一堂課</div>
             帶你迎戰學測數學
           </div>
-          <span className="lg:hidden">一堂課，帶你完整複習高中數學</span>
+          <span className="lg:hidden">一堂課，帶你迎戰學測數學</span>
         </h1>
         <p className="text-text-tertiary text-xl leading-[31px] mt-6">
           多年暢銷參考書作者親自編授，助你勇奪高分的總複習課程
