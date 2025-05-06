@@ -1,11 +1,28 @@
-import { Button } from "~/components/ui/Button";
-import { Input } from "~/components/ui/Input";
 import { BigFeatures } from "./BigFeatures";
 import { useFlash } from "~/context/flash-context";
 import { cn } from "~/utils/style";
+import { FormField } from "~/components/ui/form-field/form-field";
+import { Form, useActionData } from "@remix-run/react";
+import { conform, useForm } from "@conform-to/react";
+import { getFieldsetConstraint, parse } from "@conform-to/zod";
+import { CreateContactActionType, EmailFormSchema } from "../../route";
+import { useIsPending } from "~/utils/misc";
+import { StatusButton } from "~/components/ui/status-button";
 
 function HeroSection() {
+  const actionData = useActionData<CreateContactActionType>();
+  const isPending = useIsPending();
+  const isSuccess = actionData?.status === "success";
+
   const { isHighlighted, targetRef } = useFlash();
+  const [form, fields] = useForm({
+    id: "email-form",
+    constraint: getFieldsetConstraint(EmailFormSchema),
+    lastSubmission: actionData?.submission,
+    onValidate({ formData }) {
+      return parse(formData, { schema: EmailFormSchema });
+    },
+  });
 
   return (
     <section className="container mx-auto pt-16 pb-16 lg:pt-24 lg:pb-32 lg:flex items-end lg:space-x-8">
@@ -33,45 +50,62 @@ function HeroSection() {
           isHighlighted ? "bg-brand-100" : "bg-brand-50"
         )}
       >
-        <div>
-          <div className="text-sm font-semibold text-gray-500">
-            留下你的 Email，搶先拿到
+        {isSuccess ? (
+          <div className="lg:w-[300px] xl:w-[400px] space-y-3">
+            <p className="font-medium">🎉 感謝你的訂閱！</p>
+            <p className="text-gray-700">
+              我們已成功收到你的 Email，非常高興你對本課程感興趣。
+              之後，我們會寄送開課通知和相關總複習資料，請放心，我們不會發送任何垃圾郵件。
+            </p>
           </div>
-          <div className="text-lg font-semibold mt-0.5">
-            早鳥價連結 + 定期總複習練習題
-          </div>
-        </div>
-
-        <form className="mt-6">
-          <div className="space-y-3">
-            <div className="space-y-1.5">
-              <div className="text-sm text-gray-700 font-medium">Email *</div>
-              <Input
-                placeholder="abc@gmail.com"
-                className="lg:w-[300px] xl:w-[400px]"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <div className="text-sm text-gray-700 font-medium">
-                就讀學校 *
+        ) : (
+          <>
+            <div>
+              <div className="text-sm font-semibold text-gray-500">
+                留下你的 Email，搶先拿到
               </div>
-              <Input
-                placeholder="高雄市三民高中"
-                className="lg:w-[300px] xl:w-[400px]"
-              />
+              <div className="text-lg font-semibold mt-0.5">
+                早鳥價連結 + 定期總複習練習題
+              </div>
             </div>
-          </div>
 
-          <Button className="mt-4 w-full lg:mt-6 lg:w-auto">搶先卡位</Button>
-        </form>
+            <Form method="POST" className="mt-6" {...form.props}>
+              <div className="space-y-3">
+                <FormField
+                  labelProps={{ children: "Email *" }}
+                  inputProps={{
+                    ...conform.input(fields.email),
+                    placeholder: "abc@gmail.com",
+                  }}
+                  errors={fields.email.errors}
+                  className="grid gap-1.5 lg:w-[300px] xl:w-[400px]"
+                />
+                <FormField
+                  labelProps={{ children: "就讀學校 *" }}
+                  inputProps={{
+                    ...conform.input(fields.schoolName),
+                    placeholder: "高雄市三民高中",
+                  }}
+                  errors={fields.schoolName.errors}
+                  className="grid gap-1.5 lg:w-[300px] xl:w-[400px]"
+                />
+              </div>
 
-        {/* <div className="flex lg:space-x-4">
-          <Input placeholder="你的 email" className="lg:max-w-[360px]" />
-        </div>
-        <div className="mt-1.5 text-sm text-text-tertiary">
-          加入預售名單，享早鳥優惠價，開課立刻通知你
-        </div>
-        <Button className="block lg:hidden mt-4 w-full py-3">搶先卡位</Button> */}
+              <StatusButton
+                type="submit"
+                status={
+                  isPending
+                    ? "pending"
+                    : (actionData?.status as "success" | "error") ?? "idle"
+                }
+                disabled={isPending}
+                className="mt-4 w-full lg:mt-6 lg:w-auto"
+              >
+                搶先卡位
+              </StatusButton>
+            </Form>
+          </>
+        )}
       </div>
     </section>
   );

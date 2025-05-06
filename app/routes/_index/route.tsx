@@ -1,10 +1,18 @@
-import type { MetaFunction } from "@remix-run/node";
+import {
+  json,
+  type ActionFunctionArgs,
+  type MetaFunction,
+} from "@remix-run/node";
 import { HeroSection } from "./components/HeroSection";
 import { FeaturesSection } from "./components/FeaturesSection";
 import { TeacherSection } from "./components/TeacherSection";
 import { PricingSection } from "./components/PricingSection";
 import { CallToActionSection } from "./components/CallToActionSection";
 import { FooterSection } from "./components/FooterSection";
+import { parse } from "@conform-to/zod";
+import { EmailSchema, SchoolNameSchema } from "~/utils/validation";
+import { z } from "zod";
+import { createContact } from "~/services/loop";
 
 export const meta: MetaFunction = () => {
   return [
@@ -16,6 +24,40 @@ export const meta: MetaFunction = () => {
     },
   ];
 };
+
+export const EmailFormSchema = z.object({
+  email: EmailSchema,
+  schoolName: SchoolNameSchema,
+});
+
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const submission = await parse(formData, { schema: EmailFormSchema });
+
+  if (Object.keys(submission.error).length > 0) {
+    return json({ status: "error", submission } as const, {
+      status: 400,
+    });
+  }
+
+  const result = await createContact({
+    email: submission.value!.email,
+    schoolName: submission.value!.schoolName,
+    subscribed: true,
+  });
+
+  console.log({ result });
+
+  if (!result.success) {
+    return json({ status: "error", submission } as const, {
+      status: 500,
+    });
+  }
+
+  return json({ status: "success", submission });
+}
+
+export type CreateContactActionType = typeof action;
 
 export default function Index() {
   return (
