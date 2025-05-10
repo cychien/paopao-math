@@ -13,6 +13,7 @@ import { parse } from "@conform-to/zod";
 import { EmailSchema, SchoolNameSchema } from "~/utils/validation";
 import { z } from "zod";
 import { createContact } from "~/services/loop";
+import { checkHoneypot } from "~/utils/honeypot.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -32,6 +33,7 @@ export const EmailFormSchema = z.object({
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
+  await checkHoneypot(formData);
   const submission = await parse(formData, { schema: EmailFormSchema });
 
   if (Object.keys(submission.error).length > 0) {

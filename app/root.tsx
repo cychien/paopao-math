@@ -1,15 +1,19 @@
 import {
+  json,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
+import { HoneypotProvider } from "remix-utils/honeypot/react";
 
 import "./tailwind.css";
 import { Header } from "./components/layout/Header";
 import { FlashProvider } from "./context/flash-context";
+import { honeypot } from "./utils/honeypot.server";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -25,7 +29,14 @@ export const links: LinksFunction = () => [
   { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
 ];
 
+export async function loader() {
+  const honeyProps = await honeypot.getInputProps();
+  return json({ honeyProps });
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  const data = useLoaderData<typeof loader>();
+
   return (
     <html lang="en">
       <head>
@@ -35,13 +46,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <FlashProvider>
-          {/* All pages has minimal height 100% */}
-          <div className="flex flex-col h-full">
-            <Header />
-            <div className="flex-1">{children}</div>
-          </div>
-        </FlashProvider>
+        <HoneypotProvider {...data.honeyProps}>
+          <FlashProvider>
+            {/* All pages has minimal height 100% */}
+            <div className="flex flex-col h-full">
+              <Header />
+              <div className="flex-1">{children}</div>
+            </div>
+          </FlashProvider>
+        </HoneypotProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

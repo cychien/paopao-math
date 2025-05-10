@@ -8,6 +8,7 @@ import { getFieldsetConstraint, parse } from "@conform-to/zod";
 import { CreateContactActionType, EmailFormSchema } from "../../route";
 import { useIsPending } from "~/utils/misc";
 import { StatusButton } from "~/components/ui/status-button";
+import { HoneypotInputs } from "remix-utils/honeypot/react";
 
 function HeroSection() {
   const actionData = useActionData<CreateContactActionType>();
@@ -70,6 +71,7 @@ function HeroSection() {
             </div>
 
             <Form method="POST" className="mt-6" {...form.props}>
+              <HoneypotInputs />
               <div className="space-y-3">
                 <FormField
                   labelProps={{ children: "Email *" }}
