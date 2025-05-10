@@ -46,8 +46,6 @@ export async function action({ request }: ActionFunctionArgs) {
     subscribed: true,
   });
 
-  console.log({ result });
-
   if (!result.success) {
     return json({ status: "error", submission } as const, {
       status: 500,

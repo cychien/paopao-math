@@ -36,8 +36,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <FlashProvider>
-          <Header />
-          {children}
+          {/* All pages has minimal height 100% */}
+          <div className="flex flex-col h-full">
+            <Header />
+            <div className="flex-1">{children}</div>
+          </div>
         </FlashProvider>
         <ScrollRestoration />
         <Scripts />

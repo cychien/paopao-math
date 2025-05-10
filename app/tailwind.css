@@ -102,6 +102,10 @@
   }
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
   color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;

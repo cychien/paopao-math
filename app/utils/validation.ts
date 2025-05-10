@@ -11,3 +11,5 @@ export const EmailSchema = z
 export const SchoolNameSchema = z
   .string({ required_error: "學校名稱 必填" })
   .min(3, { message: "學校名稱 格式錯誤" });
+
+export const TempPasswordSchema = z.string({ required_error: "密碼必填" });

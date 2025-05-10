@@ -5,10 +5,12 @@ import { Menu, X } from "lucide-react";
 import logoSrc from "~/assets/logo-with-text.png";
 import { Button } from "~/components/ui/Button";
 import { useFlash } from "~/context/flash-context";
+import { useLocation } from "@remix-run/react";
 
 function Header() {
   const [isMenuPoppedOut, setIsMenuPoppedOut] = React.useState(false);
   const headerRef = React.useRef<HTMLDivElement>(null);
+  const location = useLocation();
   const { flash } = useFlash();
 
   return (
@@ -22,14 +24,16 @@ function Header() {
             </a>
           </div>
 
-          <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-5">
-            {/* <a href="/" className="font-medium text-text-tertiary">
+          {location.pathname === "/" && (
+            <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-5">
+              {/* <a href="/" className="font-medium text-text-tertiary">
               課程製作進度
             </a> */}
-            <Button size="lg" onClick={flash}>
-              搶先卡位
-            </Button>
-          </div>
+              <Button size="lg" onClick={flash}>
+                搶先卡位
+              </Button>
+            </div>
+          )}
 
           {/* Mobile menu */}
           {/* <div className="flex flex-1 justify-end space-x-3 lg:hidden">
