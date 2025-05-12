@@ -26,7 +26,7 @@ function HeroSection() {
   });
 
   return (
-    <section className="container mx-auto pt-16 pb-16 lg:pt-24 lg:pb-32 lg:flex items-end lg:space-x-8">
+    <section className="container mx-auto pt-12 md:pt-16 pb-16 lg:pt-24 lg:pb-32 lg:flex items-end lg:space-x-8">
       <div className="flex-1">
         <h1 className="text-primary font-bold text-4xl leading-[44px] lg:text-6xl lg:leading-[72px] tracking-[-1.2px]">
           <div className="hidden lg:block tracking-[1.2px]">

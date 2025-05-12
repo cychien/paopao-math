@@ -1,42 +1,96 @@
 import * as React from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { Menu, X } from "lucide-react";
+import { Menu, SquarePlay, X } from "lucide-react";
 import logoSrc from "~/assets/logo-with-text.png";
-import { Button } from "~/components/ui/Button";
-import { useFlash } from "~/context/flash-context";
-import { useLocation } from "@remix-run/react";
+import { Button, buttonVariant } from "~/components/ui/Button";
+import { redirect, useLocation } from "@remix-run/react";
+import { Badge } from "~/components/ui/badge";
+import { cn } from "~/utils/style";
+import { PlayCircleSolid } from "~/components/icons/PlayCircleSolid";
 
 function Header() {
   const [isMenuPoppedOut, setIsMenuPoppedOut] = React.useState(false);
   const headerRef = React.useRef<HTMLDivElement>(null);
   const location = useLocation();
-  const { flash } = useFlash();
 
   return (
     <div ref={headerRef} className="relative isolate z-10">
-      <header className="bg-white py-4.5">
+      <header
+        className={cn("bg-white py-4.5", {
+          "border-b border-gray-200": location.pathname !== "/",
+        })}
+      >
         <NavigationMenu.Root className="container mx-auto flex items-center">
           <div className="flex items-center space-x-10">
             <a href="/">
               <span className="sr-only">寶哥高中數學</span>
               <img src={logoSrc} alt="Logo" className="h-[37px] w-auto" />
             </a>
+            <NavigationMenu.List className="hidden lg:flex lg:space-x-8">
+              <NavigationMenu.Item className="flex items-center space-x-1.5">
+                <NavigationMenu.Link
+                  href="/course/content"
+                  className={cn(
+                    "font-medium text-gray-700 hover:text-gray-900 group flex items-center space-x-1.5 transition-colors",
+                    {
+                      "text-gray-900": location.pathname === "/course/content",
+                    }
+                  )}
+                >
+                  <PlayCircleSolid
+                    className={cn(
+                      "text-gray-400 group-hover:text-[#c1272d] transition-colors",
+                      {
+                        "text-[#c1272d]":
+                          location.pathname === "/course/content",
+                      }
+                    )}
+                  />
+                  <span className="-translate-y-px">免費試讀</span>
+                </NavigationMenu.Link>
+              </NavigationMenu.Item>
+            </NavigationMenu.List>
           </div>
 
-          {location.pathname === "/" && (
-            <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-5">
-              {/* <a href="/" className="font-medium text-text-tertiary">
-              課程製作進度
-            </a> */}
-              <Button size="lg" onClick={flash}>
-                搶先卡位
-              </Button>
-            </div>
-          )}
+          <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-5 lg:-translate-y-[0.5px]">
+            <a
+              href="/login"
+              className={cn(
+                buttonVariant({ variant: "link" }),
+                "text-gray-400 font-medium p-0 hover:text-gray-600"
+              )}
+            >
+              登入
+            </a>
+          </div>
+
+          {/* <a href="/" className="font-medium text-text-tertiary">
+          課程製作進度
+        </a> */}
 
           {/* Mobile menu */}
-          {/* <div className="flex flex-1 justify-end space-x-3 lg:hidden">
+          <div className="flex flex-1 justify-end space-x-3 lg:hidden">
+            <NavigationMenu.Link
+              href="/course/content"
+              className={cn(
+                "font-medium text-gray-700 hover:text-gray-900 group flex items-center space-x-1.5 transition-colors",
+                {
+                  "text-gray-900": location.pathname === "/course/content",
+                }
+              )}
+            >
+              <PlayCircleSolid
+                className={cn(
+                  "text-gray-400 group-hover:text-[#c1272d] transition-colors",
+                  {
+                    "text-[#c1272d]": location.pathname === "/course/content",
+                  }
+                )}
+              />
+              <span className="-translate-y-px">免費試讀</span>
+            </NavigationMenu.Link>
+
             <Dialog.Root
               open={isMenuPoppedOut}
               onOpenChange={(open) => {
@@ -46,12 +100,12 @@ function Header() {
             >
               <Dialog.Trigger asChild>
                 <Button
-                  className="translate-x-1"
                   variant="ghost"
                   iconButton
                   onClick={() => {
                     setIsMenuPoppedOut((prev) => !prev);
                   }}
+                  className="h-9"
                 >
                   {!isMenuPoppedOut ? (
                     <>
@@ -78,10 +132,13 @@ function Header() {
                       <NavigationMenu.List className="space-y-2">
                         <NavigationMenu.Item>
                           <NavigationMenu.Link
-                            href="#"
-                            className="-mx-3 block h-full rounded-lg px-3 py-2 font-medium text-text-tertiary hover:bg-bg-primary-hover"
+                            href="/login"
+                            className={cn(
+                              buttonVariant({ variant: "link" }),
+                              "-mx-3 block h-full rounded-lg px-3 py-2 font-medium text-text-tertiary hover:bg-bg-primary-hover"
+                            )}
                           >
-                            課程製作進度
+                            登入
                           </NavigationMenu.Link>
                         </NavigationMenu.Item>
                       </NavigationMenu.List>
@@ -90,7 +147,7 @@ function Header() {
                 </Dialog.Content>
               </Dialog.Portal>
             </Dialog.Root>
-          </div> */}
+          </div>
         </NavigationMenu.Root>
       </header>
     </div>
