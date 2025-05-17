@@ -14,7 +14,7 @@ export default function Layout() {
       <div className="container mx-auto h-full hidden lg:block">
         <div className="-mx-5 pr-5 h-full">
           <div className="flex h-full">
-            <aside className="w-[252px] px-5 py-9 border-l border-r border-gray-200 h-full">
+            <aside className="w-[252px] px-5 py-9 border-l border-r border-gray-200 h-full sticky top-0 bottom-0 self-start max-h-[calc(100dvh)]">
               <div className="text-gray-500 text-sm font-medium">
                 學測總複習班
               </div>
@@ -25,13 +25,13 @@ export default function Layout() {
                     icon={nav.icon}
                     label={nav.label}
                     link={nav.link}
-                    isActive={location.pathname === nav.link}
+                    isActive={location.pathname.startsWith(nav.link)}
                   />
                 ))}
               </div>
             </aside>
 
-            <div className="w-12 col-start-2 row-span-5 row-start-1 bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5" />
+            <div className="w-8 col-start-2 row-span-5 row-start-1 bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5" />
 
             <main className="flex-1 pl-12 py-9 border-l border-gray-200">
               <Outlet />
@@ -41,7 +41,7 @@ export default function Layout() {
       </div>
 
       <div className="lg:hidden">
-        <div className="border-b border-gray-200 overflow-x-auto">
+        <div className="border-b border-gray-200 overflow-x-auto sticky top-0 bg-white">
           <div className="container mx-auto flex space-x-4 md:space-x-6">
             {navigations.map((nav) => (
               <a
@@ -54,7 +54,9 @@ export default function Layout() {
                     className={cn(
                       "size-5 text-gray-400 group-hover:text-brand-500 transition-colors",
                       {
-                        "text-brand-500": location.pathname === nav.link,
+                        "text-brand-500": location.pathname.startsWith(
+                          nav.link
+                        ),
                       }
                     )}
                   />
@@ -62,7 +64,7 @@ export default function Layout() {
                     className={cn(
                       "-translate-px group-hover:text-gray-700 transition-colors",
                       {
-                        "text-gray-700": location.pathname === nav.link,
+                        "text-gray-700": location.pathname.startsWith(nav.link),
                       }
                     )}
                   >
@@ -70,14 +72,14 @@ export default function Layout() {
                   </span>
                 </span>
 
-                {location.pathname === nav.link && (
+                {location.pathname.startsWith(nav.link) && (
                   <div className="absolute inset-x-0 bottom-0 h-[3px] bg-brand-500" />
                 )}
               </a>
             ))}
           </div>
         </div>
-        <div className="col-start-2 row-span-5 row-start-1 bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5 h-12" />
+        <div className="col-start-2 row-span-5 row-start-1 bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5 h-8" />
         <main className="border-t border-gray-200">
           <div className="container mx-auto py-4">
             <Outlet />

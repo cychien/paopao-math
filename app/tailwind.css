@@ -102,6 +102,31 @@
   }
 }
 
+@utility divide-x-dot-* {
+  /* Note: Using `relative` here is not clean because this causes unexpected layout side-effects */
+  :where(& > :not(:last-child)) {
+    @apply relative;
+  }
+
+  :where(&.divide-x-reverse > :not(:last-child))::after {
+    --left: 0;
+    --right: auto; 
+  }
+
+  :where(& > :not(:last-child))::after {
+    --diameter: calc(--value(number, [number]) * 1px);
+    --right: 0;
+    --left: auto;
+
+    @apply inline-block absolute rounded-full top-1/2 -translate-y-1/2 translate-x-1/2 content-[""];
+    width: var(--diameter);
+    height: var(--diameter);
+    right: var(--right);
+    left: var(--left);
+    background: var(--color-gray-200);
+  }
+}
+
 html, body {
   height: 100%;
 }

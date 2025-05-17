@@ -24,6 +24,7 @@
     "@remix-run/serve": "^2.16.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "format-duration": "^3.0.2",
     "framer-motion": "^12.11.0",
     "isbot": "^4.1.0",
     "lucide-react": "^0.509.0",
