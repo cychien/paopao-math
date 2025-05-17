@@ -73,6 +73,10 @@ function getChapter({
   const lesson = lessonsMap[lessonSlug];
   const chapter = lessonsMap[lessonSlug].chaptersMap[chapterSlug];
 
+  const index = lesson.chapters.findIndex((c) => c.slug === chapterSlug);
+  const nextChapter =
+    index + 1 < lesson.chapters.length ? lesson.chapters[index + 1] : null;
+
   return {
     lessonMeta: {
       name: lesson.name,
@@ -83,6 +87,7 @@ function getChapter({
       })),
     },
     ...chapter,
+    nextChapter,
   };
 }
 

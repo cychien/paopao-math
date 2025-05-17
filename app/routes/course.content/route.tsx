@@ -1,9 +1,23 @@
-import { json, useLoaderData } from "@remix-run/react";
+import { json, redirect, useLoaderData } from "@remix-run/react";
 import { Clock } from "lucide-react";
 import { getSyllabus } from "~/utils/course.server";
 import format from "format-duration";
+import { LoaderFunctionArgs } from "@remix-run/node";
+import { canAccess } from "~/utils/permission";
+import { trialPermissions } from "~/data/permission";
+import { safeRedirect } from "remix-utils/safe-redirect";
 
-export function loader() {
+export function loader({ request }: LoaderFunctionArgs) {
+  const url = new URL(request.url);
+  const path = url.pathname;
+  const ok = canAccess({
+    permissions: trialPermissions,
+    pathname: path,
+  });
+  if (!ok) {
+    return redirect(safeRedirect("/"));
+  }
+
   const syllabus = getSyllabus();
   return json({ syllabus });
 }
@@ -13,11 +27,11 @@ export default function Page() {
 
   return (
     <div className="divide-y-1 divide-gray-100">
-      <div className="pb-8">
+      <div className="pb-6">
         <h1 className="text-sm text-gray-500">課程</h1>
         <h2 className="text-xl font-semibold mt-1">課程總覽</h2>
       </div>
-      <div className="pt-8 space-y-8">
+      <div className="pt-6 space-y-8">
         {syllabus.map((lesson, index) => (
           <div key={lesson.slug} className="max-xl:space-y-5 xl:flex gap-16">
             <div>

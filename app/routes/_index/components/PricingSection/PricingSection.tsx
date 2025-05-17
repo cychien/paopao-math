@@ -5,7 +5,7 @@ function PricingSection() {
   return (
     <section className="bg-bg-secondary py-16 lg:py-24">
       <div className="container mx-auto">
-        <h3 className="font-semibold text-text-brand-secondary text-sm lg:text-base">
+        <h3 className="font-semibold text-brand-500 text-sm lg:text-base">
           收費
         </h3>
         <div className="mt-3 text-3xl lg:text-4xl font-semibold">

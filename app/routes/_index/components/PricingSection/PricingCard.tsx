@@ -115,7 +115,7 @@ function PricingCard() {
               alt="check icon"
               className="w-6 h-6 flex-shrink-0"
             />
-            <span className="text-text-tertiary">多裝置支援</span>
+            <span className="text-text-tertiary">歷屆大考試題及講解</span>
           </div>
           <div className="flex space-x-3 items-center">
             <img
@@ -123,7 +123,7 @@ function PricingCard() {
               alt="check icon"
               className="w-6 h-6 flex-shrink-0"
             />
-            <span className="text-text-tertiary">平台功能持續更新</span>
+            <span className="text-text-tertiary">多裝置支援</span>
           </div>
         </div>
       </div>

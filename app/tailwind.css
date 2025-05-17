@@ -97,8 +97,16 @@
 @utility container {
   padding-inline: 16px;
   
+  @variant sm {
+    padding-inline: 24px;
+  }
+
   @variant xl {
     padding-inline: 32px;
+    
+    .wide & {
+      max-width: 96rem;
+    }
   }
 }
 

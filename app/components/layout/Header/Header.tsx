@@ -34,8 +34,7 @@ function Header() {
                   className={cn(
                     "font-medium text-gray-700 hover:text-gray-900 group flex items-center space-x-1.5 transition-colors",
                     {
-                      "text-gray-900":
-                        location.pathname.startsWith("/course/content"),
+                      "text-gray-900": location.pathname.startsWith("/course"),
                     }
                   )}
                 >
@@ -44,7 +43,7 @@ function Header() {
                       "text-gray-400 group-hover:text-[#c1272d] transition-colors",
                       {
                         "text-[#c1272d]":
-                          location.pathname.startsWith("/course/content"),
+                          location.pathname.startsWith("/course"),
                       }
                     )}
                   />
@@ -77,8 +76,7 @@ function Header() {
               className={cn(
                 "font-medium text-gray-700 hover:text-gray-900 group flex items-center space-x-1.5 transition-colors",
                 {
-                  "text-gray-900":
-                    location.pathname.startsWith("/course/content"),
+                  "text-gray-900": location.pathname.startsWith("/course"),
                 }
               )}
             >
@@ -86,8 +84,7 @@ function Header() {
                 className={cn(
                   "text-gray-400 group-hover:text-[#c1272d] transition-colors",
                   {
-                    "text-[#c1272d]":
-                      location.pathname.startsWith("/course/content"),
+                    "text-[#c1272d]": location.pathname.startsWith("/course"),
                   }
                 )}
               />

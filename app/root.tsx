@@ -6,6 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useLocation,
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
 import { HoneypotProvider } from "remix-utils/honeypot/react";
@@ -14,6 +15,7 @@ import "./tailwind.css";
 import { Header } from "./components/layout/Header";
 import { FlashProvider } from "./context/flash-context";
 import { honeypot } from "./utils/honeypot.server";
+import { cn } from "./utils/style";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -36,6 +38,7 @@ export async function loader() {
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const data = useLoaderData<typeof loader>();
+  const location = useLocation();
 
   return (
     <html lang="en">
@@ -49,7 +52,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <HoneypotProvider {...data.honeyProps}>
           <FlashProvider>
             {/* All pages has minimal height 100% */}
-            <div className="flex flex-col h-full">
+            <div
+              className={cn("flex flex-col h-full", {
+                wide: location.pathname.startsWith("/course"),
+              })}
+            >
               <Header />
               <div className="flex-1">{children}</div>
             </div>
