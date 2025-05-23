@@ -41,7 +41,7 @@ export default function Layout() {
       </div>
 
       <div className="lg:hidden">
-        <div className="border-b border-gray-200 overflow-x-auto sticky top-0 bg-white">
+        <div className="border-b border-gray-200 overflow-x-auto sticky top-0 bg-white z-10">
           <div className="container mx-auto flex space-x-3 sm:space-x-4 md:space-x-4">
             {navigations.map((nav) => (
               <a
@@ -80,7 +80,7 @@ export default function Layout() {
           </div>
         </div>
         <div className="col-start-2 row-span-5 row-start-1 bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5 h-8" />
-        <main className="border-t border-gray-200">
+        <main className="isolate border-t border-gray-200">
           <div className="container mx-auto py-6">
             <Outlet />
           </div>

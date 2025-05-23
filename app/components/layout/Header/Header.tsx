@@ -15,7 +15,7 @@ function Header() {
   const location = useLocation();
 
   return (
-    <div ref={headerRef} className="relative isolate z-10">
+    <div ref={headerRef} className="relative isolate z-20">
       <header
         className={cn("bg-white py-4.5", {
           "border-b border-gray-200": location.pathname !== "/",
@@ -27,7 +27,7 @@ function Header() {
               <span className="sr-only">寶哥高中數學</span>
               <img src={logoSrc} alt="Logo" className="h-[37px] w-auto" />
             </a>
-            <NavigationMenu.List className="hidden lg:flex lg:space-x-8">
+            <NavigationMenu.List className="hidden lg:flex lg:space-x-8 -translate-y-px">
               <NavigationMenu.Item className="flex items-center space-x-1.5">
                 <NavigationMenu.Link
                   href="/course/content"
@@ -53,7 +53,7 @@ function Header() {
             </NavigationMenu.List>
           </div>
 
-          <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-5 lg:-translate-y-[0.5px]">
+          <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-5 lg:-translate-y-[2px]">
             <a
               href="/login"
               className={cn(
@@ -70,7 +70,7 @@ function Header() {
         </a> */}
 
           {/* Mobile menu */}
-          <div className="flex flex-1 justify-end space-x-3 lg:hidden">
+          <div className="flex flex-1 justify-end space-x-3 lg:hidden -translate-y-[0.5px]">
             <NavigationMenu.Link
               href="/course/content"
               className={cn(
@@ -124,7 +124,7 @@ function Header() {
                 <Dialog.Overlay />
                 <Dialog.Title className="sr-only">選單</Dialog.Title>
                 <Dialog.Content asChild>
-                  <div className="absolute right-0 flex w-full flex-col bg-white pb-5 pt-2 shadow outline-none data-[state=closed]:duration-100 data-[state=open]:duration-200 data-[state=closed]:ease-in data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 data-[state=open]:ease-slider-in lg:hidden">
+                  <div className="absolute right-0 flex w-full flex-col bg-white pb-2 pt-2 shadow outline-none data-[state=closed]:duration-100 data-[state=open]:duration-200 data-[state=closed]:ease-in data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 data-[state=open]:ease-slider-in lg:hidden">
                     <NavigationMenu.Root
                       orientation="vertical"
                       className="container mx-auto divide-border-secondary"
