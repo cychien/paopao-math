@@ -1,6 +1,6 @@
 type Lesson = {
   name: string;
-  description: string;
+  description?: string;
   slug: string;
   chapters: Chapter[];
 };
@@ -16,8 +16,10 @@ type Teaching = { videoId: string; duration: number };
 type Exam = { videoId: string; duration: number };
 
 const LESSONS: Lesson[] = [
+  { name: "實數與指對數", slug: "real-number-log", chapters: [] },
+  { name: "直線與圓", slug: "line-circle", chapters: [] },
   {
-    name: "多項式",
+    name: "多項式函數",
     description:
       "多項式是代數學中的基礎概念，是由稱為未知數的變量和稱為係數的常數通過有限次加減法、乘法以及自然數冪次的乘方",
     slug: "polynomial",
@@ -93,6 +95,33 @@ const LESSONS: Lesson[] = [
       },
     ],
   },
+  { name: "數列與級數", slug: "sequences-series", chapters: [] },
+  { name: "數據分析", slug: "data-analysis", chapters: [] },
+  {
+    name: "排列組合與機率",
+    slug: "permutation-probability",
+    chapters: [],
+  },
+  { name: "三角比", slug: "trigonometric-ratios", chapters: [] },
+  { name: "三角函數", slug: "trigonometric-functions", chapters: [] },
+  {
+    name: "指數與對數函數",
+    slug: "exponential-logarithmic-functions",
+    chapters: [],
+  },
+  { name: "平面向量", slug: "plane-vectors", chapters: [] },
+  { name: "空間向量", slug: "space-vectors", chapters: [] },
+  {
+    name: "空間中的平面與直線",
+    slug: "planes-and-lines-in-space",
+    chapters: [],
+  },
+  {
+    name: "條件機率與貝氏定理",
+    slug: "conditional-probability-bayes-theorem",
+    chapters: [],
+  },
+  { name: "矩陣", slug: "matrices", chapters: [] },
 ];
 
 export { LESSONS };

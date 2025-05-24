@@ -14,6 +14,7 @@ export function loader({ request }: LoaderFunctionArgs) {
   if (!ok) {
     return json({ notAccess: true });
   }
+  return null;
 }
 
 export default function Page() {

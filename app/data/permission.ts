@@ -4,7 +4,11 @@ type Permission = {
 };
 
 const trialPermissions: Permission = {
-  paths: ["/course/content", "/course/content/polynomial/*"],
+  paths: [
+    "/course/content",
+    "/course/content/polynomial/*",
+    "/course/entrance-exams",
+  ],
   features: [],
 };
 

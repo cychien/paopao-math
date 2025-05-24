@@ -5,6 +5,7 @@ import { HomeLine } from "~/components/icons/HomeLine";
 import { SidebarItem } from "./SidebarItem";
 import { PlayCircle } from "~/components/icons/PlayCircle";
 import { cn } from "~/utils/style";
+import { LayersTwo } from "~/components/icons/LayersTwo";
 
 export default function Layout() {
   const location = useLocation();
@@ -31,9 +32,9 @@ export default function Layout() {
               </div>
             </aside>
 
-            <div className="w-8 col-start-2 row-span-5 row-start-1 bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5" />
+            {/* <div className="w-8 col-start-2 row-span-5 row-start-1 bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5" /> */}
 
-            <main className="flex-1 pl-12 py-9 pr-4 border-l border-gray-200">
+            <main className="flex-1 pl-12 py-9 pr-4">
               <Outlet />
             </main>
           </div>
@@ -93,6 +94,7 @@ export default function Layout() {
 const navigations = [
   { icon: HomeLine, label: "總覽", link: "/course/overview" },
   { icon: PlayCircle, label: "課程", link: "/course/content" },
-  { icon: File, label: "資源下載", link: "/course/resources" },
+  { icon: File, label: "模擬試題", link: "/course/exams" },
+  { icon: LayersTwo, label: "歷屆聯考題", link: "/course/entrance-exams" },
   { icon: CheckDone, label: "精選問答", link: "/course/curated" },
 ];
