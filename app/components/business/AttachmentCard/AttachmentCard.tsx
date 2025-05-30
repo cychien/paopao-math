@@ -20,8 +20,8 @@ const TYPE_COLORS: Record<
     iconColor: "text-[#CF3C34]",
   },
   image: {
-    bgColor: "bg-blue-50",
-    iconColor: "text-blue-600",
+    bgColor: "bg-brand-50",
+    iconColor: "text-brand-600",
   },
   video: {
     bgColor: "bg-green-50",

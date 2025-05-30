@@ -8,3 +8,5 @@ node_modules
 /generated/prisma
 
 .cursor/mcp.json
+
+*TASKS.md

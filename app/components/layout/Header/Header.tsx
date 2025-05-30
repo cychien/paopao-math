@@ -55,7 +55,7 @@ function Header() {
 
           <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-5 lg:-translate-y-[2px]">
             <a
-              href="/login"
+              href="/auth/login"
               className={cn(
                 buttonVariant({ variant: "link" }),
                 "text-gray-400 font-medium p-0 hover:text-gray-600"
@@ -132,7 +132,7 @@ function Header() {
                       <NavigationMenu.List className="space-y-2">
                         <NavigationMenu.Item>
                           <NavigationMenu.Link
-                            href="/login"
+                            href="/auth/login"
                             className={cn(
                               buttonVariant({ variant: "link" }),
                               "-mx-3 block h-full rounded-lg px-3 py-2 font-medium text-text-tertiary hover:bg-bg-primary-hover"

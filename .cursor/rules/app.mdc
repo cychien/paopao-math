@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+## Color Scheme Rules
+- Always use `brand` color instead of `blue` for primary colors
+- Use `brand-*` color variants instead of `blue-*` variants
+
+## Brand name
+- Always refer to this app by the name, "寶哥高中數學"
