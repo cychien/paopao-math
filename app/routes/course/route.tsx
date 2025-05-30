@@ -1,4 +1,6 @@
-import { Outlet, useLocation } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Outlet, useLocation, useLoaderData } from "@remix-run/react";
 import { CheckDone } from "~/components/icons/CheckDone";
 import { File } from "~/components/icons/File";
 import { HomeLine } from "~/components/icons/HomeLine";
@@ -6,9 +8,26 @@ import { SidebarItem } from "./SidebarItem";
 import { PlayCircle } from "~/components/icons/PlayCircle";
 import { cn } from "~/utils/style";
 import { LayersTwo } from "~/components/icons/LayersTwo";
+import { getUserPermissionData } from "~/services/auth/permissions";
+import type { Permission } from "~/data/permission";
+
+type LoaderData = {
+  userPermissions: Permission;
+  hasPurchase: boolean;
+};
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const { permissions, hasPurchase } = await getUserPermissionData(request);
+
+  return json<LoaderData>({
+    userPermissions: permissions,
+    hasPurchase,
+  });
+};
 
 export default function Layout() {
   const location = useLocation();
+  const { userPermissions } = useLoaderData<LoaderData>();
 
   return (
     <>
@@ -27,6 +46,7 @@ export default function Layout() {
                     label={nav.label}
                     link={nav.link}
                     isActive={location.pathname.startsWith(nav.link)}
+                    userPermissions={userPermissions}
                   />
                 ))}
               </div>

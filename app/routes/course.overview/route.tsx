@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
-import { getOptionalUser } from "~/services/auth/session";
+import { getUserPermissionData } from "~/services/auth/permissions";
 import { LockScreen } from "~/components/business/LockScreen";
 
 type LoaderData = {
@@ -20,17 +20,9 @@ type LoaderData = {
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  // 獲取用戶資訊（可選，不強制要求登入）
-  const user = await getOptionalUser(request);
+  const { user, hasPurchase } = await getUserPermissionData(request);
 
-  // 檢查是否有課程訪問權限
-  const hasAccess = user
-    ? user.purchases.some(
-        (purchase) => purchase.status === "ACTIVE" && purchase.hasLifetimeAccess
-      )
-    : false;
-
-  return json<LoaderData>({ user, hasAccess });
+  return json<LoaderData>({ user, hasAccess: hasPurchase });
 };
 
 export default function CourseOverviewPage() {

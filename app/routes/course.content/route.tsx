@@ -1,19 +1,16 @@
 import { json, redirect, useLoaderData } from "@remix-run/react";
 import { getSyllabus } from "~/utils/course.server";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { canAccess } from "~/utils/permission";
-import { trialPermissions } from "~/data/permission";
+import { canUserAccessPath } from "~/services/auth/permissions";
 import { safeRedirect } from "remix-utils/safe-redirect";
 import { Lesson } from "./components/Lesson";
 
-export function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const path = url.pathname;
-  const ok = canAccess({
-    permissions: trialPermissions,
-    pathname: path,
-  });
-  if (!ok) {
+
+  const canAccess = await canUserAccessPath(request, path);
+  if (!canAccess) {
     return redirect(safeRedirect("/"));
   }
 

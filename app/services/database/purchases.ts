@@ -53,6 +53,7 @@ export async function handleOrderCreated(webhookData: any) {
         accessGrantedAt: new Date(),
         webhookProcessed: true,
         webhookData: webhookData,
+        orderNumber: attributes.order_number,
       },
     });
 

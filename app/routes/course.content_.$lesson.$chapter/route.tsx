@@ -3,20 +3,17 @@ import { json, useLoaderData } from "@remix-run/react";
 import { ChevronRight } from "lucide-react";
 import { LockScreen } from "~/components/business/LockScreen";
 import { Video } from "~/components/business/Video";
-import { Button, buttonVariant } from "~/components/ui/Button";
-import { trialPermissions } from "~/data/permission";
+import { buttonVariant } from "~/components/ui/Button";
+import { canUserAccessPath } from "~/services/auth/permissions";
 import { getChapter } from "~/utils/course.server";
-import { canAccess } from "~/utils/permission";
 import { cn } from "~/utils/style";
 
-export function loader({ params, request }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const path = url.pathname;
-  const ok = canAccess({
-    permissions: trialPermissions,
-    pathname: path,
-  });
-  if (!ok) {
+
+  const canAccess = await canUserAccessPath(request, path);
+  if (!canAccess) {
     return json({ notAccess: true, chapter: null });
   }
 

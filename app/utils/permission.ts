@@ -8,6 +8,11 @@ function canAccess({
   pathname: string;
 }) {
   return permissions.paths.some((pattern) => {
+    // 處理完全萬用字元 *
+    if (pattern === "*") {
+      return true;
+    }
+
     // support "/foo/bar/*" wildcard
     if (pattern.endsWith("/*")) {
       const base = pattern.slice(0, -1); // "/foo/bar/"

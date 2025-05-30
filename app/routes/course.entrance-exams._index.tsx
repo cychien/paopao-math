@@ -1,17 +1,14 @@
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
-import { trialPermissions } from "~/data/permission";
-import { canAccess } from "~/utils/permission";
+import { canUserAccessPath } from "~/services/auth/permissions";
 import { getExamList } from "~/utils/entrance-exam.server";
 
-export function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const path = url.pathname;
-  const ok = canAccess({
-    permissions: trialPermissions,
-    pathname: path,
-  });
-  if (!ok) {
+
+  const canAccess = await canUserAccessPath(request, path);
+  if (!canAccess) {
     return json({ notAccess: true, examList: [] });
   }
 

@@ -1,17 +1,14 @@
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { LockScreen } from "~/components/business/LockScreen";
-import { trialPermissions } from "~/data/permission";
-import { canAccess } from "~/utils/permission";
+import { canUserAccessPath } from "~/services/auth/permissions";
 
-export function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const path = url.pathname;
-  const ok = canAccess({
-    permissions: trialPermissions,
-    pathname: path,
-  });
-  if (!ok) {
+
+  const canAccess = await canUserAccessPath(request, path);
+  if (!canAccess) {
     return json({ notAccess: true });
   }
   return null;

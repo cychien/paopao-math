@@ -4,10 +4,9 @@ import { AttachmentCard } from "~/components/business/AttachmentCard";
 import { PDF } from "~/components/icons/PDF";
 import { getExamById } from "~/utils/entrance-exam.server";
 import { AttachmentType } from "~/components/business/AttachmentCard/AttachmentCard";
-import { trialPermissions } from "~/data/permission";
-import { canAccess } from "~/utils/permission";
+import { canUserAccessPath } from "~/services/auth/permissions";
 
-export function loader({ params, request }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   const { examId } = params;
 
   if (!examId) {
@@ -17,12 +16,9 @@ export function loader({ params, request }: LoaderFunctionArgs) {
   // 權限檢查
   const url = new URL(request.url);
   const path = url.pathname;
-  const ok = canAccess({
-    permissions: trialPermissions,
-    pathname: path,
-  });
+  const canAccess = await canUserAccessPath(request, path);
 
-  if (!ok) {
+  if (!canAccess) {
     return json({ notAccess: true, exam: null });
   }
 

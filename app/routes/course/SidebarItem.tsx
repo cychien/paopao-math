@@ -1,18 +1,24 @@
 import { Lock } from "~/components/icons/Lock";
 import { SvgProps } from "~/components/icons/types";
-import { trialPermissions } from "~/data/permission";
-import { canAccess } from "~/utils/permission";
+import { Permission, hasPathPermission } from "~/data/permission";
 
 type SidebarItemProps = {
   icon: React.ComponentType<SvgProps>;
   label: string;
   link: string;
   isActive: boolean;
+  userPermissions: Permission;
 };
 
-function SidebarItem({ icon: Icon, label, link, isActive }: SidebarItemProps) {
-  const ca = canAccess({ permissions: trialPermissions, pathname: link });
-  const isLocked = !ca;
+function SidebarItem({
+  icon: Icon,
+  label,
+  link,
+  isActive,
+  userPermissions,
+}: SidebarItemProps) {
+  const canAccess = hasPathPermission(userPermissions, link);
+  const isLocked = !canAccess;
 
   return (
     <a

@@ -38,6 +38,8 @@ export const action = async ({
     // 檢查用戶是否有購買記錄
     const userWithPurchases = await getUserWithPurchases(email);
 
+    console.log({ userWithPurchases });
+
     if (!userWithPurchases) {
       return json(
         {
@@ -110,6 +112,23 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const isSubmitting = navigation.state === "submitting";
 
+  // 更可靠的 email 更新函數
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value.trim());
+  };
+
+  // 處理貼上事件
+  const handleEmailPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    // 稍微延遲以確保貼上的內容已經更新到 input 中
+    setTimeout(() => {
+      const target = e.target as HTMLInputElement;
+      setEmail(target.value.trim());
+    }, 10);
+  };
+
+  // 檢查 email 是否有效（基本檢查）
+  const isEmailValid = email.length > 0 && email.includes("@");
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
@@ -170,7 +189,9 @@ export default function LoginPage() {
                     name="email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleEmailChange}
+                    onPaste={handleEmailPaste}
+                    onInput={handleEmailChange}
                     required
                     className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-brand-500 focus:border-brand-500 focus:z-10 sm:text-sm"
                     placeholder="請輸入您的 email"
@@ -204,7 +225,7 @@ export default function LoginPage() {
               <div>
                 <button
                   type="submit"
-                  disabled={isSubmitting || !email}
+                  disabled={isSubmitting || !isEmailValid}
                   className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
