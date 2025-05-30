@@ -16,6 +16,7 @@ import { z } from "zod";
 import { createContact } from "~/services/loop";
 import { checkHoneypot } from "~/utils/honeypot.server";
 import { getOptionalUser } from "~/services/auth/session";
+import { AuroraBackground } from "~/components/aurora-background";
 
 export const meta: MetaFunction = () => {
   return [
@@ -83,7 +84,11 @@ export type CreateContactActionType = typeof action;
 export default function Index() {
   return (
     <>
-      <HeroSection />
+      <AuroraBackground className="isolate w-full -mt-[73px] pt-[73px]">
+        <div className="w-full z-10">
+          <HeroSection />
+        </div>
+      </AuroraBackground>
       <FeaturesSection />
       <TeacherSection />
       <PricingSection />

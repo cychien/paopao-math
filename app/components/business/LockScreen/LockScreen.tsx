@@ -1,5 +1,6 @@
+import { Link } from "@remix-run/react";
 import { Lock } from "~/components/icons/Lock";
-import { buttonVariant } from "~/components/ui/Button";
+import { buttonVariants } from "~/components/ui/Button";
 import { cn } from "~/utils/style";
 
 function LockScreen() {
@@ -15,15 +16,15 @@ function LockScreen() {
         想要繼續深入學習？購買課程，解鎖後續所有精彩內容！
       </p>
       <div className="mt-5 flex items-center">
-        <a
-          href="/"
+        <Link
+          to="/purchase"
           className={cn(
-            buttonVariant({ size: "sm" }),
-            "rounded w-full bg-brand-100 text-text-primary hover:bg-bg-brand-secondary-hover lg:w-auto h-[38px]"
+            buttonVariants({ size: "sm" }),
+            "bg-brand-100 text-text-primary hover:bg-bg-brand-secondary-hover lg:w-auto h-[38px]"
           )}
         >
-          搶先卡位
-        </a>
+          立即購買
+        </Link>
         <p className="ml-3 text-gray-300 text-sm">7 日內可全額退款</p>
       </div>
     </div>

@@ -31,32 +31,34 @@ export default function Layout() {
 
   return (
     <>
-      <div className="container mx-auto h-full hidden lg:block">
-        <div className="-mx-5 pr-5 h-full">
-          <div className="flex h-full">
-            <aside className="w-[256px] px-6 py-9 border-l border-r border-gray-200 h-full sticky top-0 bottom-0 self-start max-h-[calc(100dvh)]">
-              <div className="text-gray-500 text-sm font-medium">
-                學測總複習班
-              </div>
-              <div className="mt-4 space-y-1 -mx-3">
-                {navigations.map((nav) => (
-                  <SidebarItem
-                    key={nav.label}
-                    icon={nav.icon}
-                    label={nav.label}
-                    link={nav.link}
-                    isActive={location.pathname.startsWith(nav.link)}
-                    userPermissions={userPermissions}
-                  />
-                ))}
-              </div>
-            </aside>
+      <div className="h-full hidden lg:block bg-gray-100">
+        <div className="container mx-auto h-full">
+          <div className="h-full">
+            <div className="flex h-full">
+              <aside className="w-[240px] pr-6 py-9 h-full sticky top-0 bottom-0 self-start max-h-[calc(100dvh)]">
+                <div className="text-gray-700 text-sm font-medium">
+                  學測總複習班
+                </div>
+                <div className="mt-4 space-y-1 -mx-3">
+                  {navigations.map((nav) => (
+                    <SidebarItem
+                      key={nav.label}
+                      icon={nav.icon}
+                      label={nav.label}
+                      link={nav.link}
+                      isActive={location.pathname.startsWith(nav.link)}
+                      userPermissions={userPermissions}
+                    />
+                  ))}
+                </div>
+              </aside>
 
-            {/* <div className="w-8 col-start-2 row-span-5 row-start-1 bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5" /> */}
+              {/* <div className="w-8 col-start-2 row-span-5 row-start-1 bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5" /> */}
 
-            <main className="flex-1 pl-12 py-9 pr-4">
-              <Outlet />
-            </main>
+              <main className="border-x border-gray-200 flex-1 px-12 py-9 bg-white shadow-sm">
+                <Outlet />
+              </main>
+            </div>
           </div>
         </div>
       </div>

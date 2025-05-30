@@ -22,7 +22,7 @@ export default function Page() {
   const { syllabus } = useLoaderData<typeof loader>();
 
   return (
-    <div className="divide-y-1 divide-gray-100">
+    <div className="divide-y-1 divide-gray-200">
       <div className="pb-6">
         {/* <h1 className="text-sm text-gray-500">課程</h1> */}
         <h2 className="text-xl font-semibold">課程總覽</h2>

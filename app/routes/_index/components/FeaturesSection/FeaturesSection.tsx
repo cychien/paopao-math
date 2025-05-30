@@ -2,7 +2,7 @@ import featureIconSrc from "~/assets/featured.svg";
 
 function FeaturesSection() {
   return (
-    <section className="bg-bg-secondary py-16 lg:py-24">
+    <section className="bg-gray-100 py-16 lg:py-24">
       <div className="container mx-auto lg:flex lg:space-x-16">
         <div className="lg:w-[360px]">
           <img src={featureIconSrc} alt="Icon" className="size-14" />

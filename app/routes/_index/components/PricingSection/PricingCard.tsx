@@ -56,6 +56,14 @@ function PricingCard() {
               alt="check icon"
               className="w-6 h-6 flex-shrink-0"
             />
+            <span className="text-text-tertiary">完整總複習課程</span>
+          </div>
+          <div className="flex space-x-3 items-center">
+            <img
+              src={checkIconSrc}
+              alt="check icon"
+              className="w-6 h-6 flex-shrink-0"
+            />
             <span className="text-text-tertiary">實體學習參考書</span>
           </div>
           <div className="flex space-x-3 items-center">
@@ -64,25 +72,7 @@ function PricingCard() {
               alt="check icon"
               className="w-6 h-6 flex-shrink-0"
             />
-            <span className="text-text-tertiary">獨家重點整理及例題</span>
-          </div>
-          <div className="flex space-x-3 items-center">
-            <img
-              src={checkIconSrc}
-              alt="check icon"
-              className="w-6 h-6 flex-shrink-0"
-            />
-            <span className="text-text-tertiary">
-              <span className="font-inter">200+</span> 精講影片
-            </span>
-          </div>
-          <div className="flex space-x-3 items-center">
-            <img
-              src={checkIconSrc}
-              alt="check icon"
-              className="w-6 h-6 flex-shrink-0"
-            />
-            <span className="text-text-tertiary">模擬測驗及精選試題</span>
+            <span className="text-text-tertiary">定期模擬測驗</span>
           </div>
           <div className="flex space-x-3 items-center">
             <img
@@ -98,7 +88,17 @@ function PricingCard() {
               alt="check icon"
               className="w-6 h-6 flex-shrink-0"
             />
-            <span className="text-text-tertiary">多裝置支援</span>
+            <span className="text-text-tertiary">問答專區解惑</span>
+          </div>
+          <div className="flex space-x-3 items-center">
+            <img
+              src={checkIconSrc}
+              alt="check icon"
+              className="w-6 h-6 flex-shrink-0"
+            />
+            <span className="text-text-tertiary">
+              超過 <span className="font-inter">200</span> 部詳解影片
+            </span>
           </div>
         </div>
       </div>
@@ -106,7 +106,9 @@ function PricingCard() {
       <div className="-mx-6 lg:-mx-8 mt-8 mb-6 lg:mt-10 lg:mb-8 h-px bg-border-secondary" />
 
       <Link to="/purchase">
-        <Button className="w-full py-3 mb-2">立即購買</Button>
+        <Button className="w-full py-3 h-12 text-base" size="lg">
+          立即購買
+        </Button>
       </Link>
     </div>
   );

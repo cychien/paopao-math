@@ -57,7 +57,7 @@ export default function ExamPage() {
   };
 
   return (
-    <div className="divide-y-1 divide-gray-100">
+    <div className="divide-y-1 divide-gray-200">
       <div className="pb-6">
         <h2 className="text-xl font-semibold">{exam.title}</h2>
         <p className="text-gray-600 mt-1">{exam.description}</p>

@@ -24,7 +24,7 @@ export default function EntranceExamsIndexPage() {
   }
 
   return (
-    <div className="divide-y-1 divide-gray-100">
+    <div className="divide-y-1 divide-gray-200">
       <div className="pb-6">
         <h2 className="text-xl font-semibold">歷屆聯考題</h2>
       </div>

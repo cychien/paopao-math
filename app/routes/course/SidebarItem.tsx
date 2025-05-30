@@ -1,3 +1,4 @@
+import { Link } from "@remix-run/react";
 import { Lock } from "~/components/icons/Lock";
 import { SvgProps } from "~/components/icons/types";
 import { Permission, hasPathPermission } from "~/data/permission";
@@ -21,10 +22,11 @@ function SidebarItem({
   const isLocked = !canAccess;
 
   return (
-    <a
-      href={link}
+    <Link
+      to={link}
       data-active={isActive}
-      className="text-sm flex px-3 py-2 group data-[active=true]:bg-gray-100 rounded-md items-center hover:bg-gray-100 transition-colors"
+      className="text-sm flex px-3 py-2 group data-[active=true]:bg-gray-200 rounded-md items-center hover:bg-gray-100 transition-colors"
+      prefetch="intent"
     >
       <div className="flex-1 flex items-center space-x-2">
         <Icon className="size-5 text-gray-400 group-data-[active=true]:text-brand-500 group-hover:text-brand-500 group-data-[active=true]:scale-110 group-hover:scale-110 transition-all" />
@@ -33,7 +35,7 @@ function SidebarItem({
         </div>
       </div>
       {isLocked && <Lock className="size-4 text-[#FBBF24]" />}
-    </a>
+    </Link>
   );
 }
 

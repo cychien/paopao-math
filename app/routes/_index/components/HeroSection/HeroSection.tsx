@@ -47,7 +47,7 @@ function HeroSection() {
       <div
         ref={targetRef}
         className={cn(
-          "mt-8 p-6 md:p-10 lg:px-10 lg:pt-8 lg:pb-7 rounded-[10px] transition-colors duration-500 ease-in-out",
+          "mt-8 p-6 md:p-10 lg:px-10 lg:pt-8 lg:pb-7 rounded-[10px] transition-colors duration-500 ease-in-out border border-brand-100 shadow-md",
           isHighlighted ? "bg-brand-100" : "bg-brand-50"
         )}
       >
@@ -63,10 +63,10 @@ function HeroSection() {
           <>
             <div>
               <div className="text-sm font-semibold text-gray-500">
-                留下你的 Email，搶先拿到
+                還在考慮嗎？留下 Email
               </div>
-              <div className="text-lg font-semibold mt-0.5">
-                早鳥價連結 + 定期總複習練習題
+              <div className="text-lg font-semibold mt-1.5">
+                免費領取 不定期模考試題
               </div>
             </div>
 
@@ -101,9 +101,11 @@ function HeroSection() {
                     : (actionData?.status as "success" | "error") ?? "idle"
                 }
                 disabled={isPending}
-                className="mt-4 w-full lg:mt-6 lg:w-auto"
+                className="mt-4 w-full lg:mt-6 lg:w-auto border-[1.5px] border-brand-100 text-brand-600"
+                size="lg"
+                variant="ghost"
               >
-                搶先卡位
+                索取試題
               </StatusButton>
             </Form>
           </>

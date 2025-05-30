@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form, useActionData, useNavigation } from "@remix-run/react";
+import { Form, Link, useActionData, useNavigation } from "@remix-run/react";
 import { useState } from "react";
 import {
   validateEmail,
@@ -9,6 +9,8 @@ import {
 } from "~/services/auth/magic-link";
 import { sendMagicLinkEmail } from "~/services/email/magic-link-email";
 import { getUserWithPurchases } from "~/services/database/users";
+import { Button } from "~/components/ui/Button";
+import { ArrowLeft, Rocket } from "lucide-react";
 
 type ActionData =
   | { error: string; success: false }
@@ -130,16 +132,16 @@ export default function LoginPage() {
   const isEmailValid = email.length > 0 && email.includes("@");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="h-full bg-gray-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">🎯 登入</h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <h2 className="text-3xl font-bold text-gray-900">登入</h2>
+          <p className="mt-4 text-sm text-gray-600">
             限已購買用戶登入，我們將發送安全的登入連結到您的信箱
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-white rounded-lg shadow-lg py-8 px-4 lg:p-8">
           {actionData?.success ? (
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
@@ -183,7 +185,7 @@ export default function LoginPage() {
                 >
                   電子郵件地址
                 </label>
-                <div className="mt-1">
+                <div className="mt-1.5">
                   <input
                     id="email"
                     name="email"
@@ -193,7 +195,7 @@ export default function LoginPage() {
                     onPaste={handleEmailPaste}
                     onInput={handleEmailChange}
                     required
-                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-brand-500 focus:border-brand-500 focus:z-10 sm:text-sm"
+                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-brand-500 focus:border-brand-500 focus:z-10 sm:text-sm h-10"
                     placeholder="請輸入您的 email"
                   />
                 </div>
@@ -223,10 +225,11 @@ export default function LoginPage() {
               )}
 
               <div>
-                <button
+                <Button
                   type="submit"
-                  disabled={isSubmitting || !isEmailValid}
-                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  size="lg"
+                  disabled={isSubmitting}
+                  className="group relative w-full disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <>
@@ -253,9 +256,11 @@ export default function LoginPage() {
                       發送中...
                     </>
                   ) : (
-                    <>🚀 發送登入連結</>
+                    <>
+                      <Rocket className="size-4" /> 發送登入連結
+                    </>
                   )}
-                </button>
+                </Button>
               </div>
             </Form>
           )}
@@ -266,25 +271,29 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="mt-4 bg-blue-50 border border-blue-200 rounded-md p-3">
-            <p className="text-xs text-blue-700">
+          <div className="mt-4 bg-gray-50 border border-gray-200 rounded-md p-3">
+            <div className="text-sm text-gray-700">
               <strong>還沒購買課程？</strong>
               <br />
-              <a
-                href="/purchase"
-                className="text-blue-600 hover:text-blue-800 underline"
-              >
-                點此購買學測總複習班
-              </a>
-              ，購買後會自動發送登入連結到您的信箱
-            </p>
+              <p className="mt-2">
+                <Link
+                  to="/purchase"
+                  className="text-gray-600 hover:text-gray-800 underline"
+                >
+                  點此購買學測總複習班
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="text-center">
-          <a href="/" className="text-sm text-brand-600 hover:text-brand-800">
-            ← 返回首頁
-          </a>
+        <div className="flex justify-center">
+          <Link
+            to="/"
+            className="text-sm text-brand-600 hover:text-brand-800 flex gap-1 items-center"
+          >
+            <ArrowLeft className="size-4" /> 返回首頁
+          </Link>
         </div>
       </div>
     </div>

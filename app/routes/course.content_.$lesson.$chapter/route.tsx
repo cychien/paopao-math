@@ -1,9 +1,9 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { json, useLoaderData } from "@remix-run/react";
+import { json, Link, useLoaderData } from "@remix-run/react";
 import { ChevronRight } from "lucide-react";
 import { LockScreen } from "~/components/business/LockScreen";
 import { Video } from "~/components/business/Video";
-import { buttonVariant } from "~/components/ui/Button";
+import { buttonVariants } from "~/components/ui/Button";
 import { canUserAccessPath } from "~/services/auth/permissions";
 import { getChapter } from "~/utils/course.server";
 import { cn } from "~/utils/style";
@@ -48,24 +48,24 @@ export default function Page() {
         <div className="max-sm:block flex space-between items-center">
           <div className="flex-1">
             <div className="text-sm text-gray-500 flex items-center space-x-0.5">
-              <a href="/course/content" className="hover:text-gray-900">
+              <Link to="/course/content" className="hover:text-gray-900">
                 課程
-              </a>
+              </Link>
               <ChevronRight className="size-4 text-gray-300 translate-y-px" />
               <div>{chapter.lessonMeta.name}</div>
             </div>
             <h1 className="text-xl font-semibold mt-1">{chapter.name}</h1>
           </div>
           {chapter.nextChapter && (
-            <a
-              href={`/course/content/${chapter.lessonMeta.slug}/${chapter.nextChapter.slug}`}
+            <Link
+              to={`/course/content/${chapter.lessonMeta.slug}/${chapter.nextChapter.slug}`}
               className={cn(
-                buttonVariant({ size: "sm" }),
+                buttonVariants({ size: "sm" }),
                 "max-sm:mt-4 hover:bg-brand-solid-hover rounded"
               )}
             >
               前往下一章
-            </a>
+            </Link>
           )}
         </div>
 

@@ -9,7 +9,7 @@ function FooterSection() {
           數學考試交給寶哥
         </p>
         <p className="mt-4 text-text-tertiary text-lg lg:text-xl">
-          加入預售行列，開啟你的高分之路！
+          加入學習行列，開啟你的高分之路！
         </p>
 
         <div className="h-px mt-16 mb-8 bg-border-secondary w-full" />

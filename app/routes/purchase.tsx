@@ -5,6 +5,7 @@ import {
   useActionData,
   useNavigation,
   useLoaderData,
+  Link,
 } from "@remix-run/react";
 import { useState } from "react";
 import {
@@ -13,6 +14,7 @@ import {
 } from "~/services/lemonsqueezy/products";
 import { validateEmail } from "~/services/auth/magic-link";
 import checkIconSrc from "~/assets/check.svg";
+import { ArrowLeft, CreditCard } from "lucide-react";
 
 type ActionData =
   | { error: string; success: false }
@@ -76,6 +78,7 @@ export default function PurchasePage() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const isSubmitting = navigation.state === "submitting";
+  const isRedirecting = !!actionData?.success && !!actionData.checkoutUrl;
 
   // 如果有 checkout URL，重導向到 Lemon Squeezy
   if (actionData?.success && actionData.checkoutUrl) {
@@ -83,22 +86,22 @@ export default function PurchasePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           {/* 頁面標題 */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              🎯 購買學測總複習班
+              購買學測總複習班
             </h1>
             <p className="text-xl text-gray-600">
-              年費買斷，終身暢學與持續更新
+              年費買斷，年內暢學與持續更新
             </p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8">
             {/* 左側：課程資訊 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg">
+            <div className="bg-white rounded-2xl py-8 px-4 lg:p-8 shadow-lg">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 課程內容
               </h2>
@@ -123,7 +126,7 @@ export default function PurchasePage() {
                     NT${productInfo.originalPrice.toLocaleString()}
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-baseline justify-between">
                   <span className="text-2xl font-bold text-gray-900">
                     現在只需
                   </span>
@@ -131,16 +134,13 @@ export default function PurchasePage() {
                     <div className="text-3xl font-bold text-green-600">
                       NT${productInfo.price.toLocaleString()}
                     </div>
-                    <div className="text-sm text-gray-500">
-                      一次付清，終身暢學
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* 右側：購買表單 */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg">
+            <div className="bg-white rounded-2xl py-8 px-4 lg:p-8 shadow-lg">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 完成購買
               </h2>
@@ -213,10 +213,10 @@ export default function PurchasePage() {
 
                 <button
                   type="submit"
-                  disabled={isSubmitting || !email}
-                  className="w-full bg-brand-600 hover:bg-brand-700 disabled:bg-gray-400 text-white font-medium py-4 px-6 rounded-lg transition-colors disabled:cursor-not-allowed"
+                  disabled={isSubmitting || isRedirecting}
+                  className="w-full bg-brand-600 hover:bg-brand-700 disabled:bg-gray-400 text-white font-medium py-4 px-6 rounded-lg transition-colors disabled:cursor-not-allowed cursor-pointer"
                 >
-                  {isSubmitting ? (
+                  {isSubmitting || isRedirecting ? (
                     <div className="flex items-center justify-center">
                       <svg
                         className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
@@ -238,10 +238,33 @@ export default function PurchasePage() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      建立付款頁面中...
+                      導向付款頁面中...
                     </div>
                   ) : (
-                    <>💳 前往安全付款頁面</>
+                    <div className="flex items-center justify-center">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="mr-1.5 translate-y-px"
+                      >
+                        <path
+                          opacity="0.12"
+                          d="M2 8H22V14.6C22 16.8402 22 17.9603 21.564 18.816C21.1805 19.5686 20.5686 20.1805 19.816 20.564C18.9603 21 17.8402 21 15.6 21H8.4C6.15979 21 5.03969 21 4.18404 20.564C3.43139 20.1805 2.81947 19.5686 2.43597 18.816C2 17.9603 2 16.8402 2 14.6V8Z"
+                          fill="#fff"
+                        />
+                        <path
+                          d="M2.5 8H21.5M6 12H10M8.4 21H15.6C17.8402 21 18.9603 21 19.816 20.564C20.5686 20.1805 21.1805 19.5686 21.564 18.816C22 17.9603 22 16.8402 22 14.6V9.4C22 7.15979 22 6.03968 21.564 5.18404C21.1805 4.43139 20.5686 3.81947 19.816 3.43597C18.9603 3 17.8402 3 15.6 3H8.4C6.15979 3 5.03968 3 4.18404 3.43597C3.43139 3.81947 2.81947 4.43139 2.43597 5.18404C2 6.03968 2 7.15979 2 9.4V14.6C2 16.8402 2 17.9603 2.43597 18.816C2.81947 19.5686 3.43139 20.1805 4.18404 20.564C5.03968 21 6.15979 21 8.4 21Z"
+                          stroke="#fff"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      前往安全付款頁面
+                    </div>
                   )}
                 </button>
 
@@ -254,13 +277,13 @@ export default function PurchasePage() {
           </div>
 
           {/* 返回首頁 */}
-          <div className="text-center mt-12">
-            <a
-              href="/"
-              className="text-brand-600 hover:text-brand-800 font-medium"
+          <div className="flex justify-center mt-12">
+            <Link
+              to="/"
+              className="text-sm text-brand-600 hover:text-brand-800 flex gap-1 items-center"
             >
-              ← 返回首頁
-            </a>
+              <ArrowLeft className="size-4" /> 返回首頁
+            </Link>
           </div>
         </div>
       </div>
