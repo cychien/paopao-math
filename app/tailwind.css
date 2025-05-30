@@ -4,6 +4,7 @@
   --color-*: initial;
 
   --color-white: #FFFFFF;
+  --color-black: #000000;
   
   --color-gray-25: #FCFCFD;
   --color-gray-50: #f8fafc;
@@ -91,7 +92,14 @@
   --color-text-quaternary: var(--color-gray-500);
 
   --color-border-primary: var(--color-gray-300);
-  --color-border-secondary: var(--color-gray-200)
+  --color-border-secondary: var(--color-gray-200);
+
+  --color-background: var(--color-gray-100);
+  --color-foreground: var(--color-gray-900);
+  --color-muted-foreground: var(--color-gray-500);
+  --color-ring: var(--color-gray-300);
+  --color-accent: var(--color-gray-200);
+  --color-accent-foreground: var(--color-gray-900);
 }
 
 @utility container {

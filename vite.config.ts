@@ -21,4 +21,13 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  server: {
+    host: true, // 允許外部連接
+    allowedHosts: [
+      "aaa.local",
+      "localhost",
+      "127.0.0.1",
+      ".local", // 允許所有 .local 域名
+    ],
+  },
 });

@@ -8,6 +8,7 @@ const trialPermissions: Permission = {
     "/course/content",
     "/course/content/polynomial/*",
     "/course/entrance-exams",
+    "/course/entrance-exams/*",
   ],
   features: [],
 };

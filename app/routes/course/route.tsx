@@ -96,5 +96,5 @@ const navigations = [
   { icon: PlayCircle, label: "課程", link: "/course/content" },
   { icon: File, label: "模擬試題", link: "/course/exams" },
   { icon: LayersTwo, label: "歷屆聯考題", link: "/course/entrance-exams" },
-  { icon: CheckDone, label: "精選問答", link: "/course/curated" },
+  { icon: CheckDone, label: "問答討論區", link: "/course/curated" },
 ];
