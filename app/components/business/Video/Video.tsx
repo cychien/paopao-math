@@ -1,4 +1,5 @@
 import * as React from "react";
+import { cn } from "~/utils/style";
 
 type VideoProps = {
   videoId: string;
@@ -7,40 +8,32 @@ type VideoProps = {
 };
 
 function Video({ videoId, width = "100%", height = "100%" }: VideoProps) {
-  const videoElementId = `video-${React.useId()}`;
-  const iframeId = `iframe-${React.useId()}`;
+  // 影片載入完成前先隱藏
+  const [loaded, setLoaded] = React.useState(false);
+
+  // iframe onLoad 觸發後切換 loaded
+  const handleLoad = React.useCallback(() => {
+    setLoaded(true);
+  }, []);
 
   return (
     <div
-      id={videoElementId}
-      className="ring shadow-md rounded overflow-hidden ring-gray-200 opacity-0"
+      className={cn(
+        "ring shadow-md rounded overflow-hidden ring-gray-200 transition-opacity duration-300",
+        // loaded 後從 0 → 100% 透明度
+        loaded ? "opacity-100" : "opacity-0"
+      )}
     >
       <div className="relative aspect-video">
         <iframe
-          id={iframeId}
           title={videoId}
           src={`https://player.vimeo.com/video/${videoId}`}
           width={width}
           height={height}
           allow="fullscreen; picture-in-picture"
           allowFullScreen
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-            (function () {
-              const video = document.getElementById('${videoElementId}');
-              const iframe = document.getElementById('${iframeId}');
-              if (iframe.complete) {
-                video.classList.remove('opacity-0');
-              } else {
-                iframe.onload = function () {
-                  video.classList.remove('opacity-0');
-                }; 
-              }
-            })();  
-            `,
-          }}
+          onLoad={handleLoad} // 核心：iframe 載入完執行
+          className="absolute inset-0 w-full h-full"
         />
       </div>
     </div>
