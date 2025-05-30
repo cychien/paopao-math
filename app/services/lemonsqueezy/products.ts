@@ -11,9 +11,15 @@ export async function createCheckoutSession(options: {
   customData?: Record<string, unknown>;
 }): Promise<PaymentResult> {
   try {
+    console.log("Creating checkout with config:", {
+      storeId: LEMON_SQUEEZY_CONFIG.storeId,
+      variantId: LEMON_SQUEEZY_CONFIG.variantId,
+      environment: LEMON_SQUEEZY_CONFIG.environment,
+    });
+
     const response = await createCheckout(
-      parseInt(LEMON_SQUEEZY_CONFIG.storeId),
-      parseInt(LEMON_SQUEEZY_CONFIG.variantId),
+      LEMON_SQUEEZY_CONFIG.storeId,
+      LEMON_SQUEEZY_CONFIG.variantId,
       {
         checkoutOptions: {
           embed: false,
@@ -24,12 +30,23 @@ export async function createCheckoutSession(options: {
           buttonColor: "#7C3AED", // Brand purple color
         },
         checkoutData: {
-          email: options.email,
-          name: options.name,
-          custom: {
-            purchase_source: "website",
-            ...options.customData,
-          },
+          email: options.email || undefined,
+          name: options.name || undefined,
+          custom: options.customData
+            ? {
+                purchase_source: "website",
+                timestamp: String(Date.now()),
+                ...Object.fromEntries(
+                  Object.entries(options.customData).map(([key, value]) => [
+                    key,
+                    typeof value === "string" ? value : String(value),
+                  ])
+                ),
+              }
+            : {
+                purchase_source: "website",
+                timestamp: String(Date.now()),
+              },
         },
         testMode: LEMON_SQUEEZY_CONFIG.environment === "development",
       }
@@ -52,12 +69,40 @@ export async function createCheckoutSession(options: {
 
     // Handle response data based on actual API response structure
     const checkoutData = response.data as unknown as {
-      attributes?: { url: string };
+      attributes?: { url?: string; checkout_url?: string };
       url?: string;
-      id: string;
+      id?: string;
+      data?: {
+        attributes?: { url?: string };
+        id?: string;
+      };
     };
-    const checkoutUrl = checkoutData.attributes?.url || checkoutData.url;
-    const checkoutId = checkoutData.id;
+
+    // Try different possible paths for the checkout URL
+    let checkoutUrl: string | undefined;
+
+    if (checkoutData.attributes?.url) {
+      checkoutUrl = checkoutData.attributes.url;
+    } else if (checkoutData.url) {
+      checkoutUrl = checkoutData.url;
+    } else if (checkoutData.data?.attributes?.url) {
+      checkoutUrl = checkoutData.data.attributes.url;
+    } else if (checkoutData.attributes?.checkout_url) {
+      checkoutUrl = checkoutData.attributes.checkout_url;
+    }
+
+    const checkoutId = checkoutData.id || checkoutData.data?.id;
+
+    console.log("Extracted checkout URL:", checkoutUrl);
+    console.log("Extracted checkout ID:", checkoutId);
+
+    if (!checkoutUrl) {
+      console.error("Could not find checkout URL in response:", response.data);
+      return {
+        success: false,
+        error: "Checkout URL not found in response",
+      };
+    }
 
     return {
       success: true,

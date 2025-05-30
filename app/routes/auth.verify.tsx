@@ -1,48 +1,73 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { verifyMagicLink } from "~/services/auth/magic-link";
+import { createUserSession } from "~/services/auth/session";
+import { getUserWithPurchases } from "~/services/database/users";
+
+type LoaderData = {
+  success: boolean;
+  error?: string;
+  needsPurchase?: boolean;
+};
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const url = new URL(request.url);
+  const token = url.searchParams.get("token");
+
+  if (!token) {
+    return json<LoaderData>({
+      success: false,
+      error: "無效的驗證連結",
+    });
+  }
+
   try {
-    const url = new URL(request.url);
-    const token = url.searchParams.get("token");
-
-    if (!token) {
-      return json({
-        success: false,
-        error: "Missing verification token",
-        user: null,
-      });
-    }
-
-    // 驗證 Magic Link
+    // 驗證 Magic Link token
     const result = await verifyMagicLink(token);
 
-    if (!result.success) {
-      return json({
+    if (!result.success || !result.user) {
+      return json<LoaderData>({
         success: false,
-        error: result.error,
-        user: null,
+        error: "驗證連結已過期或無效",
       });
     }
 
-    // TODO: 建立用戶 session (使用 Remix sessions 或其他方案)
-    // 目前先返回成功狀態，稍後整合 session 管理
+    // 檢查用戶是否有購買記錄
+    const userWithPurchases = await getUserWithPurchases(result.user.email);
 
-    console.log(`用戶登入成功: ${result.user?.email}`);
+    if (!userWithPurchases) {
+      return json<LoaderData>({
+        success: false,
+        needsPurchase: true,
+        error: "此信箱尚未購買課程，請先完成購買才能登入",
+      });
+    }
 
-    return json({
-      success: true,
-      error: null,
-      user: result.user,
-    });
+    // 檢查是否有有效的購買記錄
+    const hasValidPurchase = userWithPurchases.purchases.some(
+      (purchase) => purchase.status === "ACTIVE" && purchase.hasLifetimeAccess
+    );
+
+    if (!hasValidPurchase) {
+      return json<LoaderData>({
+        success: false,
+        needsPurchase: true,
+        error: "您的購買記錄無效或已過期，請聯繫客服或重新購買",
+      });
+    }
+
+    // 建立用戶 session 並重導向
+    return await createUserSession(
+      userWithPurchases.id,
+      userWithPurchases.email,
+      "/course"
+    );
   } catch (error) {
     console.error("Magic Link 驗證失敗:", error);
-    return json({
+    return json<LoaderData>({
       success: false,
-      error: "Verification failed",
-      user: null,
+      error: "驗證過程發生錯誤",
     });
   }
 };
@@ -76,9 +101,6 @@ export default function VerifyPage() {
                 🎉 登入成功！
               </h1>
               <p className="mt-2 text-gray-600">歡迎回到寶哥高中數學</p>
-              {data.user && (
-                <p className="mt-1 text-sm text-gray-500">{data.user.email}</p>
-              )}
             </div>
 
             <div className="space-y-3">
@@ -123,37 +145,74 @@ export default function VerifyPage() {
           </div>
 
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">❌ 驗證失敗</h1>
-            <p className="mt-2 text-gray-600">登入連結無效或已過期</p>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {data.needsPurchase ? "🛒 需要購買課程" : "❌ 驗證失敗"}
+            </h1>
+            <p className="mt-2 text-gray-600">
+              {data.needsPurchase
+                ? "請先購買課程才能登入"
+                : "登入連結無效或已過期"}
+            </p>
             {data.error && (
               <p className="mt-1 text-sm text-red-600">{data.error}</p>
             )}
           </div>
 
           <div className="space-y-3">
-            <a
-              href="/auth/login"
-              className="block w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 px-4 rounded-md transition-colors text-center"
-            >
-              🔄 重新申請登入連結
-            </a>
-
-            <a
-              href="/"
-              className="block text-gray-600 hover:text-gray-800 text-sm"
-            >
-              ← 返回首頁
-            </a>
+            {data.needsPurchase ? (
+              <>
+                <a
+                  href="/purchase"
+                  className="block w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 px-4 rounded-md transition-colors text-center"
+                >
+                  🛒 立即購買課程
+                </a>
+                <a
+                  href="/"
+                  className="block text-gray-600 hover:text-gray-800 text-sm"
+                >
+                  ← 返回首頁體驗免費內容
+                </a>
+              </>
+            ) : (
+              <>
+                <a
+                  href="/auth/login"
+                  className="block w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 px-4 rounded-md transition-colors text-center"
+                >
+                  🔄 重新申請登入連結
+                </a>
+                <a
+                  href="/"
+                  className="block text-gray-600 hover:text-gray-800 text-sm"
+                >
+                  ← 返回首頁
+                </a>
+              </>
+            )}
           </div>
 
           <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
             <p className="text-xs text-yellow-700">
-              <strong>常見原因：</strong>
-              <br />
-              • 連結已過期 (30分鐘)
-              <br />
-              • 連結已使用過
-              <br />• 連結格式錯誤
+              {data.needsPurchase ? (
+                <>
+                  <strong>說明：</strong>
+                  <br />
+                  • 只有購買過課程的用戶才能登入
+                  <br />
+                  • 未購買用戶可體驗免費內容
+                  <br />• 購買後會自動發送登入連結
+                </>
+              ) : (
+                <>
+                  <strong>常見原因：</strong>
+                  <br />
+                  • 連結已過期 (30分鐘)
+                  <br />
+                  • 連結已使用過
+                  <br />• 連結格式錯誤
+                </>
+              )}
             </p>
           </div>
         </div>

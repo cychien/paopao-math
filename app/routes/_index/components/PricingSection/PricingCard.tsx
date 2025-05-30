@@ -1,33 +1,8 @@
 import checkIconSrc from "~/assets/check.svg";
 import { Button } from "~/components/ui/Button";
-import { useFlash } from "~/context/flash-context";
+import { Link } from "@remix-run/react";
 
 function PricingCard() {
-  const { flash, targetRef } = useFlash();
-
-  const handleClick = () => {
-    if (!targetRef.current) return;
-
-    // 1️⃣ 監聽目標進入視窗
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => flash(), 120); // 2️⃣ 進入視窗 → 閃一下
-          io.disconnect(); // 只做一次就好
-        }
-      },
-      { threshold: 0.6 } // 區塊 60 % 出現在畫面才算可視
-    );
-
-    io.observe(targetRef.current);
-
-    // 3️⃣ 平滑捲動到目標
-    targetRef.current.scrollIntoView({
-      behavior: "smooth",
-      block: "center", // 視窗置中，可按需求改 'nearest'
-    });
-  };
-
   return (
     <div
       className="p-6 lg:p-8 rounded-2xl bg-bg-primary border border-[rgba(0,0,0,0.08)]"
@@ -130,9 +105,9 @@ function PricingCard() {
 
       <div className="-mx-6 lg:-mx-8 mt-8 mb-6 lg:mt-10 lg:mb-8 h-px bg-border-secondary" />
 
-      <Button className="w-full py-3 mb-2" onClick={handleClick}>
-        搶先卡位
-      </Button>
+      <Link to="/purchase">
+        <Button className="w-full py-3 mb-2">立即購買</Button>
+      </Link>
     </div>
   );
 }

@@ -1,15 +1,23 @@
 import * as React from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import { Menu, SquarePlay, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import logoSrc from "~/assets/logo-with-text.png";
 import { Button, buttonVariant } from "~/components/ui/Button";
-import { redirect, useLocation } from "@remix-run/react";
-import { Badge } from "~/components/ui/badge";
+import { useLocation, Form } from "@remix-run/react";
 import { cn } from "~/utils/style";
 import { PlayCircleSolid } from "~/components/icons/PlayCircleSolid";
 
-function Header() {
+interface HeaderProps {
+  user?: {
+    id: string;
+    email: string;
+    name: string | null;
+    hasCourseAccess: boolean;
+  } | null;
+}
+
+function Header({ user }: HeaderProps) {
   const [isMenuPoppedOut, setIsMenuPoppedOut] = React.useState(false);
   const headerRef = React.useRef<HTMLDivElement>(null);
   const location = useLocation();
@@ -50,24 +58,56 @@ function Header() {
                   <span className="-translate-y-px">免費試讀</span>
                 </NavigationMenu.Link>
               </NavigationMenu.Item>
+
+              {/* 如果用戶已購買課程，顯示課程連結 */}
+              {user?.hasCourseAccess && (
+                <NavigationMenu.Item className="flex items-center space-x-1.5">
+                  <NavigationMenu.Link
+                    href="/course"
+                    className={cn(
+                      "font-medium text-gray-700 hover:text-gray-900 group flex items-center space-x-1.5 transition-colors",
+                      {
+                        "text-gray-900": location.pathname === "/course",
+                      }
+                    )}
+                  >
+                    <span className="-translate-y-px">我的課程</span>
+                  </NavigationMenu.Link>
+                </NavigationMenu.Item>
+              )}
             </NavigationMenu.List>
           </div>
 
           <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-5 lg:-translate-y-[2px]">
-            <a
-              href="/auth/login"
-              className={cn(
-                buttonVariant({ variant: "link" }),
-                "text-gray-400 font-medium p-0 hover:text-gray-600"
-              )}
-            >
-              登入
-            </a>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-600">
+                  嗨，{user.name || user.email}
+                </span>
+                <Form method="post" action="/auth/logout">
+                  <button
+                    type="submit"
+                    className={cn(
+                      buttonVariant({ variant: "link" }),
+                      "text-gray-400 font-medium p-0 hover:text-gray-600"
+                    )}
+                  >
+                    登出
+                  </button>
+                </Form>
+              </div>
+            ) : (
+              <a
+                href="/auth/login"
+                className={cn(
+                  buttonVariant({ variant: "link" }),
+                  "text-gray-400 font-medium p-0 hover:text-gray-600"
+                )}
+              >
+                登入
+              </a>
+            )}
           </div>
-
-          {/* <a href="/" className="font-medium text-text-tertiary">
-          課程製作進度
-        </a> */}
 
           {/* Mobile menu */}
           <div className="flex flex-1 justify-end space-x-3 lg:hidden -translate-y-[0.5px]">
@@ -101,22 +141,18 @@ function Header() {
               <Dialog.Trigger asChild>
                 <Button
                   variant="ghost"
-                  iconButton
-                  onClick={() => {
-                    setIsMenuPoppedOut((prev) => !prev);
-                  }}
-                  className="h-9"
+                  size="sm"
+                  className={cn(
+                    "h-8 w-8 p-0 text-gray-400 hover:text-gray-600 lg:hidden",
+                    {
+                      "text-gray-600": isMenuPoppedOut,
+                    }
+                  )}
                 >
-                  {!isMenuPoppedOut ? (
-                    <>
-                      <span className="sr-only">打開主選單</span>
-                      <Menu />
-                    </>
+                  {isMenuPoppedOut ? (
+                    <X className="h-4 w-4" />
                   ) : (
-                    <>
-                      <span className="sr-only">關閉主選單</span>
-                      <X />
-                    </>
+                    <Menu className="h-4 w-4" />
                   )}
                 </Button>
               </Dialog.Trigger>
@@ -130,16 +166,44 @@ function Header() {
                       className="container mx-auto divide-border-secondary"
                     >
                       <NavigationMenu.List className="space-y-2">
+                        {user?.hasCourseAccess && (
+                          <NavigationMenu.Item>
+                            <NavigationMenu.Link
+                              href="/course"
+                              className={cn(
+                                buttonVariant({ variant: "link" }),
+                                "-mx-3 block h-full rounded-lg px-3 py-2 font-medium text-text-tertiary hover:bg-bg-primary-hover"
+                              )}
+                            >
+                              我的課程
+                            </NavigationMenu.Link>
+                          </NavigationMenu.Item>
+                        )}
+
                         <NavigationMenu.Item>
-                          <NavigationMenu.Link
-                            href="/auth/login"
-                            className={cn(
-                              buttonVariant({ variant: "link" }),
-                              "-mx-3 block h-full rounded-lg px-3 py-2 font-medium text-text-tertiary hover:bg-bg-primary-hover"
-                            )}
-                          >
-                            登入
-                          </NavigationMenu.Link>
+                          {user ? (
+                            <Form method="post" action="/auth/logout">
+                              <button
+                                type="submit"
+                                className={cn(
+                                  buttonVariant({ variant: "link" }),
+                                  "-mx-3 block h-full rounded-lg px-3 py-2 font-medium text-text-tertiary hover:bg-bg-primary-hover w-full text-left"
+                                )}
+                              >
+                                登出
+                              </button>
+                            </Form>
+                          ) : (
+                            <NavigationMenu.Link
+                              href="/auth/login"
+                              className={cn(
+                                buttonVariant({ variant: "link" }),
+                                "-mx-3 block h-full rounded-lg px-3 py-2 font-medium text-text-tertiary hover:bg-bg-primary-hover"
+                              )}
+                            >
+                              登入
+                            </NavigationMenu.Link>
+                          )}
                         </NavigationMenu.Item>
                       </NavigationMenu.List>
                     </NavigationMenu.Root>

@@ -37,6 +37,14 @@ export function validateLemonSqueezyConfig() {
     "LEMONSQUEEZY_VARIANT_ID",
   ];
 
+  // console.log("Checking environment variables:");
+  // requiredVars.forEach((varName) => {
+  //   const value = process.env[varName];
+  //   console.log(
+  //     `${varName}: ${value ? `${value.substring(0, 10)}...` : "MISSING"}`
+  //   );
+  // });
+
   const missing = requiredVars.filter((varName) => !process.env[varName]);
 
   if (missing.length > 0) {
@@ -44,6 +52,23 @@ export function validateLemonSqueezyConfig() {
       `Missing required environment variables: ${missing.join(", ")}`
     );
   }
+
+  // Also validate the values are strings
+  if (
+    typeof LEMON_SQUEEZY_CONFIG.storeId !== "string" ||
+    !LEMON_SQUEEZY_CONFIG.storeId
+  ) {
+    throw new Error("LEMONSQUEEZY_STORE_ID must be a non-empty string");
+  }
+
+  if (
+    typeof LEMON_SQUEEZY_CONFIG.variantId !== "string" ||
+    !LEMON_SQUEEZY_CONFIG.variantId
+  ) {
+    throw new Error("LEMONSQUEEZY_VARIANT_ID must be a non-empty string");
+  }
+
+  console.log("All environment variables validated successfully");
 }
 
 // Initialize client on module load

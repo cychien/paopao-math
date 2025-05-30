@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import {
   getMagicLinkConfig,
 } from "~/services/auth/magic-link";
 import { sendMagicLinkEmail } from "~/services/email/magic-link-email";
+import { getUserWithPurchases } from "~/services/database/users";
 
 type ActionData =
   | { error: string; success: false }
@@ -31,6 +32,34 @@ export const action = async ({
       return json(
         { error: "請輸入有效的電子郵件地址", success: false } as const,
         { status: 400 }
+      );
+    }
+
+    // 檢查用戶是否有購買記錄
+    const userWithPurchases = await getUserWithPurchases(email);
+
+    if (!userWithPurchases) {
+      return json(
+        {
+          error: "此信箱尚未購買課程，請先完成購買才能登入",
+          success: false,
+        } as const,
+        { status: 403 }
+      );
+    }
+
+    // 檢查是否有有效的購買記錄
+    const hasValidPurchase = userWithPurchases.purchases.some(
+      (purchase) => purchase.status === "ACTIVE" && purchase.hasLifetimeAccess
+    );
+
+    if (!hasValidPurchase) {
+      return json(
+        {
+          error: "您的購買記錄無效或已過期，請聯繫客服或重新購買",
+          success: false,
+        } as const,
+        { status: 403 }
       );
     }
 
@@ -87,7 +116,7 @@ export default function LoginPage() {
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900">🎯 登入</h2>
           <p className="mt-2 text-sm text-gray-600">
-            我們將發送一個安全的登入連結到您的信箱
+            限已購買用戶登入，我們將發送安全的登入連結到您的信箱
           </p>
         </div>
 
@@ -213,6 +242,20 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-500">
               繼續使用即表示您同意我們的服務條款和隱私政策
+            </p>
+          </div>
+
+          <div className="mt-4 bg-blue-50 border border-blue-200 rounded-md p-3">
+            <p className="text-xs text-blue-700">
+              <strong>還沒購買課程？</strong>
+              <br />
+              <a
+                href="/purchase"
+                className="text-blue-600 hover:text-blue-800 underline"
+              >
+                點此購買學測總複習班
+              </a>
+              ，購買後會自動發送登入連結到您的信箱
             </p>
           </div>
         </div>

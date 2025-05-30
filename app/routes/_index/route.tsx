@@ -1,6 +1,7 @@
 import {
   json,
   type ActionFunctionArgs,
+  type LoaderFunctionArgs,
   type MetaFunction,
 } from "@remix-run/node";
 import { HeroSection } from "./components/HeroSection";
@@ -14,6 +15,7 @@ import { EmailSchema, SchoolNameSchema } from "~/utils/validation";
 import { z } from "zod";
 import { createContact } from "~/services/loop";
 import { checkHoneypot } from "~/utils/honeypot.server";
+import { getOptionalUser } from "~/services/auth/session";
 
 export const meta: MetaFunction = () => {
   return [
@@ -24,6 +26,25 @@ export const meta: MetaFunction = () => {
         "一堂課帶你高效總複習高一 ～ 高三數學，200+ 精講影片、系統化重點筆記與持續更新題庫，買斷全年內容，多裝置離線學習，助你快速提分。",
     },
   ];
+};
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  // 檢查用戶是否已登入並有課程訪問權限
+  const user = await getOptionalUser(request);
+
+  return json({
+    user: user
+      ? {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          hasCourseAccess: user.purchases.some(
+            (purchase) =>
+              purchase.status === "ACTIVE" && purchase.hasLifetimeAccess
+          ),
+        }
+      : null,
+  });
 };
 
 export const EmailFormSchema = z.object({
