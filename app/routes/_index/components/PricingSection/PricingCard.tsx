@@ -40,7 +40,7 @@ function PricingCard() {
         <div className="block lg:hidden">
           <div className="lg:hidden font-inter font-semibold space-x-0.5 flex items-start">
             <span className="text-4xl pt-1.5 leading-[44px]">NT$</span>
-            <span className="text-5xl leading-[60px]">4,999</span>
+            <span className="text-5xl leading-[60px]">4,995</span>
           </div>
           <div className="text-gray-600 -translate-y-1 line-through">
             NT$ 7,999
@@ -62,7 +62,7 @@ function PricingCard() {
         <div className="hidden lg:block">
           <div className="flex font-inter font-semibold space-x-0.5">
             <span className="text-4xl pt-2 leading-[44px]">NT$</span>
-            <span className="text-6xl leading-[72px]">4,999</span>
+            <span className="text-6xl leading-[72px]">4,995</span>
           </div>
           <div className="text-gray-600 text-right -translate-y-1 line-through">
             NT$ 7,999
