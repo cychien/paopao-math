@@ -1,5 +1,11 @@
 import format from "format-duration";
-import { Clock } from "lucide-react";
+import {
+  Clock,
+  ChevronDown,
+  ChevronUp,
+  BarChart3,
+  FileText,
+} from "lucide-react";
 import { Lock } from "~/components/icons/Lock";
 import { Syllabus } from "./Syllabus";
 import React from "react";
@@ -28,83 +34,108 @@ function Lesson({ lesson, index }: LessonProps) {
   const isLocked = lesson.chapters.length === 0;
 
   return (
-    <div key={lesson.slug} className="max-xl:space-y-5 xl:flex gap-16">
-      <div className="xl:w-[300px]">
-        <div className="text-sm text-brand-500 font-medium">
-          第 {index + 1} 單元
+    <div className="space-y-4">
+      {/* 單元頭部 */}
+      <div className="space-y-3">
+        {/* 單元標題行 */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center w-8 h-8 bg-brand-100 text-brand-700 rounded-md font-bold font-inter">
+              {index + 1}
+            </div>
+          </div>
+
+          {isLocked && (
+            <div className="flex items-center space-x-1 px-2 py-1 bg-orange-50 border border-orange-300 rounded-md">
+              <Lock className="size-4 text-orange-500" />
+              <span className="text-xs text-orange-800 font-medium">
+                購買限定
+              </span>
+            </div>
+          )}
         </div>
-        <div className="text-xl font-semibold mt-1 flex items-center">
+
+        {/* 課程名稱 */}
+        <h3 className="text-lg font-bold text-gray-900 leading-tight">
           {lesson.name}
-          {isLocked && <Lock className="ml-2 size-4 text-[#FBBF24]" />}
-        </div>
+        </h3>
 
+        {/* 描述 */}
+        {lesson.description && (
+          <p className="text-gray-600 text-sm leading-relaxed">
+            {lesson.description}
+          </p>
+        )}
+
+        {/* 統計信息 */}
         {!isLocked && (
-          <>
-            {mode === "normal" && (
-              <Button
-                size="sm"
-                variant="link"
-                className="px-0 font-normal text-gray-500"
-                onClick={() => {
-                  setMode("detailed");
-                }}
-              >
-                展開主題
-              </Button>
-            )}
+          <div className="flex flex-wrap gap-4">
+            <StatsItem
+              icon={<FileText className="size-4" />}
+              label="章節"
+              value={lesson.chapters.length}
+            />
+            <StatsItem
+              icon={<BarChart3 className="size-4" />}
+              label="例題"
+              value={lesson.examCount}
+            />
+            <StatsItem
+              icon={<Clock className="size-4" />}
+              label="時長"
+              value={format(lesson.totalDuration * 1000)}
+            />
+          </div>
+        )}
 
-            {mode === "detailed" && (
-              <>
-                <p className="max-sm:hidden text-sm mt-4 text-gray-500 leading-[24px]">
-                  {lesson.description}
-                </p>
-                {!isLocked && (
-                  <div className="mt-4">
-                    <StatsBar
-                      chapterCount={lesson.chapters.length}
-                      examCount={lesson.examCount}
-                      totalDuration={lesson.totalDuration}
-                    />
-                  </div>
-                )}
-                <Button
-                  size="sm"
-                  variant="link"
-                  className="mt-2 px-0 font-normal text-gray-500"
-                  onClick={() => {
-                    setMode("normal");
-                  }}
-                >
-                  收合主題
-                </Button>
-              </>
-            )}
-          </>
+        {/* 展開按鈕 */}
+        {!isLocked && (
+          <div className="pt-2">
+            <Button
+              // size=""
+              variant="outline"
+              className="w-full justify-center bg-gray-100 border-gray-200 hover:bg-gray-300/40"
+              onClick={() => setMode(mode === "normal" ? "detailed" : "normal")}
+            >
+              {mode === "normal" ? (
+                <>
+                  <span>查看課程內容</span>
+                  <ChevronDown className="size-4" />
+                </>
+              ) : (
+                <>
+                  <span>收合課程內容</span>
+                  <ChevronUp className="size-4" />
+                </>
+              )}
+            </Button>
+          </div>
         )}
       </div>
+
+      {/* 展開的課程內容 */}
       {!isLocked && mode === "detailed" && (
-        <Syllabus lessonSlug={lesson.slug} chapters={lesson.chapters} />
+        <div className="mt-4 pt-4 border-t border-gray-200 animate-in fade-in-0 duration-200">
+          <Syllabus lessonSlug={lesson.slug} chapters={lesson.chapters} />
+        </div>
       )}
     </div>
   );
 }
 
-type StatsBarProps = {
-  chapterCount: number;
-  examCount: number;
-  totalDuration: number;
+type StatsItemProps = {
+  icon: React.ReactNode;
+  label: string;
+  value: string | number;
 };
 
-function StatsBar({ chapterCount, examCount, totalDuration }: StatsBarProps) {
+function StatsItem({ icon, label, value }: StatsItemProps) {
   return (
-    <div className="flex text-sm text-gray-500 divide-x-dot-3">
-      <div className="pr-2">{chapterCount} 單元</div>
-      <div className="px-2">{examCount} 例題</div>
-      <div className="flex items-center px-2">
-        <Clock className="size-4 text-gray-400 translate-y-px" />
-        <span className="ml-1">{format(totalDuration * 1000)}</span>
-      </div>
-      <div className="flex items-center pl-2">進度 0%</div>
+    <div className="flex items-center space-x-2">
+      <div className="text-gray-400">{icon}</div>
+      <span className="text-sm text-gray-600">
+        {value} {label}
+      </span>
     </div>
   );
 }

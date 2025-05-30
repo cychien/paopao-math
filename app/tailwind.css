@@ -55,6 +55,18 @@
   --color-red-900: oklch(0.396 0.141 25.723);
   --color-red-950: oklch(0.258 0.092 26.042);
 
+  --color-orange-50: #fff9eb;
+  --color-orange-100: #fef2d2;
+  --color-orange-200: #fde6aa;
+  --color-orange-300: #fdd87d;
+  --color-orange-400: #fccb50;
+  --color-orange-500: #fbbf24;
+  --color-orange-600: #e1a304;
+  --color-orange-700: #aa7b03;
+  --color-orange-800: #735302;
+  --color-orange-900: #372801;
+  --color-orange-950: #1e1601;
+
   --font-inter: "Inter", sans-serif;
   --font-sans: "Noto Sans TC", sans-serif;
 

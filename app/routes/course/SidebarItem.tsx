@@ -29,8 +29,8 @@ function SidebarItem({
       prefetch="intent"
     >
       <div className="flex-1 flex items-center space-x-2">
-        <Icon className="size-5 text-gray-400 group-data-[active=true]:text-brand-500 group-hover:text-brand-500 group-data-[active=true]:scale-110 group-hover:scale-110 transition-all" />
-        <div className="font-medium text-gray-500 group-data-[active=true]:text-gray-700 group-hover:text-gray-700 transition-colors">
+        <Icon className="size-5 text-gray-500 group-data-[active=true]:text-brand-600 group-hover:text-brand-600 group-data-[active=true]:scale-110 group-hover:scale-110 transition-all" />
+        <div className="font-medium text-gray-700 group-data-[active=true]:text-gray-900 group-hover:text-gray-700 transition-colors">
           {label}
         </div>
       </div>

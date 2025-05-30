@@ -25,7 +25,7 @@ const LESSONS: Lesson[] = [
     slug: "polynomial",
     chapters: [
       {
-        name: "主題一：多項式觀念",
+        name: "多項式觀念",
         slug: "concept",
         teachings: [{ videoId: "1084688606", duration: 207 }],
         exams: [
@@ -34,7 +34,7 @@ const LESSONS: Lesson[] = [
         ],
       },
       {
-        name: "主題二：多項式的運算 (除法原理與綜合除法)",
+        name: "多項式的運算 (除法原理與綜合除法)",
         slug: "division-synthetic",
         teachings: [{ videoId: "1084843003", duration: 300 }],
         exams: [
@@ -44,7 +44,7 @@ const LESSONS: Lesson[] = [
         ],
       },
       {
-        name: "主題三：餘式定理與因式定理",
+        name: "餘式定理與因式定理",
         slug: "remainder-and-factor-theorem",
         teachings: [{ videoId: "1084843728", duration: 96 }],
         exams: [
@@ -56,7 +56,7 @@ const LESSONS: Lesson[] = [
         ],
       },
       {
-        name: "主題四：一次函數與二次函數",
+        name: "一次函數與二次函數",
         slug: "linear-and-quadratic-functions",
         teachings: [{ videoId: "1084844018", duration: 215 }],
         exams: [
@@ -67,7 +67,7 @@ const LESSONS: Lesson[] = [
         ],
       },
       {
-        name: "主題五：二次多項式",
+        name: "二次多項式",
         slug: "quadratic-polynomials",
         teachings: [{ videoId: "1084844212", duration: 214 }],
         exams: [
@@ -76,7 +76,7 @@ const LESSONS: Lesson[] = [
         ],
       },
       {
-        name: "主題六：二次不等式",
+        name: "二次不等式",
         slug: "quadratic-inequalities",
         teachings: [{ videoId: "1084844343", duration: 242 }],
         exams: [
@@ -85,7 +85,7 @@ const LESSONS: Lesson[] = [
         ],
       },
       {
-        name: "主題七：高次多項式",
+        name: "高次多項式",
         slug: "higher-degree-polynomials",
         teachings: [{ videoId: "1084844564", duration: 158 }],
         exams: [

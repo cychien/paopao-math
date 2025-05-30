@@ -25,12 +25,22 @@ export default function Page() {
     <div className="divide-y-1 divide-gray-200">
       <div className="pb-6">
         {/* <h1 className="text-sm text-gray-500">課程</h1> */}
-        <h2 className="text-xl font-semibold">課程總覽</h2>
+        <h1 className="text-xl font-semibold">課程</h1>
       </div>
-      <div className="pt-6 space-y-8">
-        {syllabus.map((lesson, index) => (
-          <Lesson key={lesson.slug} lesson={lesson} index={index} />
-        ))}
+
+      <div className="py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4 max-w-7xl items-start">
+          {syllabus.map((lesson, index) => (
+            <div
+              key={lesson.slug}
+              className="bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
+            >
+              <div className="p-4">
+                <Lesson lesson={lesson} index={index} />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
