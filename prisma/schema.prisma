@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// 用戶表 - 支援 Magic Link 登入
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 關聯
+  purchases Purchase[]
+  sessions  Session[]
+
+  @@map("users")
+}
+
+// 購買記錄表 - 一次性購買模型
+model Purchase {
+  id               String          @id @default(cuid())
+  userId           String
+  email            String          // 冗余字段，便於查詢
+  lemonsqueezyId   String          @unique // Lemon Squeezy 訂單 ID
+  customerId       String?         // Lemon Squeezy 客戶 ID
+  status           PurchaseStatus  @default(PENDING)
+  amount           Int             // 金額（分為單位）
+  currency         String          @default("TWD")
+  productName      String          @default("學測總複習班")
+  purchasedAt      DateTime        @default(now())
+  refundedAt       DateTime?
+  
+  // 權限相關
+  hasLifetimeAccess Boolean        @default(true)
+  accessGrantedAt   DateTime?
+  
+  // Webhook 相關
+  webhookProcessed  Boolean        @default(false)
+  webhookData       Json?          // 儲存 webhook 原始資料
+  
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  // 關聯
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("purchases")
+}
+
+// 登入會話表 - 支援 Magic Link
+model Session {
+  id           String      @id @default(cuid())
+  userId       String
+  email        String      // 冗余字段
+  token        String      @unique // Magic Link token
+  expiresAt    DateTime    // Token 過期時間
+  used         Boolean     @default(false)
+  usedAt       DateTime?
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime    @default(now())
+
+  // 關聯
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// 購買狀態枚舉
+enum PurchaseStatus {
+  PENDING    // 待付款
+  ACTIVE     // 已付款，有效
+  REFUNDED   // 已退款
+}
+
+// 索引優化
+// 1. 按 email 查詢購買記錄
+// 2. 按 lemonsqueezyId 查詢（webhook 處理）
+// 3. 按 token 查詢（Magic Link 驗證）
+// 4. 按狀態查詢活躍購買
