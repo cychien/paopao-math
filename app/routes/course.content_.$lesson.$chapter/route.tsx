@@ -3,11 +3,8 @@ import { json, Link, useLoaderData } from "@remix-run/react";
 import {
   ChevronRight,
   BookOpen,
-  PlayCircle,
   BarChart3,
   Clock,
-  CheckCircle,
-  ArrowLeft,
   VideoIcon,
 } from "lucide-react";
 import { LockScreen } from "~/components/business/LockScreen";
@@ -62,9 +59,9 @@ export default function Page() {
       <div className="divide-y-1 divide-gray-200">
         <div className="pb-3">
           <div>
-            <div className="flex items-center justify-between h-8">
+            <div className="lg:flex items-center justify-between lg:h-8">
               <div className="flex items-center space-x-4">
-                <div className="hidden sm:flex items-center space-x-2 text-sm text-gray-500">
+                <div className="flex items-center space-x-2 text-sm text-gray-500 flex-wrap">
                   <Link to="/course/content" className="hover:text-gray-900">
                     課程
                   </Link>
@@ -85,7 +82,7 @@ export default function Page() {
                   to={`/course/content/${chapter.lessonMeta.slug}/${chapter.nextChapter.slug}`}
                   className={cn(
                     buttonVariants({ size: "sm" }),
-                    "bg-brand-600 hover:bg-brand-700"
+                    "max-lg:mt-4 bg-brand-600 hover:bg-brand-700"
                   )}
                 >
                   下一章節
@@ -148,7 +145,7 @@ export default function Page() {
                     <div className="space-y-4">
                       {chapter.teachings.map((teaching) => (
                         <div key={teaching.videoId}>
-                          <div className="py-2">
+                          <div>
                             <Video videoId={teaching.videoId} />
                           </div>
                         </div>
@@ -172,7 +169,7 @@ export default function Page() {
                     <div className="space-y-4">
                       {chapter.exams.map((exam) => (
                         <div key={exam.videoId}>
-                          <div className="py-2">
+                          <div>
                             <Video videoId={exam.videoId} />
                           </div>
                         </div>
