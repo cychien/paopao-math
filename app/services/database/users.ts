@@ -1,4 +1,5 @@
 import { prisma } from "./client";
+import { withCache, cacheKeys, cache } from "../cache/redis";
 
 export type UserWithPurchases = {
   id: string;
@@ -46,47 +47,60 @@ export async function createOrGetUser(email: string, name?: string) {
 }
 
 /**
- * 根據 email 獲取用戶及其購買記錄
+ * 根據 email 獲取用戶及其購買記錄（快取版本）
  */
 export async function getUserWithPurchases(
   email: string
 ): Promise<UserWithPurchases | null> {
-  try {
-    return await prisma.user.findUnique({
-      where: { email },
-      include: {
-        purchases: {
-          orderBy: {
-            purchasedAt: "desc",
+  return withCache(
+    cacheKeys.userWithPurchases(email),
+    async () => {
+      try {
+        return await prisma.user.findUnique({
+          where: { email },
+          include: {
+            purchases: {
+              orderBy: {
+                purchasedAt: "desc",
+              },
+            },
           },
-        },
-      },
-    });
-  } catch (error) {
-    console.error("獲取用戶購買記錄失敗:", error);
-    throw new Error("獲取用戶數據失敗");
-  }
+        });
+      } catch (error) {
+        console.error("獲取用戶購買記錄失敗:", error);
+        throw new Error("獲取用戶數據失敗");
+      }
+    },
+    300 // 快取 5 分鐘
+  );
 }
 
 /**
- * 檢查用戶是否有課程訪問權限
+ * 檢查用戶是否有課程訪問權限（快取版本）
  */
 export async function checkUserAccess(email: string): Promise<boolean> {
-  try {
-    const user = await getUserWithPurchases(email);
+  return withCache(
+    cacheKeys.userAccess(email),
+    async () => {
+      try {
+        const user = await getUserWithPurchases(email);
 
-    if (!user) {
-      return false;
-    }
+        if (!user) {
+          return false;
+        }
 
-    // 檢查是否有任何有效的購買記錄
-    return user.purchases.some(
-      (purchase) => purchase.status === "ACTIVE" && purchase.hasLifetimeAccess
-    );
-  } catch (error) {
-    console.error("檢查用戶權限失敗:", error);
-    return false;
-  }
+        // 檢查是否有任何有效的購買記錄
+        return user.purchases.some(
+          (purchase) =>
+            purchase.status === "ACTIVE" && purchase.hasLifetimeAccess
+        );
+      } catch (error) {
+        console.error("檢查用戶權限失敗:", error);
+        return false;
+      }
+    },
+    600 // 快取 10 分鐘
+  );
 }
 
 /**
@@ -190,7 +204,7 @@ export async function cleanupExpiredSessions(): Promise<number> {
 }
 
 /**
- * 創建購買記錄
+ * 創建購買記錄時清除相關快取
  */
 export async function createPurchaseRecord(data: {
   userId: string;
@@ -198,45 +212,37 @@ export async function createPurchaseRecord(data: {
   lemonSqueezyOrderId: string;
   orderNumber: string;
   amount: number;
-  currency: string;
   status: string;
   hasLifetimeAccess: boolean;
   testMode: boolean;
   purchasedAt: Date;
 }) {
   try {
-    // 檢查是否已存在相同的訂單記錄
-    const existingPurchase = await prisma.purchase.findUnique({
-      where: { lemonsqueezyId: data.lemonSqueezyOrderId },
-    });
+    // 確保用戶存在
+    const user = await createOrGetUser(data.email);
 
-    if (existingPurchase) {
-      console.log(
-        `Purchase record already exists for order ${data.orderNumber}`
-      );
-      return existingPurchase;
-    }
-
-    // 創建新的購買記錄
+    // 創建購買記錄
     const purchase = await prisma.purchase.create({
       data: {
-        userId: data.userId,
+        userId: user.id,
         email: data.email,
         lemonsqueezyId: data.lemonSqueezyOrderId,
         orderNumber: data.orderNumber,
         amount: data.amount,
-        currency: data.currency,
-        status: data.status,
+        status: data.status as "PENDING" | "ACTIVE" | "REFUNDED",
         hasLifetimeAccess: data.hasLifetimeAccess,
         testMode: data.testMode,
         purchasedAt: data.purchasedAt,
+        productName: "學測總複習班",
       },
     });
 
-    console.log(`✅ Created purchase record for ${data.email}`, {
-      purchaseId: purchase.id,
-      orderNumber: data.orderNumber,
-    });
+    // 清除相關快取
+    await Promise.all([
+      cache.del(cacheKeys.userWithPurchases(data.email)),
+      cache.del(cacheKeys.userAccess(data.email)),
+      cache.del(cacheKeys.purchaseStats()),
+    ]);
 
     return purchase;
   } catch (error) {
@@ -246,65 +252,43 @@ export async function createPurchaseRecord(data: {
 }
 
 /**
- * 更新購買記錄狀態（用於退款等情況）
+ * 更新購買狀態時清除相關快取
  */
 export async function updatePurchaseStatus(
   lemonSqueezyOrderId: string,
-  status: "ACTIVE" | "REFUNDED" | "CANCELLED",
+  status: "ACTIVE" | "REFUNDED",
   hasLifetimeAccess: boolean
 ) {
   try {
-    // 查找購買記錄
+    // 首先找到購買記錄
     const purchase = await prisma.purchase.findUnique({
       where: { lemonsqueezyId: lemonSqueezyOrderId },
-      include: { user: true },
     });
 
     if (!purchase) {
-      console.error(
-        `Purchase record not found for order ${lemonSqueezyOrderId}`
-      );
-      return null;
+      throw new Error(`找不到訂單 ${lemonSqueezyOrderId}`);
     }
 
-    // 更新購買記錄
+    // 更新購買狀態
     const updatedPurchase = await prisma.purchase.update({
       where: { lemonsqueezyId: lemonSqueezyOrderId },
       data: {
         status,
         hasLifetimeAccess,
-        updatedAt: new Date(),
+        ...(status === "REFUNDED" && { refundedAt: new Date() }),
       },
     });
 
-    // 如果是退款，清除用戶的所有活動 session
-    if (status === "REFUNDED") {
-      await prisma.session.updateMany({
-        where: {
-          userId: purchase.userId,
-          used: false,
-        },
-        data: {
-          used: true,
-          usedAt: new Date(),
-        },
-      });
-
-      console.log(
-        `🚫 Revoked access for user ${purchase.user.email} due to refund`
-      );
-    }
-
-    console.log(`✅ Updated purchase status for ${purchase.user.email}`, {
-      purchaseId: purchase.id,
-      oldStatus: purchase.status,
-      newStatus: status,
-      hasLifetimeAccess,
-    });
+    // 清除相關快取
+    await Promise.all([
+      cache.del(cacheKeys.userWithPurchases(purchase.email)),
+      cache.del(cacheKeys.userAccess(purchase.email)),
+      cache.del(cacheKeys.purchaseStats()),
+    ]);
 
     return updatedPurchase;
   } catch (error) {
-    console.error("更新購買記錄失敗:", error);
-    throw new Error("更新購買記錄失敗");
+    console.error("更新購買狀態失敗:", error);
+    throw new Error("更新購買狀態失敗");
   }
 }

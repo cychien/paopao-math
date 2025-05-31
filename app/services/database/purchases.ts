@@ -1,4 +1,5 @@
 import { prisma } from "./client";
+import { withCache, cacheKeys } from "../cache/redis";
 
 /**
  * 處理 Lemon Squeezy 訂單創建 webhook
@@ -107,37 +108,49 @@ export async function handleOrderRefunded(webhookData: any) {
 }
 
 /**
- * 根據 email 獲取用戶的有效購買記錄
+ * 根據 email 獲取用戶的有效購買記錄（快取版本）
  */
 export async function getUserActivePurchases(email: string) {
-  try {
-    return await prisma.purchase.findMany({
-      where: {
-        email,
-        status: "ACTIVE",
-        hasLifetimeAccess: true,
-      },
-      orderBy: {
-        purchasedAt: "desc",
-      },
-    });
-  } catch (error) {
-    console.error("獲取用戶購買記錄失敗:", error);
-    throw new Error("獲取購買記錄失敗");
-  }
+  return withCache(
+    `user_active_purchases:${email}`,
+    async () => {
+      try {
+        return await prisma.purchase.findMany({
+          where: {
+            email,
+            status: "ACTIVE",
+            hasLifetimeAccess: true,
+          },
+          orderBy: {
+            purchasedAt: "desc",
+          },
+        });
+      } catch (error) {
+        console.error("獲取用戶購買記錄失敗:", error);
+        throw new Error("獲取購買記錄失敗");
+      }
+    },
+    300 // 快取 5 分鐘
+  );
 }
 
 /**
- * 驗證用戶是否有課程訪問權限
+ * 驗證用戶是否有課程訪問權限（快取版本）
  */
 export async function verifyUserAccess(email: string): Promise<boolean> {
-  try {
-    const activePurchases = await getUserActivePurchases(email);
-    return activePurchases.length > 0;
-  } catch (error) {
-    console.error("驗證用戶權限失敗:", error);
-    return false;
-  }
+  return withCache(
+    cacheKeys.userAccess(email),
+    async () => {
+      try {
+        const activePurchases = await getUserActivePurchases(email);
+        return activePurchases.length > 0;
+      } catch (error) {
+        console.error("驗證用戶權限失敗:", error);
+        return false;
+      }
+    },
+    600 // 快取 10 分鐘
+  );
 }
 
 /**
@@ -158,29 +171,39 @@ export async function findPurchaseByLemonSqueezyId(lemonsqueezyId: string) {
 }
 
 /**
- * 獲取購買統計信息
+ * 獲取購買統計信息（快取版本）
  */
 export async function getPurchaseStats() {
-  try {
-    const [totalPurchases, activePurchases, refundedPurchases, totalRevenue] =
-      await Promise.all([
-        prisma.purchase.count(),
-        prisma.purchase.count({ where: { status: "ACTIVE" } }),
-        prisma.purchase.count({ where: { status: "REFUNDED" } }),
-        prisma.purchase.aggregate({
-          where: { status: "ACTIVE" },
-          _sum: { amount: true },
-        }),
-      ]);
+  return withCache(
+    cacheKeys.purchaseStats(),
+    async () => {
+      try {
+        const [
+          totalPurchases,
+          activePurchases,
+          refundedPurchases,
+          totalRevenue,
+        ] = await Promise.all([
+          prisma.purchase.count(),
+          prisma.purchase.count({ where: { status: "ACTIVE" } }),
+          prisma.purchase.count({ where: { status: "REFUNDED" } }),
+          prisma.purchase.aggregate({
+            where: { status: "ACTIVE" },
+            _sum: { amount: true },
+          }),
+        ]);
 
-    return {
-      totalPurchases,
-      activePurchases,
-      refundedPurchases,
-      totalRevenue: totalRevenue._sum.amount || 0,
-    };
-  } catch (error) {
-    console.error("獲取購買統計失敗:", error);
-    throw new Error("獲取統計信息失敗");
-  }
+        return {
+          totalPurchases,
+          activePurchases,
+          refundedPurchases,
+          totalRevenue: totalRevenue._sum.amount || 0,
+        };
+      } catch (error) {
+        console.error("獲取購買統計失敗:", error);
+        throw new Error("獲取統計信息失敗");
+      }
+    },
+    1800 // 快取 30 分鐘
+  );
 }
