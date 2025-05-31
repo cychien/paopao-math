@@ -10,7 +10,7 @@ import {
 import { sendMagicLinkEmail } from "~/services/email/magic-link-email";
 import { getUserWithPurchases } from "~/services/database/users";
 import { Button } from "~/components/ui/Button";
-import { ArrowLeft, Rocket } from "lucide-react";
+import { ArrowLeft, Check, Rocket } from "lucide-react";
 
 type ActionData =
   | { error: string; success: false }
@@ -39,8 +39,6 @@ export const action = async ({
 
     // 檢查用戶是否有購買記錄
     const userWithPurchases = await getUserWithPurchases(email);
-
-    console.log({ userWithPurchases });
 
     if (!userWithPurchases) {
       return json(
@@ -144,37 +142,22 @@ export default function LoginPage() {
         <div className="bg-white rounded-lg shadow-lg py-8 px-4 lg:p-8">
           {actionData?.success ? (
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
+              <div className="w-16 h-16 bg-success-100 rounded-full flex items-center justify-center mx-auto">
+                <Check className="size-8 text-success-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900">
                 郵件已發送！
               </h3>
               <p className="text-sm text-gray-600">{actionData.message}</p>
               <div className="bg-brand-50 border border-brand-200 rounded-md p-3">
-                <p className="text-xs text-brand-700">
+                <p className="text-sm text-brand-700">
                   💡
                   提示：請檢查您的垃圾郵件資料夾，有時郵件可能會被誤判為垃圾郵件
                 </p>
               </div>
-              <button
-                onClick={() => window.location.reload()}
-                className="text-brand-600 hover:text-brand-800 text-sm font-medium"
-              >
+              <Button variant="link" onClick={() => window.location.reload()}>
                 重新發送登入連結
-              </button>
+              </Button>
             </div>
           ) : (
             <Form method="post" className="space-y-6">
