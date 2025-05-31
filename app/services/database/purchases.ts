@@ -59,7 +59,7 @@ export async function handleOrderCreated(webhookData: any) {
     });
 
     console.log(
-      `成功處理訂單 ${lemonsqueezyId}，用戶 ${email} 獲得終身訪問權限`
+      `成功處理訂單 ${lemonsqueezyId}，用戶 ${email} 獲得一年訪問權限`
     );
     return purchase;
   } catch (error) {

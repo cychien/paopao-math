@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useNavigation } from "@remix-run/react";
 import { useState } from "react";
 import {
@@ -11,14 +11,24 @@ import { sendMagicLinkEmail } from "~/services/email/magic-link-email";
 import { getUserWithPurchases } from "~/services/database/users";
 import { Button } from "~/components/ui/Button";
 import { ArrowLeft, Check, Rocket } from "lucide-react";
+import { getOptionalUser } from "~/services/auth/session";
 
 type ActionData =
   | { error: string; success: false }
   | { success: true; message: string; email: string };
 
-export const loader = async () => {
-  // 如果用戶已登入，重導向到主頁面
-  // TODO: 實作用戶 session 檢查
+export const loader = async ({ request }: { request: Request }) => {
+  // 檢查用戶是否已登入並有課程訪問權限
+  const user = await getOptionalUser(request);
+
+  if (
+    user?.purchases.some(
+      (purchase) => purchase.status === "ACTIVE" && purchase.hasLifetimeAccess
+    )
+  ) {
+    throw redirect("/course/overview");
+  }
+
   return json({});
 };
 
@@ -125,9 +135,6 @@ export default function LoginPage() {
       setEmail(target.value.trim());
     }, 10);
   };
-
-  // 檢查 email 是否有效（基本檢查）
-  const isEmailValid = email.length > 0 && email.includes("@");
 
   return (
     <div className="h-full bg-gray-100 flex items-center justify-center p-4">

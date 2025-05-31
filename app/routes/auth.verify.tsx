@@ -61,7 +61,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     return await createUserSession(
       userWithPurchases.id,
       userWithPurchases.email,
-      "/course"
+      "/course/content"
     );
   } catch (error) {
     console.error("Magic Link 驗證失敗:", error);

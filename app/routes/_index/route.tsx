@@ -1,5 +1,6 @@
 import {
   json,
+  redirect,
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
   type MetaFunction,
@@ -32,6 +33,14 @@ export const meta: MetaFunction = () => {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   // 檢查用戶是否已登入並有課程訪問權限
   const user = await getOptionalUser(request);
+
+  if (
+    user?.purchases.some(
+      (purchase) => purchase.status === "ACTIVE" && purchase.hasLifetimeAccess
+    )
+  ) {
+    throw redirect("/course/overview");
+  }
 
   return json({
     user: user

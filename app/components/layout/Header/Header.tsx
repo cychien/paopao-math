@@ -38,29 +38,31 @@ function Header({ user }: HeaderProps) {
               <span className="sr-only">寶哥高中數學</span>
               <img src={logoSrc} alt="Logo" className="h-[34px] w-auto" />
             </Link>
-            <NavigationMenu.List className="hidden lg:flex lg:space-x-8">
-              <NavigationMenu.Item className="flex items-center space-x-1.5">
-                <NavigationMenu.Link asChild>
-                  <Link
-                    to="/course/content"
-                    className={cn(
-                      "font-medium text-gray-900 group flex items-center gap-1.5 transition-colors text-sm"
-                    )}
-                  >
-                    <PlayCircleSolid
+            {!user && (
+              <NavigationMenu.List className="hidden lg:flex lg:space-x-8">
+                <NavigationMenu.Item className="flex items-center space-x-1.5">
+                  <NavigationMenu.Link asChild>
+                    <Link
+                      to="/course/content"
                       className={cn(
-                        "text-gray-400 group-hover:text-[#c1272d] transition-colors translate-y-px",
-                        {
-                          "text-[#c1272d]":
-                            location.pathname.startsWith("/course"),
-                        }
+                        "font-medium text-gray-900 group flex items-center gap-1.5 transition-colors text-sm"
                       )}
-                    />
-                    <span>免費試讀</span>
-                  </Link>
-                </NavigationMenu.Link>
-              </NavigationMenu.Item>
-            </NavigationMenu.List>
+                    >
+                      <PlayCircleSolid
+                        className={cn(
+                          "text-gray-400 group-hover:text-[#c1272d] transition-colors translate-y-px",
+                          {
+                            "text-[#c1272d]":
+                              location.pathname.startsWith("/course"),
+                          }
+                        )}
+                      />
+                      <span>免費試讀</span>
+                    </Link>
+                  </NavigationMenu.Link>
+                </NavigationMenu.Item>
+              </NavigationMenu.List>
+            )}
           </div>
 
           <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end">
@@ -105,24 +107,27 @@ function Header({ user }: HeaderProps) {
 
           {/* Mobile menu */}
           <div className={"flex flex-1 justify-end space-x-3 lg:hidden"}>
-            <NavigationMenu.Link asChild>
-              <Link
-                to="/course/content"
-                className={cn(
-                  "font-medium text-gray-900 hover:text-gray-900 group flex items-center gap-1.5 transition-colors text-sm"
-                )}
-              >
-                <PlayCircleSolid
+            {!user && (
+              <NavigationMenu.Link asChild>
+                <Link
+                  to="/course/content"
                   className={cn(
-                    "text-gray-400 group-hover:text-[#c1272d] transition-colors translate-y-px",
-                    {
-                      "text-[#c1272d]": location.pathname.startsWith("/course"),
-                    }
+                    "font-medium text-gray-900 hover:text-gray-900 group flex items-center gap-1.5 transition-colors text-sm"
                   )}
-                />
-                <span>免費試讀</span>
-              </Link>
-            </NavigationMenu.Link>
+                >
+                  <PlayCircleSolid
+                    className={cn(
+                      "text-gray-400 group-hover:text-[#c1272d] transition-colors translate-y-px",
+                      {
+                        "text-[#c1272d]":
+                          location.pathname.startsWith("/course"),
+                      }
+                    )}
+                  />
+                  <span>免費試讀</span>
+                </Link>
+              </NavigationMenu.Link>
+            )}
 
             <Dialog.Root
               open={isMenuPoppedOut}
@@ -159,7 +164,7 @@ function Header({ user }: HeaderProps) {
                       className="container mx-auto divide-border-secondary"
                     >
                       <NavigationMenu.List className="space-y-2">
-                        {user?.hasCourseAccess && (
+                        {/* {user?.hasCourseAccess && (
                           <NavigationMenu.Item>
                             <NavigationMenu.Link
                               href="/course"
@@ -171,7 +176,7 @@ function Header({ user }: HeaderProps) {
                               我的課程
                             </NavigationMenu.Link>
                           </NavigationMenu.Item>
-                        )}
+                        )} */}
 
                         <NavigationMenu.Item>
                           {user ? (

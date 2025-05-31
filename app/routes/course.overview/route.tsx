@@ -39,7 +39,7 @@ export default function CourseOverviewPage() {
 
   return (
     <div className="max-w-4xl">
-      {/* 歡迎訊息 */}
+      {/* 歡迎訊息
       <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
           🎉 歡迎來到學測總複習班！
@@ -55,10 +55,10 @@ export default function CourseOverviewPage() {
             <li>• 多裝置同步學習進度</li>
           </ul>
         </div>
-      </div>
+      </div> */}
 
       {/* 課程統計 */}
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
+      {/* <div className="grid md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow p-6 text-center">
           <div className="text-3xl font-bold text-blue-600 mb-2">200+</div>
           <div className="text-gray-600">精講影片</div>
@@ -71,10 +71,10 @@ export default function CourseOverviewPage() {
           <div className="text-3xl font-bold text-purple-600 mb-2">100%</div>
           <div className="text-gray-600">完成進度</div>
         </div>
-      </div>
+      </div> */}
 
       {/* 快速導航 */}
-      <div className="grid md:grid-cols-2 gap-6">
+      {/* <div className="grid md:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-xl font-semibold text-gray-900 mb-4">
             📚 課程章節
@@ -136,7 +136,7 @@ export default function CourseOverviewPage() {
             </Link>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* 購買資訊 */}
       <div className="mt-8 bg-white rounded-lg shadow p-6">
@@ -166,11 +166,6 @@ export default function CourseOverviewPage() {
                 >
                   {purchase.status === "ACTIVE" ? "有效" : purchase.status}
                 </span>
-                {purchase.hasLifetimeAccess && (
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
-                    終身訪問
-                  </span>
-                )}
               </div>
             </div>
           ))}

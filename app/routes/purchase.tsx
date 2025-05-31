@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import {
   Form,
   useActionData,
@@ -14,13 +14,25 @@ import {
 } from "~/services/lemonsqueezy/products";
 import { validateEmail } from "~/services/auth/magic-link";
 import checkIconSrc from "~/assets/check.svg";
-import { ArrowLeft, CreditCard } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { getOptionalUser } from "~/services/auth/session";
 
 type ActionData =
   | { error: string; success: false }
   | { success: true; checkoutUrl: string };
 
-export const loader = async () => {
+export const loader = async ({ request }: { request: Request }) => {
+  // 檢查用戶是否已登入並有課程訪問權限
+  const user = await getOptionalUser(request);
+
+  if (
+    user?.purchases.some(
+      (purchase) => purchase.status === "ACTIVE" && purchase.hasLifetimeAccess
+    )
+  ) {
+    throw redirect("/course/overview");
+  }
+
   // 預載產品資訊
   const productInfo = getProductInfo();
   return json({ productInfo });
