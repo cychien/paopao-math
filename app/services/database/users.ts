@@ -5,6 +5,7 @@ export type UserWithPurchases = {
   id: string;
   email: string;
   name: string | null;
+  role: string;
   createdAt: Date;
   updatedAt: Date;
   purchases: Array<{
@@ -56,7 +57,7 @@ export async function getUserWithPurchases(
     cacheKeys.userWithPurchases(email),
     async () => {
       try {
-        return await prisma.user.findUnique({
+        const result = await prisma.user.findUnique({
           where: { email },
           include: {
             purchases: {
@@ -66,6 +67,7 @@ export async function getUserWithPurchases(
             },
           },
         });
+        return result as UserWithPurchases | null;
       } catch (error) {
         console.error("獲取用戶購買記錄失敗:", error);
         throw new Error("獲取用戶數據失敗");

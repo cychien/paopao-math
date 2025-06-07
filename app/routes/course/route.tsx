@@ -4,30 +4,47 @@ import { Outlet, useLocation, useLoaderData } from "@remix-run/react";
 import { CheckDone } from "~/components/icons/CheckDone";
 import { File } from "~/components/icons/File";
 import { HomeLine } from "~/components/icons/HomeLine";
+import { Upload } from "~/components/icons/Upload";
 import { SidebarItem } from "./SidebarItem";
 import { PlayCircle } from "~/components/icons/PlayCircle";
 import { cn } from "~/utils/style";
 import { LayersTwo } from "~/components/icons/LayersTwo";
 import { getUserPermissionData } from "~/services/auth/permissions";
+import { isUserAdmin } from "~/services/auth/session";
 import type { Permission } from "~/data/permission";
 
 type LoaderData = {
   userPermissions: Permission;
   hasPurchase: boolean;
+  isAdmin: boolean;
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { permissions, hasPurchase } = await getUserPermissionData(request);
+  const isAdmin = await isUserAdmin(request);
 
   return json<LoaderData>({
     userPermissions: permissions,
     hasPurchase,
+    isAdmin,
   });
 };
 
 export default function Layout() {
   const location = useLocation();
-  const { userPermissions } = useLoaderData<LoaderData>();
+  const { userPermissions, isAdmin } = useLoaderData<LoaderData>();
+
+  // 動態生成導航項目，管理員會看到額外的上傳項目
+  const navigations = [
+    { icon: HomeLine, label: "總覽", link: "/course/overview" },
+    { icon: PlayCircle, label: "課程", link: "/course/content" },
+    { icon: File, label: "模擬試題", link: "/course/exams" },
+    { icon: LayersTwo, label: "歷屆聯考題", link: "/course/entrance-exams" },
+    { icon: CheckDone, label: "問答討論區", link: "/course/curated" },
+    ...(isAdmin
+      ? [{ icon: Upload, label: "上傳教學內容", link: "/admin/upload" }]
+      : []),
+  ];
 
   return (
     <>
@@ -112,11 +129,3 @@ export default function Layout() {
     </>
   );
 }
-
-const navigations = [
-  { icon: HomeLine, label: "總覽", link: "/course/overview" },
-  { icon: PlayCircle, label: "課程", link: "/course/content" },
-  { icon: File, label: "模擬試題", link: "/course/exams" },
-  { icon: LayersTwo, label: "歷屆聯考題", link: "/course/entrance-exams" },
-  { icon: CheckDone, label: "問答討論區", link: "/course/curated" },
-];
