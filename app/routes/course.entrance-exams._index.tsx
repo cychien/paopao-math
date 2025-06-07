@@ -104,7 +104,7 @@ export default function EntranceExamsIndexPage() {
                           )}
                           {exam.questionCount > 0 && (
                             <div
-                              className="w-2 h-2 bg-blue-400 rounded-full"
+                              className="w-2 h-2 bg-brand-400 rounded-full"
                               title="有題目檔案"
                             />
                           )}

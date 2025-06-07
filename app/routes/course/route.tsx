@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Outlet, useLocation, useLoaderData } from "@remix-run/react";
+import { Outlet, useLocation, useLoaderData, Link } from "@remix-run/react";
 import { CheckDone } from "~/components/icons/CheckDone";
 import { File } from "~/components/icons/File";
 import { HomeLine } from "~/components/icons/HomeLine";
@@ -12,6 +12,7 @@ import { LayersTwo } from "~/components/icons/LayersTwo";
 import { getUserPermissionData } from "~/services/auth/permissions";
 import { isUserAdmin } from "~/services/auth/session";
 import type { Permission } from "~/data/permission";
+import { buttonVariants } from "~/components/ui/Button";
 
 type LoaderData = {
   userPermissions: Permission;
@@ -69,16 +70,18 @@ export default function Layout() {
                 </div>
 
                 {isAdmin && (
-                  <div className="-mx-3 mt-6 pt-6 border-t border-gray-200">
-                    <button
-                      onClick={() => (window.location.href = "/admin/upload")}
-                      className="cursor-pointer w-full text-sm px-3 py-3 rounded-lg bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
+                  <div className="fixed bottom-8 w-[230px] -translate-x-3 border-t border-gray-200">
+                    <Link
+                      to="/admin/management"
+                      className={cn(
+                        buttonVariants({ size: "lg" }),
+                        "w-full justify-start h-12 text-base"
+                      )}
+                      prefetch="intent"
                     >
-                      <div className="flex items-center space-x-3">
-                        <Upload className="size-5" />
-                        <span>管理教學內容</span>
-                      </div>
-                    </button>
+                      <Upload className="size-5" />
+                      <span>管理教學內容</span>
+                    </Link>
                   </div>
                 )}
               </aside>
