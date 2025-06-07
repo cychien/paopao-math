@@ -38,11 +38,21 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         );
       }
 
+      // 獲取該課程下最大的order值
+      const maxOrderChapter = await prisma.chapter.findFirst({
+        where: { lessonId },
+        orderBy: { order: "desc" },
+        select: { order: true },
+      });
+
+      const newOrder = (maxOrderChapter?.order ?? 0) + 1;
+
       const chapter = await prisma.chapter.create({
         data: {
           name,
           slug,
           lessonId,
+          order: newOrder,
         },
       });
 
@@ -96,6 +106,29 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       });
 
       return json({ success: true, chapter });
+    }
+
+    if (method === "PATCH" && intent === "reorder") {
+      const updates = JSON.parse(formData.get("updates") as string) as Array<{
+        id: string;
+        order: number;
+      }>;
+
+      if (!Array.isArray(updates) || updates.length === 0) {
+        return json({ error: "更新資料格式不正確" }, { status: 400 });
+      }
+
+      // 使用事務批量更新 order
+      await prisma.$transaction(
+        updates.map(({ id, order }) =>
+          prisma.chapter.update({
+            where: { id },
+            data: { order },
+          })
+        )
+      );
+
+      return json({ success: true });
     }
 
     if (method === "DELETE" && intent === "delete") {
