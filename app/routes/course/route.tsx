@@ -34,16 +34,13 @@ export default function Layout() {
   const location = useLocation();
   const { userPermissions, isAdmin } = useLoaderData<LoaderData>();
 
-  // 動態生成導航項目，管理員會看到額外的上傳項目
+  // 基本導航項目
   const navigations = [
     { icon: HomeLine, label: "總覽", link: "/course/overview" },
     { icon: PlayCircle, label: "課程", link: "/course/content" },
     { icon: File, label: "模擬試題", link: "/course/exams" },
     { icon: LayersTwo, label: "歷屆聯考題", link: "/course/entrance-exams" },
     { icon: CheckDone, label: "問答討論區", link: "/course/curated" },
-    ...(isAdmin
-      ? [{ icon: Upload, label: "上傳教學內容", link: "/admin/upload" }]
-      : []),
   ];
 
   return (
@@ -52,11 +49,13 @@ export default function Layout() {
         <div className="container mx-auto h-full">
           <div className="h-full">
             <div className="flex h-full">
-              <aside className="w-[240px] pr-6 py-9 h-full sticky top-0 bottom-0 self-start max-h-[calc(100dvh)]">
+              <aside className="w-[240px] pr-6 py-9 h-full sticky top-0 bottom-0 self-start max-h-[calc(100dvh)] flex flex-col">
                 <div className="text-gray-700 text-sm font-medium">
                   學測總複習班
                 </div>
-                <div className="mt-4 space-y-1 -mx-3">
+
+                {/* 基本導航項目 */}
+                <div className="mt-4 space-y-1 -mx-3 flex-1">
                   {navigations.map((nav) => (
                     <SidebarItem
                       key={nav.label}
@@ -68,6 +67,20 @@ export default function Layout() {
                     />
                   ))}
                 </div>
+
+                {isAdmin && (
+                  <div className="-mx-3 mt-6 pt-6 border-t border-gray-200">
+                    <button
+                      onClick={() => (window.location.href = "/admin/upload")}
+                      className="cursor-pointer w-full text-sm px-3 py-3 rounded-lg bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Upload className="size-5" />
+                        <span>管理教學內容</span>
+                      </div>
+                    </button>
+                  </div>
+                )}
               </aside>
 
               {/* <div className="w-8 col-start-2 row-span-5 row-start-1 bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5" /> */}
