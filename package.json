@@ -12,6 +12,7 @@
     "prisma:generate": "yarn prisma generate"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.826.0",
     "@conform-to/react": "^0.9.1",
     "@conform-to/zod": "^0.9.1",
     "@lemonsqueezy/lemonsqueezy.js": "^4.0.0",

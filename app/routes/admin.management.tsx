@@ -98,18 +98,25 @@ export default function AdminUploadPage() {
 
           <div className="flex flex-col gap-4">
             <div className="p-4 bg-gray-100 rounded-lg">
-              <h3 className="font-medium text-gray-900 mb-2">題庫管理功能</h3>
+              <h3 className="font-medium text-gray-900 mb-2">聯考題管理功能</h3>
               <ul className="text-sm text-gray-600 space-y-1">
                 <li>• 上傳歷屆試題</li>
                 <li>• 新增解題影片</li>
                 <li>• 分類題目類型</li>
-                <li>• 設定難易度</li>
+                <li>• 設定題目順序</li>
               </ul>
             </div>
 
-            <button className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors">
-              開始管理題庫
-            </button>
+            <Link
+              to="/admin/management/entrance-exams"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "w-full text-base h-12"
+              )}
+              prefetch="intent"
+            >
+              管理歷屆聯考題
+            </Link>
           </div>
         </div>
       </div>

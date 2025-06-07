@@ -128,3 +128,51 @@ model Exam {
 
   @@map("exams")
 }
+
+model EntranceExam {
+  id          String         @id @default(cuid())
+  title       String
+  year        Int
+  subject     String
+  type        String         // A, B 等
+  description String?
+  order       Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  questions   ExamQuestion[]
+
+  @@map("entrance_exams")
+}
+
+model ExamQuestion {
+  id                String       @id @default(cuid())
+  title             String
+  fileType          String       // pdf, video 等
+  fileUrl           String?      // 用於 PDF 等檔案
+  downloadFilename  String?      // 下載檔案名稱
+  questionType      String       // single-choice, multiple-choice, fill-in
+  order             Int          @default(0)
+  examId            String
+  exam              EntranceExam @relation(fields: [examId], references: [id], onDelete: Cascade)
+  answers           ExamAnswer[]
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@map("exam_questions")
+}
+
+model ExamAnswer {
+  id         String       @id @default(cuid())
+  title      String
+  fileType   String       // video, pdf 等
+  videoId    String?      // 用於影片
+  duration   Int?         // 影片時長（秒）
+  fileUrl    String?      // 用於其他檔案類型
+  order      Int          @default(0)
+  questionId String
+  question   ExamQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@map("exam_answers")
+}
