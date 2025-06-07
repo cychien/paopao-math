@@ -101,7 +101,7 @@ function HeroSection() {
                     : (actionData?.status as "success" | "error") ?? "idle"
                 }
                 disabled={isPending}
-                className="mt-4 w-full lg:mt-6 lg:w-auto border-[1.5px] border-brand-100 text-brand-600"
+                className="mt-4 w-full lg:mt-6 lg:w-auto border-[1.5px] border-brand-100 text-brand-600 hover:bg-[color-mix(in_oklab,_theme(colors.brand.50),_theme(colors.brand.900)_5%)]"
                 size="lg"
                 variant="ghost"
               >

@@ -59,7 +59,7 @@ class RedisCache implements CacheService {
   constructor() {
     if (process.env.REDIS_URL) {
       try {
-        this.redis = new Redis(process.env.REDIS_URL, {
+        this.redis = new Redis(`${process.env.REDIS_URL}?family=6`, {
           maxRetriesPerRequest: 3,
           lazyConnect: true,
         });
