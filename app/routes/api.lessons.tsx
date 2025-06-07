@@ -2,6 +2,7 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { requireAdmin } from "~/services/auth/session";
 import { prisma } from "~/services/database/client";
+import { cacheManager } from "~/services/cache/redis";
 
 // 生成 slug 的輔助函數
 function generateSlug(name: string): string {
@@ -65,6 +66,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         },
       });
 
+      // 清除相關緩存
+      await cacheManager.clearLessonCache(lesson.slug, lesson.id);
+      await cacheManager.clearCourseStatsCache();
+
       return json({ success: true, lesson });
     }
 
@@ -109,6 +114,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         },
       });
 
+      // 清除相關緩存
+      await cacheManager.clearLessonCache(lesson.slug, lesson.id);
+      await cacheManager.clearCourseStatsCache();
+
       return json({ success: true, lesson });
     }
 
@@ -132,6 +141,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         )
       );
 
+      // 清除相關緩存
+      await cacheManager.clearAllCourseCache();
+
       return json({ success: true });
     }
 
@@ -142,9 +154,21 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         return json({ error: "ID 為必填欄位" }, { status: 400 });
       }
 
+      // 先獲取課程信息以便清除緩存
+      const lesson = await prisma.lesson.findUnique({
+        where: { id },
+        select: { slug: true },
+      });
+
       await prisma.lesson.delete({
         where: { id },
       });
+
+      // 清除相關緩存
+      if (lesson) {
+        await cacheManager.clearLessonCache(lesson.slug, id);
+      }
+      await cacheManager.clearCourseStatsCache();
 
       return json({ success: true });
     }

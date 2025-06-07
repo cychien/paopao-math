@@ -2,6 +2,7 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { requireAdmin } from "~/services/auth/session";
 import { prisma } from "~/services/database/client";
+import { cacheManager } from "~/services/cache/redis";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   await requireAdmin(request);
@@ -39,7 +40,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           chapterId,
           order: newOrder,
         },
+        include: {
+          chapter: {
+            include: {
+              lesson: {
+                select: { slug: true },
+              },
+            },
+          },
+        },
       });
+
+      // 清除相關緩存
+      await cacheManager.clearChapterCache(
+        teaching.chapter.lesson.slug,
+        teaching.chapter.slug
+      );
 
       return json({ success: true, teaching });
     }
@@ -59,7 +75,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           videoId,
           duration,
         },
+        include: {
+          chapter: {
+            include: {
+              lesson: {
+                select: { slug: true },
+              },
+            },
+          },
+        },
       });
+
+      // 清除相關緩存
+      await cacheManager.clearChapterCache(
+        teaching.chapter.lesson.slug,
+        teaching.chapter.slug
+      );
 
       return json({ success: true, teaching });
     }
@@ -84,6 +115,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         )
       );
 
+      // 清除相關緩存
+      await cacheManager.clearAllCourseCache();
+
       return json({ success: true });
     }
 
@@ -94,9 +128,31 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         return json({ error: "ID 為必填欄位" }, { status: 400 });
       }
 
+      // 先獲取 teaching 信息以便清除緩存
+      const teaching = await prisma.teaching.findUnique({
+        where: { id },
+        include: {
+          chapter: {
+            include: {
+              lesson: {
+                select: { slug: true },
+              },
+            },
+          },
+        },
+      });
+
       await prisma.teaching.delete({
         where: { id },
       });
+
+      // 清除相關緩存
+      if (teaching) {
+        await cacheManager.clearChapterCache(
+          teaching.chapter.lesson.slug,
+          teaching.chapter.slug
+        );
+      }
 
       return json({ success: true });
     }

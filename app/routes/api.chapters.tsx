@@ -2,6 +2,7 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { requireAdmin } from "~/services/auth/session";
 import { prisma } from "~/services/database/client";
+import { cacheManager } from "~/services/cache/redis";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   await requireAdmin(request);
@@ -54,7 +55,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           lessonId,
           order: newOrder,
         },
+        include: {
+          lesson: {
+            select: { slug: true },
+          },
+        },
       });
+
+      // 清除相關緩存
+      await cacheManager.clearChapterCache(chapter.lesson.slug, chapter.slug);
+      await cacheManager.clearCourseStatsCache();
 
       return json({ success: true, chapter });
     }
@@ -74,7 +84,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       // 獲取當前章節的 lessonId
       const currentChapter = await prisma.chapter.findUnique({
         where: { id },
-        select: { lessonId: true },
+        select: { lessonId: true, slug: true },
       });
 
       if (!currentChapter) {
@@ -103,7 +113,19 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           name,
           slug,
         },
+        include: {
+          lesson: {
+            select: { slug: true },
+          },
+        },
       });
+
+      // 清除相關緩存（包括舊的和新的 slug）
+      await cacheManager.clearChapterCache(
+        chapter.lesson.slug,
+        currentChapter.slug
+      );
+      await cacheManager.clearChapterCache(chapter.lesson.slug, chapter.slug);
 
       return json({ success: true, chapter });
     }
@@ -128,6 +150,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         )
       );
 
+      // 清除所有課程相關緩存（因為章節順序改變影響所有相關數據）
+      await cacheManager.clearAllCourseCache();
+
       return json({ success: true });
     }
 
@@ -138,9 +163,26 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         return json({ error: "ID 為必填欄位" }, { status: 400 });
       }
 
+      // 先獲取章節信息以便清除緩存
+      const chapter = await prisma.chapter.findUnique({
+        where: { id },
+        select: {
+          slug: true,
+          lesson: {
+            select: { slug: true },
+          },
+        },
+      });
+
       await prisma.chapter.delete({
         where: { id },
       });
+
+      // 清除相關緩存
+      if (chapter) {
+        await cacheManager.clearChapterCache(chapter.lesson.slug, chapter.slug);
+      }
+      await cacheManager.clearCourseStatsCache();
 
       return json({ success: true });
     }

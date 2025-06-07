@@ -193,6 +193,13 @@ export const cacheKeys = {
   userWithPurchases: (email: string) => `user_purchases:${email}`,
   userAccess: (email: string) => `user_access:${email}`,
   purchaseStats: () => "purchase_stats",
+  // 課程相關緩存鍵
+  allLessons: () => "course:all-lessons",
+  lessonBySlug: (slug: string) => `course:lesson:${slug}`,
+  lessonById: (id: string) => `course:lesson-id:${id}`,
+  chapterBySlug: (lessonSlug: string, chapterSlug: string) =>
+    `course:chapter:${lessonSlug}:${chapterSlug}`,
+  courseStats: () => "course:stats",
 } as const;
 
 // 快取統計和管理工具
@@ -204,6 +211,51 @@ export const cacheManager = {
       cache.del(cacheKeys.userWithPurchases(email)),
       cache.del(cacheKeys.userAccess(email)),
     ]);
+  },
+
+  // 清除所有課程相關快取
+  async clearAllCourseCache() {
+    await Promise.all([
+      cache.del(cacheKeys.allLessons()),
+      cache.del(cacheKeys.courseStats()),
+      // 清除所有課程和章節的緩存需要更複雜的邏輯，這裡先清除主要的
+    ]);
+  },
+
+  // 清除特定課程的快取
+  async clearLessonCache(lessonSlug?: string, lessonId?: string) {
+    const promises = [cache.del(cacheKeys.allLessons())];
+
+    if (lessonSlug) {
+      promises.push(cache.del(cacheKeys.lessonBySlug(lessonSlug)));
+    }
+
+    if (lessonId) {
+      promises.push(cache.del(cacheKeys.lessonById(lessonId)));
+    }
+
+    await Promise.all(promises);
+  },
+
+  // 清除特定章節的快取
+  async clearChapterCache(lessonSlug: string, chapterSlug?: string) {
+    const promises = [
+      cache.del(cacheKeys.allLessons()),
+      cache.del(cacheKeys.lessonBySlug(lessonSlug)),
+    ];
+
+    if (chapterSlug) {
+      promises.push(
+        cache.del(cacheKeys.chapterBySlug(lessonSlug, chapterSlug))
+      );
+    }
+
+    await Promise.all(promises);
+  },
+
+  // 清除課程統計快取
+  async clearCourseStatsCache() {
+    await cache.del(cacheKeys.courseStats());
   },
 
   // 健康檢查
