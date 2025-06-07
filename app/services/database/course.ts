@@ -120,3 +120,98 @@ export async function getCourseStats() {
     throw new Error("獲取統計數據失敗");
   }
 }
+
+/**
+ * 根據 slug 獲取課程
+ */
+export async function getLessonBySlug(
+  slug: string
+): Promise<LessonWithDetails | null> {
+  try {
+    return await prisma.lesson.findUnique({
+      where: { slug },
+      include: {
+        chapters: {
+          include: {
+            teachings: {
+              orderBy: { order: "asc" },
+            },
+            exams: {
+              orderBy: { order: "asc" },
+            },
+          },
+          orderBy: { order: "asc" },
+        },
+      },
+    });
+  } catch (error) {
+    console.error("獲取課程失敗:", error);
+    throw new Error("獲取課程數據失敗");
+  }
+}
+
+/**
+ * 根據課程 slug 和章節 slug 獲取章節詳情
+ */
+export async function getChapterBySlug(
+  lessonSlug: string,
+  chapterSlug: string
+) {
+  try {
+    const lesson = await prisma.lesson.findUnique({
+      where: { slug: lessonSlug },
+      include: {
+        chapters: {
+          include: {
+            teachings: {
+              orderBy: { order: "asc" },
+            },
+            exams: {
+              orderBy: { order: "asc" },
+            },
+          },
+          orderBy: { order: "asc" },
+        },
+      },
+    });
+
+    if (!lesson) {
+      return null;
+    }
+
+    const chapter = lesson.chapters.find((c) => c.slug === chapterSlug);
+    if (!chapter) {
+      return null;
+    }
+
+    // 找到當前章節的索引
+    const currentIndex = lesson.chapters.findIndex(
+      (c) => c.slug === chapterSlug
+    );
+    const nextChapter =
+      currentIndex + 1 < lesson.chapters.length
+        ? lesson.chapters[currentIndex + 1]
+        : null;
+
+    return {
+      ...chapter,
+      lessonMeta: {
+        name: lesson.name,
+        slug: lesson.slug,
+        chapters: lesson.chapters.map((c) => ({
+          name: c.name,
+          slug: c.slug,
+        })),
+      },
+      nextChapter: nextChapter
+        ? {
+            name: nextChapter.name,
+            slug: nextChapter.slug,
+          }
+        : null,
+    };
+  } catch (error) {
+    console.error("獲取章節失敗:", error);
+    throw new Error("獲取章節數據失敗");
+  }
+}

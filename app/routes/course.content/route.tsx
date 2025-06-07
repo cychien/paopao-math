@@ -1,25 +1,65 @@
-import { json, redirect, useLoaderData } from "@remix-run/react";
-import { getSyllabus } from "~/utils/course.server";
+import { json, useLoaderData } from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { canUserAccessPath } from "~/services/auth/permissions";
-import { safeRedirect } from "remix-utils/safe-redirect";
+import { getAllLessonsWithDetails } from "~/services/database/course";
 import { Lesson } from "./components/Lesson";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const path = url.pathname;
 
+  // 檢查用戶是否能訪問此路徑（即是否登入）
   const canAccess = await canUserAccessPath(request, path);
-  if (!canAccess) {
-    return redirect(safeRedirect("/"));
-  }
 
-  const syllabus = getSyllabus();
-  return json({ syllabus });
+  // 從數據庫獲取課程數據
+  const lessons = await getAllLessonsWithDetails();
+
+  // 轉換數據格式以匹配前端組件需求
+  const syllabus = lessons.map((lesson) => {
+    const totalDuration = lesson.chapters.reduce(
+      (sum, chapter) =>
+        sum +
+        chapter.teachings.reduce(
+          (tSum, teaching) => tSum + teaching.duration,
+          0
+        ) +
+        chapter.exams.reduce((eSum, exam) => eSum + exam.duration, 0),
+      0
+    );
+
+    const examCount = lesson.chapters.reduce(
+      (sum, chapter) => sum + chapter.exams.length,
+      0
+    );
+
+    return {
+      name: lesson.name,
+      description: lesson.description || undefined, // 將 null 轉換為 undefined
+      slug: lesson.slug,
+      totalDuration,
+      examCount,
+      chapters: lesson.chapters.map((chapter) => {
+        const chapterDuration =
+          chapter.teachings.reduce(
+            (sum, teaching) => sum + teaching.duration,
+            0
+          ) + chapter.exams.reduce((sum, exam) => sum + exam.duration, 0);
+
+        return {
+          name: chapter.name,
+          duration: chapterDuration,
+          slug: chapter.slug,
+          examCount: chapter.exams.length,
+        };
+      }),
+    };
+  });
+
+  return json({ syllabus, isLoggedIn: canAccess });
 }
 
 export default function Page() {
-  const { syllabus } = useLoaderData<typeof loader>();
+  const { syllabus, isLoggedIn } = useLoaderData<typeof loader>();
 
   return (
     <div className="divide-y-1 divide-gray-200">
@@ -36,7 +76,7 @@ export default function Page() {
               className="bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
             >
               <div className="p-4">
-                <Lesson lesson={lesson} index={index} />
+                <Lesson lesson={lesson} index={index} isLoggedIn={isLoggedIn} />
               </div>
             </div>
           ))}

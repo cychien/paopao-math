@@ -26,12 +26,14 @@ type LessonProps = {
     }[];
   };
   index: number;
+  isLoggedIn: boolean;
 };
 
-function Lesson({ lesson, index }: LessonProps) {
+function Lesson({ lesson, index, isLoggedIn }: LessonProps) {
   const [mode, setMode] = React.useState<"normal" | "detailed">("normal");
 
-  const isLocked = lesson.chapters.length === 0;
+  // 根據登入狀態決定是否鎖定
+  const isLocked = !isLoggedIn;
 
   return (
     <div className="space-y-4">
@@ -88,8 +90,8 @@ function Lesson({ lesson, index }: LessonProps) {
           </div>
         )}
 
-        {/* 展開按鈕 */}
-        {!isLocked && (
+        {/* 展開按鈕 - 只有登入且有章節時才顯示 */}
+        {!isLocked && lesson.chapters.length > 0 && (
           <div className="pt-2">
             <Button
               // size=""
@@ -113,8 +115,8 @@ function Lesson({ lesson, index }: LessonProps) {
         )}
       </div>
 
-      {/* 展開的課程內容 */}
-      {!isLocked && mode === "detailed" && (
+      {/* 展開的課程內容 - 只有登入用戶才能看到 */}
+      {!isLocked && mode === "detailed" && lesson.chapters.length > 0 && (
         <div className="mt-4 pt-4 border-t border-gray-200 animate-in fade-in-0 duration-200">
           <Syllabus lessonSlug={lesson.slug} chapters={lesson.chapters} />
         </div>

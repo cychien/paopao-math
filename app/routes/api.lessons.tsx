@@ -23,12 +23,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     if (method === "POST" && intent === "create") {
       const name = formData.get("name") as string;
       const description = formData.get("description") as string;
+      const customSlug = formData.get("slug") as string;
 
       if (!name) {
         return json({ error: "課程名稱為必填欄位" }, { status: 400 });
       }
 
-      const slug = generateSlug(name);
+      // 使用用戶提供的 slug，如果沒有則自動生成
+      const slug = customSlug?.trim() || generateSlug(name);
 
       // 檢查 slug 是否已存在
       const existingLesson = await prisma.lesson.findUnique({
@@ -37,7 +39,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
       if (existingLesson) {
         return json(
-          { error: "課程名稱重複，請使用不同的名稱" },
+          {
+            error: customSlug
+              ? "Slug 已存在，請使用不同的 slug"
+              : "課程名稱重複，請使用不同的名稱",
+          },
           { status: 400 }
         );
       }
@@ -66,12 +72,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       const id = formData.get("id") as string;
       const name = formData.get("name") as string;
       const description = formData.get("description") as string;
+      const customSlug = formData.get("slug") as string;
 
       if (!id || !name) {
         return json({ error: "ID 和課程名稱為必填欄位" }, { status: 400 });
       }
 
-      const slug = generateSlug(name);
+      // 使用用戶提供的 slug，如果沒有則自動生成
+      const slug = customSlug?.trim() || generateSlug(name);
 
       // 檢查 slug 是否已被其他課程使用
       const existingLesson = await prisma.lesson.findFirst({
@@ -83,7 +91,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
       if (existingLesson) {
         return json(
-          { error: "課程名稱重複，請使用不同的名稱" },
+          {
+            error: customSlug
+              ? "Slug 已存在，請使用不同的 slug"
+              : "課程名稱重複，請使用不同的名稱",
+          },
           { status: 400 }
         );
       }

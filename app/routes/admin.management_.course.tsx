@@ -83,6 +83,7 @@ export default function CourseManagementPage() {
     id: string;
     name: string;
     description?: string | null;
+    slug: string;
   } | null>(null);
   const [editingChapter, setEditingChapter] = useState<{
     id: string;
@@ -307,6 +308,7 @@ export default function CourseManagementPage() {
     id: string;
     name: string;
     description?: string | null;
+    slug: string;
   }) => {
     setEditingLesson(lesson);
     setIsLessonDialogOpen(true);
@@ -732,7 +734,14 @@ export default function CourseManagementPage() {
                       <Button
                         size="icon"
                         variant="outline"
-                        onClick={() => handleEditLesson(lesson)}
+                        onClick={() =>
+                          handleEditLesson({
+                            id: lesson.id,
+                            name: lesson.name,
+                            description: lesson.description,
+                            slug: lesson.slug,
+                          })
+                        }
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -1123,6 +1132,24 @@ export default function CourseManagementPage() {
                 defaultValue={editingLesson?.description || ""}
               />
             </div>
+            <div>
+              <label
+                htmlFor="lesson-slug"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Slug *
+              </label>
+              <Input
+                id="lesson-slug"
+                name="slug"
+                placeholder="輸入 slug（用於 URL，例如：lesson-1）"
+                defaultValue={editingLesson?.slug || ""}
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Slug 用於網址路徑，建議使用英文和數字，以破折號分隔
+              </p>
+            </div>
 
             <DialogFooter>
               <Button
@@ -1154,7 +1181,7 @@ export default function CourseManagementPage() {
 
       {/* Chapter Dialog */}
       <Dialog open={isChapterDialogOpen} onOpenChange={setIsChapterDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white">
           <DialogHeader>
             <DialogTitle>
               {editingChapter ? "編輯章節" : "新增章節"}
@@ -1388,7 +1415,7 @@ export default function CourseManagementPage() {
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-white">
           <AlertDialogHeader>
             <AlertDialogTitle>確認刪除</AlertDialogTitle>
             <AlertDialogDescription>

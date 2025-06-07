@@ -11,7 +11,7 @@ import { LockScreen } from "~/components/business/LockScreen";
 import { Video } from "~/components/business/Video";
 import { buttonVariants } from "~/components/ui/Button";
 import { canUserAccessPath } from "~/services/auth/permissions";
-import { getChapter } from "~/utils/course.server";
+import { getChapterBySlug } from "~/services/database/course";
 import { cn } from "~/utils/style";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
@@ -27,10 +27,10 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   const chapterSlug = params.chapter;
 
   if (!lessonSlug || !chapterSlug) {
-    return null;
+    return json({ notAccess: false, chapter: null });
   }
 
-  const chapter = getChapter({ lessonSlug, chapterSlug });
+  const chapter = await getChapterBySlug(lessonSlug, chapterSlug);
 
   return json({ notAccess: false, chapter });
 }
