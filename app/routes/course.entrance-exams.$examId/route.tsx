@@ -1,12 +1,21 @@
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
-import { ArrowLeft, Target, Clock, FileBadge, VideoIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  Target,
+  FileBadge,
+  VideoIcon,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
 import { AttachmentCard } from "~/components/business/AttachmentCard";
 import { PDF } from "~/components/icons/PDF";
 import { Video } from "~/components/business/Video";
 import { getExamById } from "~/utils/entrance-exam.server";
 import { AttachmentType } from "~/components/business/AttachmentCard/AttachmentCard";
 import { canUserAccessPath } from "~/services/auth/permissions";
+import { useState } from "react";
+import { cn } from "~/utils/style";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const { examId } = params;
@@ -24,7 +33,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     return json({ notAccess: true, exam: null });
   }
 
-  const exam = getExamById(examId);
+  const exam = await getExamById(examId);
 
   if (!exam) {
     throw new Response("Exam not found", { status: 404 });
@@ -35,12 +44,28 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 export default function ExamPage() {
   const data = useLoaderData<typeof loader>();
+  const [expandedAnswers, setExpandedAnswers] = useState<Set<string>>(
+    new Set()
+  );
 
   if (data.notAccess || !data.exam) {
     return <div>無權限訪問</div>;
   }
 
   const exam = data.exam;
+
+  // 切換答案展開狀態
+  const toggleAnswer = (answerId: string) => {
+    setExpandedAnswers((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(answerId)) {
+        newSet.delete(answerId);
+      } else {
+        newSet.add(answerId);
+      }
+      return newSet;
+    });
+  };
 
   // 動態選擇圖標
   const getFileIcon = (type: string) => {
@@ -125,31 +150,48 @@ export default function ExamPage() {
             {/* 左右排列容器 */}
             <div className="flex gap-8 xl:gap-12">
               {/* 左側：詳解影片內容 */}
-              <div className="flex-1 max-w-4xl space-y-6">
-                {exam.answers.map((answer) => (
-                  <div key={answer.id} id={`answer-${answer.id}`}>
-                    {answer.type === "video" && answer.videoId ? (
-                      // 影片類型 - 使用 Video 組件
-                      <div>
-                        <h3 className="font-medium text-gray-900">
-                          {answer.title}
-                        </h3>
-                        <div className="pt-2">
-                          <Video videoId={answer.videoId} />
+              <div className="flex-1 max-w-4xl space-y-3">
+                {exam.answers.map((answer) => {
+                  const isExpanded = expandedAnswers.has(answer.id);
+
+                  return (
+                    <div key={answer.id} id={`answer-${answer.id}`}>
+                      {answer.type === "video" && answer.videoId ? (
+                        // 影片類型 - 使用 Video 組件
+                        <div className="border border-gray-200 rounded-lg overflow-hidden">
+                          {/* 影片標題列 - 可點擊展開/收合 */}
+                          <button
+                            onClick={() => toggleAnswer(answer.id)}
+                            className={cn(
+                              "w-full flex items-center justify-between p-4 hover:bg-gray-100 transition-colors text-left cursor-pointer",
+                              isExpanded && "bg-gray-100"
+                            )}
+                          >
+                            <h3 className="font-medium text-gray-900">
+                              {answer.title}
+                            </h3>
+                            {isExpanded ? (
+                              <ChevronDown className="size-5 text-gray-400" />
+                            ) : (
+                              <ChevronRight className="size-5 text-gray-400" />
+                            )}
+                          </button>
+
+                          {/* 影片內容 - 只有展開時才顯示 */}
+                          {isExpanded && <Video videoId={answer.videoId} />}
                         </div>
-                      </div>
-                    ) : (
-                      // 其他類型 - 使用 AttachmentCard
-                      <AttachmentCard
-                        icon={getFileIcon(answer.type)}
-                        title={answer.title}
-                        type={answer.type as AttachmentType}
-                        fileUrl={answer.fileUrl}
-                        downloadFilename={answer.downloadFilename}
-                      />
-                    )}
-                  </div>
-                ))}
+                      ) : (
+                        // 其他類型 - 使用 AttachmentCard
+                        <AttachmentCard
+                          icon={getFileIcon(answer.type)}
+                          title={answer.title}
+                          type={answer.type as AttachmentType}
+                          fileUrl={answer.fileUrl}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
               {/* 右側：目錄 */}
@@ -162,17 +204,21 @@ export default function ExamPage() {
                     </div>
 
                     <div className="space-y-1">
-                      {exam.answers.map((answer) => (
-                        <Link
-                          key={answer.id}
-                          to={`#answer-${answer.id}`}
-                          className="block py-2 px-3 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="truncate">{answer.title}</span>
+                      {exam.answers.map((answer) => {
+                        return (
+                          <div key={answer.id} className="space-y-1">
+                            {/* 目錄項目 */}
+                            <Link
+                              to={`#answer-${answer.id}`}
+                              className="block py-2 px-3 rounded-lg text-sm transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="truncate">{answer.title}</span>
+                              </div>
+                            </Link>
                           </div>
-                        </Link>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>

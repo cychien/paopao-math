@@ -13,7 +13,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return json({ notAccess: true, examList: [] });
   }
 
-  const examList = getExamList();
+  const examList = await getExamList();
   return json({ notAccess: false, examList });
 }
 

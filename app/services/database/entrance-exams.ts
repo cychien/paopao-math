@@ -67,6 +67,33 @@ export async function getAllEntranceExamsWithDetails(): Promise<
 }
 
 /**
+ * 根據 ID 獲取特定入學考試及詳細資料
+ */
+export async function getEntranceExamById(
+  id: string
+): Promise<EntranceExamWithDetails | null> {
+  return withCache(
+    cacheKeys.entranceExamById(id),
+    async () => {
+      return await prisma.entranceExam.findUnique({
+        where: { id },
+        include: {
+          questions: {
+            include: {
+              answers: {
+                orderBy: { order: "asc" },
+              },
+            },
+            orderBy: { order: "asc" },
+          },
+        },
+      });
+    },
+    300 // 5分鐘緩存
+  );
+}
+
+/**
  * 獲取入學考試統計資料
  */
 export async function getEntranceExamStats() {
