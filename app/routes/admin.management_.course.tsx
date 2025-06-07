@@ -5,6 +5,10 @@ import { requireAdmin } from "~/services/auth/session";
 import {
   getAllLessonsWithDetails,
   getCourseStats,
+  type LessonWithDetails,
+  type ChapterWithDetails,
+  type TeachingDetails,
+  type ExamDetails,
 } from "~/services/database/course";
 import { useState } from "react";
 import {
@@ -630,25 +634,29 @@ export default function CourseManagementPage() {
         </div>
 
         <div className="divide-y divide-gray-300">
-          {lessons.map((lesson, lessonIndex) => {
+          {lessons.map((lesson: LessonWithDetails, lessonIndex: number) => {
             const isExpanded = expandedLessons.has(lesson.id);
             const totalTeachings = lesson.chapters.reduce(
-              (sum, chapter) => sum + chapter.teachings.length,
+              (sum: number, chapter: ChapterWithDetails) =>
+                sum + chapter.teachings.length,
               0
             );
             const totalExams = lesson.chapters.reduce(
-              (sum, chapter) => sum + chapter.exams.length,
+              (sum: number, chapter: ChapterWithDetails) =>
+                sum + chapter.exams.length,
               0
             );
             const totalDuration = lesson.chapters.reduce(
-              (sum, chapter) =>
+              (sum: number, chapter: ChapterWithDetails) =>
                 sum +
                 chapter.teachings.reduce(
-                  (chapterSum, teaching) => chapterSum + teaching.duration,
+                  (chapterSum: number, teaching: TeachingDetails) =>
+                    chapterSum + teaching.duration,
                   0
                 ) +
                 chapter.exams.reduce(
-                  (chapterSum, exam) => chapterSum + exam.duration,
+                  (chapterSum: number, exam: ExamDetails) =>
+                    chapterSum + exam.duration,
                   0
                 ),
               0
@@ -755,298 +763,312 @@ export default function CourseManagementPage() {
                     </div>
 
                     <div className="space-y-4">
-                      {lesson.chapters.map((chapter, chapterIndex) => (
-                        <div
-                          key={chapter.id}
-                          className="bg-gray-100 rounded-lg p-4"
-                        >
-                          <div className="flex items-center justify-between mb-3">
-                            <div>
-                              <h5 className="font-semibold text-gray-900">
-                                {chapter.name}
-                              </h5>
-                              <p className="text-sm text-gray-600 mt-1">
-                                {chapter.teachings.length} 觀念講解 •{" "}
-                                {chapter.exams.length} 突破關卡
-                              </p>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              {/* 章節排序按鈕 */}
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() =>
-                                  handleReorderChapters(
-                                    lesson.id,
-                                    chapterIndex,
-                                    chapterIndex - 1
-                                  )
-                                }
-                                disabled={
-                                  chapterIndex === 0 ||
-                                  reorderFetcher.state === "submitting"
-                                }
-                                title="上移"
-                              >
-                                <ChevronUp className="size-4" />
-                              </Button>
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() =>
-                                  handleReorderChapters(
-                                    lesson.id,
-                                    chapterIndex,
-                                    chapterIndex + 1
-                                  )
-                                }
-                                disabled={
-                                  chapterIndex === lesson.chapters.length - 1 ||
-                                  reorderFetcher.state === "submitting"
-                                }
-                                title="下移"
-                              >
-                                <ChevronDown className="size-4" />
-                              </Button>
-                              <Button
-                                onClick={() => handleEditChapter(chapter)}
-                                variant="outline"
-                                size="icon"
-                              >
-                                <Edit className="size-4" />
-                              </Button>
-                              <Button
-                                onClick={() =>
-                                  handleDeleteChapter(chapter.id, chapter.name)
-                                }
-                                variant="outline"
-                                size="icon"
-                              >
-                                <Trash2 className="size-4" />
-                              </Button>
-                            </div>
-                          </div>
-
-                          {/* 觀念講解列表 */}
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <h6 className="text-sm font-medium text-gray-700">
-                                觀念講解
-                              </h6>
-                              <Button
-                                size="sm"
-                                onClick={() => handleCreateTeaching(chapter.id)}
-                              >
-                                <Plus className="w-3 h-3" />
-                                新增觀念講解
-                              </Button>
-                            </div>
-
-                            {chapter.teachings.map(
-                              (teaching, teachingIndex) => (
-                                <div
-                                  key={teaching.id}
-                                  className="flex items-center justify-between text-sm bg-white rounded p-2"
-                                >
-                                  <div className="flex items-center space-x-2">
-                                    <div className="p-2 bg-brand-100 rounded-md flex items-center justify-center">
-                                      <BookOpen className="size-4 text-brand-600" />
-                                    </div>
-                                    <span className="text-gray-700">
-                                      觀念講解 {teachingIndex + 1} (ID:{" "}
-                                      {teaching.videoId})
-                                    </span>
-                                    <span className="text-gray-500">
-                                      ({Math.floor(teaching.duration / 60)}:
-                                      {(teaching.duration % 60)
-                                        .toString()
-                                        .padStart(2, "0")}
-                                      )
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center">
-                                    {/* 觀念講解排序按鈕 */}
-                                    <Button
-                                      size="icon"
-                                      variant="ghost"
-                                      onClick={() =>
-                                        handleReorderTeachings(
-                                          chapter.id,
-                                          teachingIndex,
-                                          teachingIndex - 1
-                                        )
-                                      }
-                                      disabled={
-                                        teachingIndex === 0 ||
-                                        reorderFetcher.state === "submitting"
-                                      }
-                                      title="上移"
-                                      className="text-gray-500"
-                                    >
-                                      <ChevronUp className="w-3 h-3" />
-                                    </Button>
-                                    <Button
-                                      size="icon"
-                                      variant="ghost"
-                                      onClick={() =>
-                                        handleReorderTeachings(
-                                          chapter.id,
-                                          teachingIndex,
-                                          teachingIndex + 1
-                                        )
-                                      }
-                                      disabled={
-                                        teachingIndex ===
-                                          chapter.teachings.length - 1 ||
-                                        reorderFetcher.state === "submitting"
-                                      }
-                                      title="下移"
-                                      className="text-gray-500"
-                                    >
-                                      <ChevronDown className="w-3 h-3" />
-                                    </Button>
-                                    <Button
-                                      onClick={() =>
-                                        handleEditTeaching({
-                                          id: teaching.id,
-                                          videoId: teaching.videoId,
-                                          duration: teaching.duration,
-                                          chapterId: chapter.id,
-                                        })
-                                      }
-                                      size="icon"
-                                      variant="ghost"
-                                      className="text-gray-500"
-                                    >
-                                      <Edit className="w-3 h-3" />
-                                    </Button>
-                                    <Button
-                                      onClick={() =>
-                                        handleDeleteTeaching(
-                                          teaching.id,
-                                          `觀念講解 ${teachingIndex + 1}`
-                                        )
-                                      }
-                                      size="icon"
-                                      variant="ghost"
-                                      className="text-gray-500"
-                                    >
-                                      <Trash2 className="w-3 h-3" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              )
-                            )}
-
-                            {/* 突破關卡列表 */}
-                            <div className="flex items-center justify-between mt-4">
-                              <h6 className="text-sm font-medium text-gray-700">
-                                突破關卡
-                              </h6>
-                              <Button
-                                size="sm"
-                                onClick={() => handleCreateExam(chapter.id)}
-                              >
-                                <Plus className="w-3 h-3" />
-                                新增突破關卡
-                              </Button>
-                            </div>
-
-                            {chapter.exams.map((exam, examIndex) => (
-                              <div
-                                key={exam.id}
-                                className="flex items-center justify-between text-sm bg-white rounded p-2"
-                              >
-                                <div className="flex items-center space-x-2">
-                                  <div className="p-2 bg-brand-100 rounded-md flex items-center justify-center">
-                                    <BarChart3 className="size-4 text-brand-600" />
-                                  </div>
-                                  <span className="text-gray-700">
-                                    突破關卡 {examIndex + 1} (ID: {exam.videoId}
-                                    )
-                                  </span>
-                                  <span className="text-gray-500">
-                                    ({Math.floor(exam.duration / 60)}:
-                                    {(exam.duration % 60)
-                                      .toString()
-                                      .padStart(2, "0")}
-                                    )
-                                  </span>
-                                </div>
-                                <div className="flex items-center">
-                                  {/* 突破關卡排序按鈕 */}
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    onClick={() =>
-                                      handleReorderExams(
-                                        chapter.id,
-                                        examIndex,
-                                        examIndex - 1
-                                      )
-                                    }
-                                    disabled={
-                                      examIndex === 0 ||
-                                      reorderFetcher.state === "submitting"
-                                    }
-                                    title="上移"
-                                    className="text-gray-500"
-                                  >
-                                    <ChevronUp className="w-3 h-3" />
-                                  </Button>
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    onClick={() =>
-                                      handleReorderExams(
-                                        chapter.id,
-                                        examIndex,
-                                        examIndex + 1
-                                      )
-                                    }
-                                    disabled={
-                                      examIndex === chapter.exams.length - 1 ||
-                                      reorderFetcher.state === "submitting"
-                                    }
-                                    title="下移"
-                                    className="text-gray-500"
-                                  >
-                                    <ChevronDown className="w-3 h-3" />
-                                  </Button>
-                                  <Button
-                                    onClick={() =>
-                                      handleEditExam({
-                                        id: exam.id,
-                                        videoId: exam.videoId,
-                                        duration: exam.duration,
-                                        chapterId: chapter.id,
-                                      })
-                                    }
-                                    size="icon"
-                                    variant="ghost"
-                                    className="text-gray-500"
-                                  >
-                                    <Edit className="w-3 h-3" />
-                                  </Button>
-                                  <Button
-                                    onClick={() =>
-                                      handleDeleteExam(
-                                        exam.id,
-                                        `突破關卡 ${examIndex + 1}`
-                                      )
-                                    }
-                                    size="icon"
-                                    variant="ghost"
-                                    className="text-gray-500"
-                                  >
-                                    <Trash2 className="w-3 h-3" />
-                                  </Button>
-                                </div>
+                      {lesson.chapters.map(
+                        (chapter: ChapterWithDetails, chapterIndex: number) => (
+                          <div
+                            key={chapter.id}
+                            className="bg-gray-100 rounded-lg p-4"
+                          >
+                            <div className="flex items-center justify-between mb-3">
+                              <div>
+                                <h5 className="font-semibold text-gray-900">
+                                  {chapter.name}
+                                </h5>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  {chapter.teachings.length} 觀念講解 •{" "}
+                                  {chapter.exams.length} 突破關卡
+                                </p>
                               </div>
-                            ))}
+                              <div className="flex items-center space-x-2">
+                                {/* 章節排序按鈕 */}
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() =>
+                                    handleReorderChapters(
+                                      lesson.id,
+                                      chapterIndex,
+                                      chapterIndex - 1
+                                    )
+                                  }
+                                  disabled={
+                                    chapterIndex === 0 ||
+                                    reorderFetcher.state === "submitting"
+                                  }
+                                  title="上移"
+                                >
+                                  <ChevronUp className="size-4" />
+                                </Button>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() =>
+                                    handleReorderChapters(
+                                      lesson.id,
+                                      chapterIndex,
+                                      chapterIndex + 1
+                                    )
+                                  }
+                                  disabled={
+                                    chapterIndex ===
+                                      lesson.chapters.length - 1 ||
+                                    reorderFetcher.state === "submitting"
+                                  }
+                                  title="下移"
+                                >
+                                  <ChevronDown className="size-4" />
+                                </Button>
+                                <Button
+                                  onClick={() => handleEditChapter(chapter)}
+                                  variant="outline"
+                                  size="icon"
+                                >
+                                  <Edit className="size-4" />
+                                </Button>
+                                <Button
+                                  onClick={() =>
+                                    handleDeleteChapter(
+                                      chapter.id,
+                                      chapter.name
+                                    )
+                                  }
+                                  variant="outline"
+                                  size="icon"
+                                >
+                                  <Trash2 className="size-4" />
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* 觀念講解列表 */}
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <h6 className="text-sm font-medium text-gray-700">
+                                  觀念講解
+                                </h6>
+                                <Button
+                                  size="sm"
+                                  onClick={() =>
+                                    handleCreateTeaching(chapter.id)
+                                  }
+                                >
+                                  <Plus className="w-3 h-3" />
+                                  新增觀念講解
+                                </Button>
+                              </div>
+
+                              {chapter.teachings.map(
+                                (
+                                  teaching: TeachingDetails,
+                                  teachingIndex: number
+                                ) => (
+                                  <div
+                                    key={teaching.id}
+                                    className="flex items-center justify-between text-sm bg-white rounded p-2"
+                                  >
+                                    <div className="flex items-center space-x-2">
+                                      <div className="p-2 bg-brand-100 rounded-md flex items-center justify-center">
+                                        <BookOpen className="size-4 text-brand-600" />
+                                      </div>
+                                      <span className="text-gray-700">
+                                        觀念講解 {teachingIndex + 1} (ID:{" "}
+                                        {teaching.videoId})
+                                      </span>
+                                      <span className="text-gray-500">
+                                        ({Math.floor(teaching.duration / 60)}:
+                                        {(teaching.duration % 60)
+                                          .toString()
+                                          .padStart(2, "0")}
+                                        )
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center">
+                                      {/* 觀念講解排序按鈕 */}
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={() =>
+                                          handleReorderTeachings(
+                                            chapter.id,
+                                            teachingIndex,
+                                            teachingIndex - 1
+                                          )
+                                        }
+                                        disabled={
+                                          teachingIndex === 0 ||
+                                          reorderFetcher.state === "submitting"
+                                        }
+                                        title="上移"
+                                        className="text-gray-500"
+                                      >
+                                        <ChevronUp className="w-3 h-3" />
+                                      </Button>
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={() =>
+                                          handleReorderTeachings(
+                                            chapter.id,
+                                            teachingIndex,
+                                            teachingIndex + 1
+                                          )
+                                        }
+                                        disabled={
+                                          teachingIndex ===
+                                            chapter.teachings.length - 1 ||
+                                          reorderFetcher.state === "submitting"
+                                        }
+                                        title="下移"
+                                        className="text-gray-500"
+                                      >
+                                        <ChevronDown className="w-3 h-3" />
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          handleEditTeaching({
+                                            id: teaching.id,
+                                            videoId: teaching.videoId,
+                                            duration: teaching.duration,
+                                            chapterId: chapter.id,
+                                          })
+                                        }
+                                        size="icon"
+                                        variant="ghost"
+                                        className="text-gray-500"
+                                      >
+                                        <Edit className="w-3 h-3" />
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          handleDeleteTeaching(
+                                            teaching.id,
+                                            `觀念講解 ${teachingIndex + 1}`
+                                          )
+                                        }
+                                        size="icon"
+                                        variant="ghost"
+                                        className="text-gray-500"
+                                      >
+                                        <Trash2 className="w-3 h-3" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                )
+                              )}
+
+                              {/* 突破關卡列表 */}
+                              <div className="flex items-center justify-between mt-4">
+                                <h6 className="text-sm font-medium text-gray-700">
+                                  突破關卡
+                                </h6>
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleCreateExam(chapter.id)}
+                                >
+                                  <Plus className="w-3 h-3" />
+                                  新增突破關卡
+                                </Button>
+                              </div>
+
+                              {chapter.exams.map(
+                                (exam: ExamDetails, examIndex: number) => (
+                                  <div
+                                    key={exam.id}
+                                    className="flex items-center justify-between text-sm bg-white rounded p-2"
+                                  >
+                                    <div className="flex items-center space-x-2">
+                                      <div className="p-2 bg-brand-100 rounded-md flex items-center justify-center">
+                                        <BarChart3 className="size-4 text-brand-600" />
+                                      </div>
+                                      <span className="text-gray-700">
+                                        突破關卡 {examIndex + 1} (ID:{" "}
+                                        {exam.videoId})
+                                      </span>
+                                      <span className="text-gray-500">
+                                        ({Math.floor(exam.duration / 60)}:
+                                        {(exam.duration % 60)
+                                          .toString()
+                                          .padStart(2, "0")}
+                                        )
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center">
+                                      {/* 突破關卡排序按鈕 */}
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={() =>
+                                          handleReorderExams(
+                                            chapter.id,
+                                            examIndex,
+                                            examIndex - 1
+                                          )
+                                        }
+                                        disabled={
+                                          examIndex === 0 ||
+                                          reorderFetcher.state === "submitting"
+                                        }
+                                        title="上移"
+                                        className="text-gray-500"
+                                      >
+                                        <ChevronUp className="w-3 h-3" />
+                                      </Button>
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={() =>
+                                          handleReorderExams(
+                                            chapter.id,
+                                            examIndex,
+                                            examIndex + 1
+                                          )
+                                        }
+                                        disabled={
+                                          examIndex ===
+                                            chapter.exams.length - 1 ||
+                                          reorderFetcher.state === "submitting"
+                                        }
+                                        title="下移"
+                                        className="text-gray-500"
+                                      >
+                                        <ChevronDown className="w-3 h-3" />
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          handleEditExam({
+                                            id: exam.id,
+                                            videoId: exam.videoId,
+                                            duration: exam.duration,
+                                            chapterId: chapter.id,
+                                          })
+                                        }
+                                        size="icon"
+                                        variant="ghost"
+                                        className="text-gray-500"
+                                      >
+                                        <Edit className="w-3 h-3" />
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          handleDeleteExam(
+                                            exam.id,
+                                            `突破關卡 ${examIndex + 1}`
+                                          )
+                                        }
+                                        size="icon"
+                                        variant="ghost"
+                                        className="text-gray-500"
+                                      >
+                                        <Trash2 className="w-3 h-3" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                )
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        )
+                      )}
                     </div>
                   </div>
                 )}
