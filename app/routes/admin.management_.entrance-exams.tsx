@@ -616,6 +616,11 @@ export default function EntranceExamsManagementPage() {
             </Button>
           </DialogFooter>
         </questionFetcher.Form>
+
+        <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground cursor-pointer">
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </DialogClose>
       </DialogContent>
     </Dialog>
   );
@@ -813,14 +818,28 @@ export default function EntranceExamsManagementPage() {
                             className="bg-gray-100 rounded-lg p-4"
                           >
                             <div className="flex items-center justify-between mb-3">
-                              <div>
+                              <div className="flex-1">
                                 <h5 className="font-semibold text-gray-900">
                                   {question.title}
                                 </h5>
                                 <p className="text-sm text-gray-600 mt-1">
                                   {getQuestionTypeLabel(question.questionType)}{" "}
                                   • {question.answers.length} 解答
-                                  {question.fileUrl && <span> • 有檔案</span>}
+                                  {question.fileUrl && (
+                                    <span>
+                                      {" "}
+                                      • 有檔案 (
+                                      <a
+                                        href={question.fileUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="underline underline-offset-2"
+                                      >
+                                        {question.downloadFilename}
+                                      </a>
+                                      )
+                                    </span>
+                                  )}
                                 </p>
                               </div>
                               <div className="flex items-center space-x-2">

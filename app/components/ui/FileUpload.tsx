@@ -195,7 +195,7 @@ export function FileUpload({
                     href={currentFile.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-brand-600 hover:text-brand-700"
+                    className="text-xs text-brand-600 hover:text-brand-700 block"
                   >
                     查看檔案
                   </a>
@@ -212,15 +212,17 @@ export function FileUpload({
               >
                 更換檔案
               </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={handleRemove}
-                disabled={disabled}
-              >
-                <X className="w-4 h-4" />
-              </Button>
+              {selectedFile && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleRemove}
+                  disabled={disabled}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
