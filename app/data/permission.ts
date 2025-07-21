@@ -7,7 +7,9 @@ type Permission = {
 const trialPermissions: Permission = {
   paths: [
     "/course/content",
+    "/course/content/real-number-log/*",
     "/course/content/polynomial/*",
+    "/course/content/line-circle/*",
     "/course/entrance-exams",
     "/course/entrance-exams/*",
   ],
