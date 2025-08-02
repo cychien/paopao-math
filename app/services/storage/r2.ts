@@ -13,6 +13,14 @@ interface UploadResult {
   cdnUrl: string;
 }
 
+// 支援 FileLike 對象的類型定義
+interface FileLike {
+  arrayBuffer(): Promise<ArrayBuffer>;
+  type?: string;
+  name?: string;
+  size?: number;
+}
+
 class R2Storage {
   private client: S3Client;
 
@@ -34,14 +42,20 @@ class R2Storage {
         accessKeyId: process.env.R2_ACCESS_KEY_ID,
         secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
       },
+      // 解決方案 4: 關閉自動雜湊計算以避免 flowing stream 錯誤
+      requestChecksumCalculation: "WHEN_REQUIRED",
+      responseChecksumValidation: "WHEN_REQUIRED",
+      // 確保與 R2 兼容的其他設置
+      forcePathStyle: true,
     });
   }
 
   /**
    * 上傳檔案到 R2
+   * 解決方案 2: 直接轉 Buffer 再上傳，避免 stream 問題
    */
   async upload(
-    file: File | Buffer,
+    file: File | FileLike | Buffer,
     options: {
       filename?: string;
       contentType?: string;
@@ -56,17 +70,39 @@ class R2Storage {
       const extension = filename ? this.getFileExtension(filename) : "";
       const key = `${folder}/${uuid}${extension}`;
 
-      // 準備檔案內容
+      // 解決方案 2: 確保使用 Buffer，避免 stream 問題
       let body: Buffer;
       let finalContentType: string;
 
-      if (file instanceof File) {
-        body = Buffer.from(await file.arrayBuffer());
-        finalContentType =
-          contentType || file.type || "application/octet-stream";
-      } else {
+      if (file instanceof Buffer) {
+        // 已經是 Buffer
         body = file;
         finalContentType = contentType || "application/octet-stream";
+      } else if (file && typeof file === "object" && "arrayBuffer" in file) {
+        // 處理 File 或 FileLike 對象
+        try {
+          // 嘗試獲取 arrayBuffer
+          const arrayBuffer = await (file as FileLike).arrayBuffer();
+          body = Buffer.from(arrayBuffer);
+
+          // 嘗試獲取 type 和 name 屬性
+          const fileType = (file as FileLike).type || "";
+          const fileName = (file as FileLike).name || filename || "";
+
+          finalContentType =
+            contentType || fileType || "application/octet-stream";
+
+          // 如果沒有提供 filename，嘗試從 file 對象獲取
+          if (!filename && fileName) {
+            options.filename = fileName;
+          }
+        } catch (error) {
+          console.error("Error processing file object:", error);
+          throw new Error("無法處理檔案對象");
+        }
+      } else {
+        console.error("Unsupported file type:", typeof file, file);
+        throw new Error("不支援的檔案類型");
       }
 
       // 上傳到 R2
@@ -75,10 +111,15 @@ class R2Storage {
         Key: key,
         Body: body,
         ContentType: finalContentType,
+        // 明確設置 ContentLength 以確保上傳正確
+        ContentLength: body.length,
         Metadata: {
-          originalFilename: filename
-            ? Buffer.from(filename).toString("base64")
-            : "unknown",
+          originalFilename:
+            options.filename || filename
+              ? Buffer.from(options.filename || filename || "").toString(
+                  "base64"
+                )
+              : "unknown",
           uploadedAt: new Date().toISOString(),
         },
       });
@@ -196,7 +237,7 @@ export const r2Storage = new R2Storage();
 
 // 輔助函數
 export async function uploadFile(
-  file: File,
+  file: File | FileLike,
   options?: {
     filename?: string;
     contentType?: string;
@@ -204,11 +245,11 @@ export async function uploadFile(
   }
 ): Promise<UploadResult> {
   // 驗證檔案
-  if (!R2Storage.isValidFileType(file)) {
+  if (file instanceof File && !R2Storage.isValidFileType(file)) {
     throw new Error("不支援的檔案類型");
   }
 
-  if (!R2Storage.isValidFileSize(file)) {
+  if (file instanceof File && !R2Storage.isValidFileSize(file)) {
     throw new Error("檔案大小超過限制（10MB）");
   }
 
