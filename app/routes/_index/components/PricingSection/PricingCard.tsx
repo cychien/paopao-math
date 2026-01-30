@@ -1,115 +1,106 @@
-import checkIconSrc from "~/assets/check.svg";
 import { Button } from "~/components/ui/Button";
 import { Link } from "react-router";
+import { Check, Sparkles } from "lucide-react";
+import { ArrowRight02Icon, ArrowRightIcon, CheckmarkCircle03Icon, Tick01Icon } from "@hugeicons/core-free-icons";
+import Icon from "~/components/ui/icon";
 
 function PricingCard() {
+  const features = [
+    "超過 200 部詳解影片",
+    "實體學習參考書",
+    "好題分享",
+    "學習進度規劃表",
+    "歷屆大考試題及講解",
+    "考前模擬測驗",
+  ];
+
   return (
-    <div
-      className="p-6 lg:p-8 rounded-2xl bg-bg-primary border border-[rgba(0,0,0,0.08)]"
-      style={{
-        boxShadow:
-          "0px 12px 16px -4px var(--Colors-Effects-Shadows-shadow-lg_01, rgba(10, 13, 18, 0.08)), 0px 4px 6px -2px var(--Colors-Effects-Shadows-shadow-lg_02, rgba(10, 13, 18, 0.03)), 0px 2px 2px -1px var(--Colors-Effects-Shadows-shadow-lg_03, rgba(10, 13, 18, 0.04))",
-      }}
-    >
-      <div className="lg:flex lg:items-center lg:justify-between">
-        <div className="block lg:hidden">
-          <div className="lg:hidden font-inter font-semibold space-x-0.5 flex items-start">
-            <span className="text-4xl pt-1.5 leading-[44px]">NT$</span>
-            <span className="text-5xl leading-[60px]">4,995</span>
-          </div>
-          <div className="text-gray-600 -translate-y-1 line-through">
-            NT$ 7,999
-          </div>
-        </div>
-        <div className="mt-4 lg:mt-0">
-          <div className="flex space-x-2 items-center">
-            <div className="text-xl font-semibold leading-[30px]">
-              學測總複習班
-            </div>
-            <div className="rounded-full bg-[#FEFAF1] border border-[#F7D07D] text-[#825B08] text-sm font-medium py-0.5 px-2.5">
-              早鳥價
-            </div>
-          </div>
-          <p className="text-text-tertiary mt-1 lg:mt-0.5">
-            解鎖全課程與未來功能更新
-          </p>
-        </div>
-        <div className="hidden lg:block">
-          <div className="flex font-inter font-semibold space-x-0.5">
-            <span className="text-4xl pt-2 leading-[44px]">NT$</span>
-            <span className="text-6xl leading-[72px]">4,995</span>
-          </div>
-          <div className="text-gray-600 text-right -translate-y-1 line-through">
-            NT$ 7,999
-          </div>
-        </div>
-      </div>
+    <div className="relative group">
+      {/* Glow effect */}
+      <div className="absolute -inset-1 bg-gradient-to-r from-brand-200 via-brand-100 to-brand-200 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500" />
 
-      <div className="-mx-6 lg:-mx-8 mt-8 mb-8 lg:mt-6 lg:mb-6 h-px bg-border-secondary" />
+      <div className="relative p-8 lg:p-10 rounded-3xl bg-white border border-gray-200 shadow-2xl shadow-gray-200/50 overflow-hidden">
+        {/* Background decorations */}
+        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-brand-50 to-transparent rounded-bl-full -mr-10 -mt-10 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-gray-50 to-transparent rounded-tr-full -ml-8 -mb-8 pointer-events-none" />
 
-      <div>
-        <div className="font-semibold">解鎖內容</div>
-        <div className="mt-6 grid lg:grid-cols-2 lg:gap-x-8 gap-y-4">
-          <div className="flex space-x-3 items-center">
-            <img
-              src={checkIconSrc}
-              alt="check icon"
-              className="w-6 h-6 flex-shrink-0"
-            />
-            <span className="text-text-tertiary">完整總複習課程</span>
-          </div>
-          <div className="flex space-x-3 items-center">
-            <img
-              src={checkIconSrc}
-              alt="check icon"
-              className="w-6 h-6 flex-shrink-0"
-            />
-            <span className="text-text-tertiary">實體學習參考書</span>
-          </div>
-          <div className="flex space-x-3 items-center">
-            <img
-              src={checkIconSrc}
-              alt="check icon"
-              className="w-6 h-6 flex-shrink-0"
-            />
-            <span className="text-text-tertiary">定期模擬測驗</span>
-          </div>
-          <div className="flex space-x-3 items-center">
-            <img
-              src={checkIconSrc}
-              alt="check icon"
-              className="w-6 h-6 flex-shrink-0"
-            />
-            <span className="text-text-tertiary">歷屆大考試題及講解</span>
-          </div>
-          <div className="flex space-x-3 items-center">
-            <img
-              src={checkIconSrc}
-              alt="check icon"
-              className="w-6 h-6 flex-shrink-0"
-            />
-            <span className="text-text-tertiary">問答專區解惑</span>
-          </div>
-          <div className="flex space-x-3 items-center">
-            <img
-              src={checkIconSrc}
-              alt="check icon"
-              className="w-6 h-6 flex-shrink-0"
-            />
-            <span className="text-text-tertiary">
-              超過 <span className="font-inter">200</span> 部詳解影片
+        {/* Header */}
+        <div className="relative z-10">
+          {/* Badge */}
+          <div className="flex items-center gap-3 mb-6">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 border border-orange-300 text-amber-700 text-sm font-medium py-1.5 px-4">
+              <Sparkles className="w-4 h-4" />
+              早鳥限定
             </span>
+            <span className="text-sm text-gray-400 font-medium">省 NT$3,546</span>
+          </div>
+
+          {/* Title and Price */}
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+              <h3 className="text-2xl font-semibold text-gray-900">學測總複習班</h3>
+              <p className="text-gray-500 mt-2">解鎖全課程與未來功能更新</p>
+            </div>
+            <div className="text-right">
+              <div className="text-gray-400 text-sm line-through font-medium">NT$ 4,995</div>
+              <div className="flex items-baseline gap-1 justify-end">
+                <span className="text-2xl font-bold text-gray-900">NT$</span>
+                <span className="text-5xl font-bold text-gray-900 tracking-tight">1,449</span>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Divider */}
+        <div className="my-8 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+
+        {/* Features */}
+        <div className="relative z-10">
+          <div className="text-sm font-medium text-gray-900 uppercase tracking-wide mb-5">課程包含</div>
+          <div className="space-y-3">
+            {features.map((feature) => (
+              <div
+                key={feature}
+                className="flex items-center gap-3"
+              >
+                <Icon icon={CheckmarkCircle03Icon} className="w-5 h-5 text-success-600 flex-shrink-0" />
+                <span className="text-[15px] font-medium text-gray-700">
+                  {feature}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="my-8 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+
+        {/* CTA */}
+        <Link to="/purchase" className="relative z-10 block focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 rounded-xl">
+          <Button className="w-full h-14 text-lg font-semibold rounded-xl shadow-lg shadow-brand-600/20 hover:shadow-brand-600/30 transition-all duration-200" size="lg">
+            立即購買
+            <Icon icon={ArrowRight02Icon} className="size-5 translate-y-px" />
+          </Button>
+        </Link>
+
+        {/* Trust badges */}
+        <div className="mt-6 flex items-center justify-center gap-4 text-sm text-gray-400 flex-wrap">
+          <span className="flex items-center gap-1">
+            <Icon icon={Tick01Icon} className="size-5" />
+            7 天退款保證
+          </span>
+          <span className="w-1 h-1 rounded-full bg-gray-300" />
+          <span className="flex items-center gap-1">
+            <Icon icon={Tick01Icon} className="size-5" />
+            安全付款
+          </span>
+          <span className="w-1 h-1 rounded-full bg-gray-300" />
+          <span className="flex items-center gap-1">
+            <Icon icon={Tick01Icon} className="size-5" />
+            年使用權限
+          </span>
+        </div>
       </div>
-
-      <div className="-mx-6 lg:-mx-8 mt-8 mb-6 lg:mt-10 lg:mb-8 h-px bg-border-secondary" />
-
-      <Link to="/purchase">
-        <Button className="w-full py-3 h-12 text-base" size="lg">
-          立即購買
-        </Button>
-      </Link>
     </div>
   );
 }

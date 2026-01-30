@@ -1,30 +1,31 @@
 import { redirect, data } from "react-router";
-import { HeroSection } from "./components/HeroSection";
-import { FeaturesSectionNew } from "./components/FeaturesSection";
-import { TeacherSection, TeacherSectionNew } from "./components/TeacherSection";
-import { PricingSection, PricingSectionNew } from "./components/PricingSection";
-import { CallToActionSection } from "./components/CallToActionSection";
-import { FooterSection } from "./components/FooterSection";
+import type { Route } from "./+types/_index.route";
+import {
+  HeroSection,
+  SocialProofSection,
+  FeaturesSection,
+  TeacherSection,
+  PricingSection,
+  CallToActionSection,
+  FooterSection,
+} from "./_index/components/index.new";
 import { parse } from "@conform-to/zod";
 import { EmailSchema, SchoolNameSchema } from "~/utils/validation";
 import { z } from "zod";
 import { createContact } from "~/services/loop";
 import { checkHoneypot } from "~/utils/honeypot.server";
-// import { AuroraBackground } from "~/components/aurora-background";
 import { checkIsCustomer } from "~/services/customer-session.server";
-import { Separator } from "~/components/ui/separator";
-import { CallToActionSectionNew } from "./components/CallToActionSection/CallToActionSectionNew";
 
 // Default app slug for single-tenant mode
 const DEFAULT_APP_SLUG = "paopao-math";
 
 export function meta() {
   return [
-    { title: "寶哥高中數學" },
+    { title: "寶哥高中數學 - 30 年教學精華，學測數學一次搞定" },
     {
       name: "description",
       content:
-        "一堂課帶你高效總複習高一 ～ 高三數學，200+ 精講影片、系統化重點筆記與持續更新題庫，買斷全年內容，多裝置離線學習，助你快速提分。",
+        "多年暢銷參考書作者親授，200+ 觀念精講影片，系統化重點統整，助你在最短時間內突破學測難關。早鳥優惠 NT$4,995，平均提升 4.2 級分。",
     },
   ];
 }
@@ -82,14 +83,11 @@ export default function Index() {
   return (
     <div className="overflow-hidden">
       <HeroSection />
-      <FeaturesSectionNew />
-      {/* <FeaturesSection /> */}
-      {/* <TeacherSection /> */}
-      <TeacherSectionNew />
+      <SocialProofSection />
+      <FeaturesSection />
+      <TeacherSection />
       <PricingSection />
-      {/* <PricingSectionNew /> */}
-      {/* <CallToActionSection /> */}
-      <CallToActionSectionNew />
+      <CallToActionSection />
       <FooterSection />
     </div>
   );

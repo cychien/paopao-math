@@ -21,15 +21,19 @@ function Header({ user }: HeaderProps) {
   const [isMenuPoppedOut, setIsMenuPoppedOut] = React.useState(false);
   const headerRef = React.useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const isHomePage = location.pathname === "/";
 
   return (
     <div
       ref={headerRef}
-      className={cn("relative isolate z-20", { "bg-white": isMenuPoppedOut })}
+      className={cn("relative isolate z-20 bg-brand-50", {
+        "bg-white": isMenuPoppedOut,
+        "bg-white/80 backdrop-blur-md": !isHomePage,
+      })}
     >
       <header
-        className={cn("py-4.5", {
-          "border-b border-gray-200": location.pathname !== "/",
+        className={cn("py-4", {
+          "border-b border-gray-200/80": !isHomePage,
         })}
       >
         <NavigationMenu.Root className="container mx-auto flex items-center">
@@ -50,9 +54,9 @@ function Header({ user }: HeaderProps) {
                     >
                       <PlayCircleSolid
                         className={cn(
-                          "text-gray-400 group-hover:text-[#c1272d] transition-colors translate-y-px",
+                          "text-gray-500 group-hover:text-brand-600 transition-colors",
                           {
-                            "text-[#c1272d]":
+                            "text-brand-600":
                               location.pathname.startsWith("/course"),
                           }
                         )}
@@ -114,9 +118,9 @@ function Header({ user }: HeaderProps) {
                 >
                   <PlayCircleSolid
                     className={cn(
-                      "text-gray-400 group-hover:text-[#c1272d] transition-colors translate-y-px",
+                      "text-gray-400 group-hover:text-brand-600 transition-colors translate-y-px",
                       {
-                        "text-[#c1272d]":
+                        "text-brand-600":
                           location.pathname.startsWith("/course"),
                       }
                     )}

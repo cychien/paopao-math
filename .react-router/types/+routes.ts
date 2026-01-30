@@ -65,6 +65,9 @@ type Pages = {
   "/login": {
     params: {};
   };
+  "/aaa": {
+    params: {};
+  };
   "/*": {
     params: {
       "*": string;
@@ -75,7 +78,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/api/webhooks/lemon-squeezy" | "/api/cache-status" | "/auth/logout" | "/auth/verify" | "/auth/login" | "/purchase" | "/learn" | "/learn/:moduleSlug/:lessonSlug" | "/course" | "/course/content/:lesson/:chapter" | "/course/overview" | "/course/content" | "/course/curated" | "/logout" | "/login" | "/*";
+    page: "/" | "/api/webhooks/lemon-squeezy" | "/api/cache-status" | "/auth/logout" | "/auth/verify" | "/auth/login" | "/purchase" | "/learn" | "/learn/:moduleSlug/:lessonSlug" | "/course" | "/course/content/:lesson/:chapter" | "/course/overview" | "/course/content" | "/course/curated" | "/logout" | "/login" | "/aaa" | "/*";
   };
   "routes/api.webhooks.lemon-squeezy.tsx": {
     id: "routes/api.webhooks.lemon-squeezy";
@@ -149,6 +152,10 @@ type RouteFiles = {
     id: "routes/login";
     page: "/login";
   };
+  "routes/aaa.tsx": {
+    id: "routes/aaa";
+    page: "/aaa";
+  };
   "routes/$.tsx": {
     id: "routes/$";
     page: "/*";
@@ -175,5 +182,6 @@ type RouteModules = {
   "routes/course.curated": typeof import("./app/routes/course.curated/route.tsx");
   "routes/logout": typeof import("./app/routes/logout.tsx");
   "routes/login": typeof import("./app/routes/login.tsx");
+  "routes/aaa": typeof import("./app/routes/aaa.tsx");
   "routes/$": typeof import("./app/routes/$.tsx");
 };
