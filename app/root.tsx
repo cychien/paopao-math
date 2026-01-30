@@ -1,5 +1,5 @@
 import {
-  json,
+  data,
   Links,
   Meta,
   Outlet,
@@ -7,18 +7,17 @@ import {
   ScrollRestoration,
   useLoaderData,
   useLocation,
-} from "@remix-run/react";
-import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { HoneypotProvider } from "remix-utils/honeypot/react";
+} from "react-router";
+import type { Route } from "./+types/root.tsx";
 
 import "./tailwind.css";
 import { Header } from "./components/layout/Header";
 import { FlashProvider } from "./context/flash-context";
-import { honeypot } from "./utils/honeypot.server";
 import { cn } from "./utils/style";
-import { getOptionalUser } from "./services/auth/session";
+import { getCustomerSession } from "./services/customer-session.server";
+import { prisma } from "~/services/database/prisma.server";
 
-export const links: LinksFunction = () => [
+export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -32,30 +31,46 @@ export const links: LinksFunction = () => [
   { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
 ];
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const honeyProps = await honeypot.getInputProps();
+export async function loader({ request }: Route.LoaderArgs) {
+  // 檢查用戶是否已登入
+  const { customerId } = await getCustomerSession(request);
 
-  // 檢查用戶是否已登入並有課程訪問權限
-  const user = await getOptionalUser(request);
+  let user = null;
+  if (customerId) {
+    const customer = await prisma.appCustomer.findUnique({
+      where: { id: customerId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+    });
 
-  return json({
-    honeyProps,
-    user: user
-      ? {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          hasCourseAccess: user.purchases.some(
-            (purchase) =>
-              purchase.status === "ACTIVE" && purchase.hasLifetimeAccess
-          ),
-        }
-      : null,
-  });
+    if (customer) {
+      user = {
+        id: customer.id,
+        email: customer.email,
+        name: customer.name,
+        hasCourseAccess: true, // Customer always has access
+      };
+    }
+  }
+
+  return data({ user });
+}
+
+export async function action({ request }: Route.ActionArgs) {
+  console.error(`Unexpected ${request.method} request to root route. URL: ${request.url}`);
+  return data(
+    {
+      error: "Invalid request. Webhooks should be sent to /api/webhooks/lemon-squeezy"
+    },
+    { status: 400 }
+  );
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const data = useLoaderData<typeof loader>();
+  const loaderData = useLoaderData<typeof loader>();
   const location = useLocation();
 
   return (
@@ -67,19 +82,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <HoneypotProvider {...data.honeyProps}>
-          <FlashProvider>
-            {/* All pages has minimal height 100% */}
-            <div
-              className={cn("flex flex-col h-full", {
-                wide: location.pathname.startsWith("/course"),
-              })}
-            >
-              <Header user={data.user} />
-              <div className="flex-1">{children}</div>
-            </div>
-          </FlashProvider>
-        </HoneypotProvider>
+        <FlashProvider>
+          {/* All pages has minimal height 100% */}
+          <div
+            className={cn("flex flex-col h-full", {
+              wide: location.pathname.startsWith("/course"),
+            })}
+          >
+            <Header user={loaderData?.user ?? null} />
+            <div className="flex-1">{children}</div>
+          </div>
+        </FlashProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

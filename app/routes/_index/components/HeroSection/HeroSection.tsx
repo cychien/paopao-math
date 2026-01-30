@@ -1,30 +1,6 @@
 import { BigFeatures } from "./BigFeatures";
-import { useFlash } from "~/context/flash-context";
-import { cn } from "~/utils/style";
-import { FormField } from "~/components/ui/form-field/form-field";
-import { Form, useActionData } from "@remix-run/react";
-import { conform, useForm } from "@conform-to/react";
-import { getFieldsetConstraint, parse } from "@conform-to/zod";
-import { CreateContactActionType, EmailFormSchema } from "../../route";
-import { useIsPending } from "~/utils/misc";
-import { StatusButton } from "~/components/ui/status-button";
-import { HoneypotInputs } from "remix-utils/honeypot/react";
 
 function HeroSection() {
-  const actionData = useActionData<CreateContactActionType>();
-  const isPending = useIsPending();
-  const isSuccess = actionData?.status === "success";
-
-  const { isHighlighted, targetRef } = useFlash();
-  const [form, fields] = useForm({
-    id: "email-form",
-    constraint: getFieldsetConstraint(EmailFormSchema),
-    lastSubmission: actionData?.submission,
-    onValidate({ formData }) {
-      return parse(formData, { schema: EmailFormSchema });
-    },
-  });
-
   return (
     <section className="container mx-auto pt-12 md:pt-16 pb-16 lg:pt-24 lg:pb-32 lg:flex items-end lg:space-x-8">
       <div className="flex-1">
@@ -44,7 +20,7 @@ function HeroSection() {
         </div>
       </div>
 
-      <div
+      {/* <div
         ref={targetRef}
         className={cn(
           "mt-8 p-6 md:p-10 lg:px-10 lg:pt-8 lg:pb-7 rounded-[10px] transition-colors duration-500 ease-in-out border border-brand-100 shadow-md",
@@ -110,7 +86,7 @@ function HeroSection() {
             </Form>
           </>
         )}
-      </div>
+      </div> */}
     </section>
   );
 }

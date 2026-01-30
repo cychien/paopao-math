@@ -6,7 +6,7 @@ import {
   DialogClose,
   DialogContent,
   DialogTrigger,
-} from "~/components/ui/Dialog";
+} from "~/components/ui/dialog";
 
 type AttachmentType = "pdf" | "image" | "video" | "document" | "custom";
 
@@ -163,7 +163,7 @@ const AttachmentCard = React.forwardRef<
         className={cn(
           "inline-flex bg-white p-1.5 shadow-xs border border-gray-200 rounded-lg items-center w-full",
           (isClickable || isPdfPreview) &&
-            "cursor-pointer hover:shadow-sm transition-shadow",
+          "cursor-pointer hover:shadow-sm transition-shadow",
           className
         )}
         onClick={
@@ -174,11 +174,11 @@ const AttachmentCard = React.forwardRef<
         onKeyDown={
           !isPdfPreview && isClickable
             ? (e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  handleClick();
-                }
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleClick();
               }
+            }
             : undefined
         }
       >

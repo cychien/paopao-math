@@ -4,7 +4,7 @@ import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { Menu, X } from "lucide-react";
 import logoSrc from "~/assets/logo-with-text.png";
 import { Button, buttonVariants } from "~/components/ui/Button";
-import { useLocation, Form, Link } from "@remix-run/react";
+import { useLocation, Form, Link } from "react-router";
 import { cn } from "~/utils/style";
 import { PlayCircleSolid } from "~/components/icons/PlayCircleSolid";
 
@@ -71,33 +71,30 @@ function Header({ user }: HeaderProps) {
                 <span className="text-sm text-gray-600">
                   嗨，{user.name || user.email}
                 </span>
-                <Form method="post" action="/auth/logout">
-                  <Button
-                    type="submit"
-                    variant="ghost"
-                    size="lg"
-                    className="hover:bg-gray-900/5"
-                  >
-                    登出
-                  </Button>
-                </Form>
-              </div>
-            ) : (
-              <div className="flex items-center gap-4">
                 <Link
-                  to="/auth/login"
+                  to="/logout"
                   className={cn(
                     buttonVariants({ variant: "ghost", size: "lg" }),
                     "hover:bg-gray-900/5"
                   )}
-                  prefetch="viewport"
+                >
+                  登出
+                </Link>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <Link
+                  to="/login"
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "lg" }),
+                    "hover:bg-gray-900/5"
+                  )}
                 >
                   登入
                 </Link>
                 <Link
                   to="/purchase"
                   className={cn(buttonVariants({ size: "lg" }))}
-                  prefetch="viewport"
                 >
                   立即購買
                 </Link>
@@ -180,26 +177,28 @@ function Header({ user }: HeaderProps) {
 
                         <NavigationMenu.Item>
                           {user ? (
-                            <Form method="post" action="/auth/logout">
-                              <button
-                                type="submit"
+                            <NavigationMenu.Link asChild>
+                              <Link
+                                to="/logout"
                                 className={cn(
                                   buttonVariants({ variant: "link" }),
-                                  "-mx-3 block h-full rounded-lg px-3 py-2 font-medium text-text-tertiary hover:bg-bg-primary-hover w-full text-left"
+                                  "-mx-3 block h-full rounded-lg px-3 py-2 font-medium text-text-tertiary hover:bg-bg-primary-hover"
                                 )}
                               >
                                 登出
-                              </button>
-                            </Form>
+                              </Link>
+                            </NavigationMenu.Link>
                           ) : (
-                            <NavigationMenu.Link
-                              href="/auth/login"
-                              className={cn(
-                                buttonVariants({ variant: "link" }),
-                                "-mx-3 block h-full rounded-lg px-3 py-2 font-medium text-text-tertiary hover:bg-bg-primary-hover"
-                              )}
-                            >
-                              登入
+                            <NavigationMenu.Link asChild>
+                              <Link
+                                to="/login"
+                                className={cn(
+                                  buttonVariants({ variant: "link" }),
+                                  "-mx-3 block h-full rounded-lg px-3 py-2 font-medium text-text-tertiary hover:bg-bg-primary-hover"
+                                )}
+                              >
+                                登入
+                              </Link>
                             </NavigationMenu.Link>
                           )}
                         </NavigationMenu.Item>

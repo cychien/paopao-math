@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { Lock } from "~/components/icons/Lock";
 import { SvgProps } from "~/components/icons/types";
 import { Permission, hasPathPermission } from "~/data/permission";

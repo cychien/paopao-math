@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { Lock } from "~/components/icons/Lock";
 import { buttonVariants } from "~/components/ui/Button";
 import { cn } from "~/utils/style";

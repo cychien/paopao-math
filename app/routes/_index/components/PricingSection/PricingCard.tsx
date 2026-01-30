@@ -1,6 +1,6 @@
 import checkIconSrc from "~/assets/check.svg";
 import { Button } from "~/components/ui/Button";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 
 function PricingCard() {
   return (

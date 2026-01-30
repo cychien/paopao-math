@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { buttonVariants } from "~/components/ui/Button";
 import { cn } from "~/utils/style";
 
@@ -19,7 +19,6 @@ function CallToActionSection() {
               buttonVariants({ size: "lg" }),
               "w-full bg-bg-brand-secondary text-text-primary hover:enabled:bg-bg-brand-secondary-hover lg:w-auto"
             )}
-            prefetch="viewport"
           >
             立即購買
           </Link>

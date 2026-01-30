@@ -1,39 +1,32 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Outlet, useLocation, useLoaderData, Link } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "react-router";
+import { Outlet, useLocation, useLoaderData, Link } from "react-router";
 import { CheckDone } from "~/components/icons/CheckDone";
 import { File } from "~/components/icons/File";
 import { HomeLine } from "~/components/icons/HomeLine";
-import { Upload } from "~/components/icons/Upload";
 import { SidebarItem } from "./SidebarItem";
 import { PlayCircle } from "~/components/icons/PlayCircle";
 import { cn } from "~/utils/style";
 import { LayersTwo } from "~/components/icons/LayersTwo";
 import { getUserPermissionData } from "~/services/auth/permissions";
-import { isUserAdmin } from "~/services/auth/session";
 import type { Permission } from "~/data/permission";
-import { buttonVariants } from "~/components/ui/Button";
 
 type LoaderData = {
   userPermissions: Permission;
   hasPurchase: boolean;
-  isAdmin: boolean;
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { permissions, hasPurchase } = await getUserPermissionData(request);
-  const isAdmin = await isUserAdmin(request);
 
-  return json<LoaderData>({
+  return {
     userPermissions: permissions,
     hasPurchase,
-    isAdmin,
-  });
+  };
 };
 
 export default function Layout() {
   const location = useLocation();
-  const { userPermissions, isAdmin } = useLoaderData<LoaderData>();
+  const { userPermissions } = useLoaderData<LoaderData>();
 
   // 基本導航項目
   const navigations = [
@@ -68,22 +61,6 @@ export default function Layout() {
                     />
                   ))}
                 </div>
-
-                {isAdmin && (
-                  <div className="fixed bottom-8 w-[230px] -translate-x-3 border-t border-gray-200">
-                    <Link
-                      to="/admin/management"
-                      className={cn(
-                        buttonVariants({ size: "lg" }),
-                        "w-full justify-start h-12 text-base"
-                      )}
-                      prefetch="intent"
-                    >
-                      <Upload className="size-5" />
-                      <span>管理教學內容</span>
-                    </Link>
-                  </div>
-                )}
               </aside>
 
               {/* <div className="w-8 col-start-2 row-span-5 row-start-1 bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5" /> */}

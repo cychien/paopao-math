@@ -1,6 +1,6 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Form, Link, useActionData, useNavigation } from "@remix-run/react";
+import type { ActionFunctionArgs } from "react-router";
+import { redirect } from "react-router";
+import { Form, Link, useActionData, useNavigation } from "react-router";
 import { useState } from "react";
 import {
   validateEmail,
@@ -29,7 +29,7 @@ export const loader = async ({ request }: { request: Request }) => {
     throw redirect("/course/overview");
   }
 
-  return json({});
+  return {};
 };
 
 export const action = async ({
@@ -41,7 +41,7 @@ export const action = async ({
 
     // 驗證 email
     if (!email || !validateEmail(email)) {
-      return json(
+      return Response.json(
         { error: "請輸入有效的電子郵件地址", success: false } as const,
         { status: 400 }
       );
@@ -51,7 +51,7 @@ export const action = async ({
     const userWithPurchases = await getUserWithPurchases(email);
 
     if (!userWithPurchases) {
-      return json(
+      return Response.json(
         {
           error: "此信箱尚未購買課程，請先完成購買才能登入",
           success: false,
@@ -66,7 +66,7 @@ export const action = async ({
     );
 
     if (!hasValidPurchase) {
-      return json(
+      return Response.json(
         {
           error: "您的購買記錄無效或已過期，請聯繫客服或重新購買",
           success: false,
@@ -97,20 +97,20 @@ export const action = async ({
     const emailSent = await sendMagicLinkEmail(email, url, expiresAt);
 
     if (!emailSent) {
-      return json(
+      return Response.json(
         { error: "郵件發送失敗，請稍後再試", success: false } as const,
         { status: 500 }
       );
     }
 
-    return json({
+    return Response.json({
       success: true,
       message: `登入連結已發送到 ${email}，請檢查您的信箱`,
       email,
     } as const);
   } catch (error) {
     console.error("登入處理失敗:", error);
-    return json({ error: "系統錯誤，請稍後再試", success: false } as const, {
+    return Response.json({ error: "系統錯誤，請稍後再試", success: false } as const, {
       status: 500,
     });
   }

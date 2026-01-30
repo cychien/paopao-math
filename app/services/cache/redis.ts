@@ -193,17 +193,13 @@ export const cacheKeys = {
   userWithPurchases: (email: string) => `user_purchases:${email}`,
   userAccess: (email: string) => `user_access:${email}`,
   purchaseStats: () => "purchase_stats",
-  // 課程相關緩存鍵
+  // 課程相關緩存鍵（使用新的數據結構）
   allLessons: () => "course:all-lessons",
   lessonBySlug: (slug: string) => `course:lesson:${slug}`,
   lessonById: (id: string) => `course:lesson-id:${id}`,
   chapterBySlug: (lessonSlug: string, chapterSlug: string) =>
     `course:chapter:${lessonSlug}:${chapterSlug}`,
   courseStats: () => "course:stats",
-  // 入學考試相關緩存鍵
-  entranceExamsWithDetails: () => "entrance-exams:all-with-details",
-  entranceExamStats: () => "entrance-exams:stats",
-  entranceExamById: (id: string) => `entrance-exams:exam-id:${id}`,
 } as const;
 
 // 快取統計和管理工具
@@ -260,28 +256,6 @@ export const cacheManager = {
   // 清除課程統計快取
   async clearCourseStatsCache() {
     await cache.del(cacheKeys.courseStats());
-  },
-
-  // 清除所有入學考試相關快取
-  async clearAllEntranceExamCache() {
-    await Promise.all([
-      cache.del(cacheKeys.entranceExamsWithDetails()),
-      cache.del(cacheKeys.entranceExamStats()),
-    ]);
-  },
-
-  // 清除特定入學考試的快取
-  async clearEntranceExamCache(examId?: string) {
-    const promises = [
-      cache.del(cacheKeys.entranceExamsWithDetails()),
-      cache.del(cacheKeys.entranceExamStats()),
-    ];
-
-    if (examId) {
-      promises.push(cache.del(cacheKeys.entranceExamById(examId)));
-    }
-
-    await Promise.all(promises);
   },
 
   // 健康檢查

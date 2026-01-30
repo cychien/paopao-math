@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-1.1.x"]
+  provider        = "prisma-client"
+  previewFeatures = ["driverAdapters"]
+  output          = "../app/services/database/.generated/prisma"
 }
 
 datasource db {
@@ -9,170 +10,443 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model User {
-  id        String     @id @default(cuid())
-  email     String     @unique
-  name      String?
-  role      UserRole   @default(USER)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  purchases Purchase[]
-  sessions  Session[]
-
-  @@map("users")
+// ---------------- Enums ----------------
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
 }
 
-model Purchase {
-  id                String         @id @default(cuid())
-  userId            String
-  email             String
-  lemonsqueezyId    String         @unique
-  orderNumber       String
-  customerId        String?
-  status            PurchaseStatus @default(PENDING)
-  amount            Int
-  currency          String         @default("TWD")
-  productName       String         @default("學測總複習班")
-  purchasedAt       DateTime       @default(now())
-  refundedAt        DateTime?
-  hasLifetimeAccess Boolean        @default(true)
-  accessGrantedAt   DateTime?
-  testMode          Boolean        @default(false)
-  webhookProcessed  Boolean        @default(false)
-  webhookData       Json?
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+enum AppType {
+  COURSE
+  BLOG
+}
 
-  @@map("purchases")
+enum EmailChallengeStatus {
+  PENDING
+  EXPIRED
+  LOCKED
+  CONSUMED
+}
+
+enum MediaType {
+  IMAGE
+  DOCUMENT
+}
+
+enum TargetType {
+  COURSE
+  LESSON
+}
+
+enum FrontType {
+  REACT
+}
+
+enum ConfigStatus {
+  PUBLISHED
+  DRAFT
+}
+
+enum PaymentProvider {
+  LEMON_SQUEEZY
+}
+
+// ---------------- Identity / Tenant ----------------
+model User {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  name        String?
+  avatarUrl   String?
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  identities      Identity[]
+  sessions        Session[]
+  memberships     WorkspaceMember[]
+  ownedWorkspaces Workspace[]       @relation("WorkspaceOwner")
+  createdMedia    Media[]           @relation("MediaCreator")
+}
+
+model Identity {
+  id         String   @id @default(cuid())
+  userId     String
+  provider   String // "google", "github", etc.
+  providerId String // sub from OAuth provider
+  email      String?
+  name       String?
+  picture    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+  @@index([userId])
 }
 
 model Session {
-  id        String    @id @default(cuid())
-  userId    String
-  email     String
-  token     String    @unique
-  expiresAt DateTime
-  used      Boolean   @default(false)
-  usedAt    DateTime?
-  ipAddress String?
-  userAgent String?
-  createdAt DateTime  @default(now())
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("sessions")
-}
-
-enum PurchaseStatus {
-  PENDING
-  ACTIVE
-  REFUNDED
-}
-
-enum UserRole {
-  USER
-  ADMIN
-}
-
-model Lesson {
   id          String    @id @default(cuid())
-  name        String
-  description String?
-  slug        String    @unique
-  order       Int       @default(0)
+  userId      String
+  workspaceId String?
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  lastUsedAt  DateTime?
+  userAgent   String?
+  ipAddress   String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  chapters    Chapter[]
 
-  @@map("lessons")
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([workspaceId])
+  @@index([tokenHash])
+  @@index([expiresAt])
 }
 
-model Chapter {
-  id        String     @id @default(cuid())
+model EmailChallenge {
+  id        String               @id @default(cuid())
+  email     String
+  username  String?
+  tokenHash String
+  status    EmailChallengeStatus @default(PENDING)
+  issuedAt  DateTime             @default(now())
+  expiresAt DateTime
+
+  // For customer login - links to the app they're logging into
+  appId String?
+  app   App?    @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@unique([email, tokenHash])
+  @@index([email])
+  @@index([expiresAt])
+  @@index([appId])
+}
+
+model Workspace {
+  id        String   @id @default(cuid())
   name      String
+  ownerId   String
+  owner     User     @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions Session[]
+  members  WorkspaceMember[]
+  apps     App[]
+
+  // shared assets
+  media      Media[]
+  MediaUsage MediaUsage[]
+
+  @@index([ownerId])
+}
+
+model WorkspaceMember {
+  id          String        @id @default(cuid())
+  userId      String
+  workspaceId String
+  role        WorkspaceRole @default(VIEWER)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+  @@index([workspaceId])
+}
+
+// ---------------- App / Service ----------------
+model App {
+  id          String   @id @default(cuid())
+  workspaceId String
+  type        AppType
+  name        String
+  slug        String   @unique
+  isFree      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  courseProfile      AppCourseProfile?
+  paymentIntegration AppPaymentIntegration?
+  emailChallenges    EmailChallenge[]
+  customerSessions   CustomerSession[]
+
+  @@index([workspaceId, type])
+}
+
+model AppCourseProfile {
+  appId     String   @id
+  app       App      @relation(fields: [appId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  modules  CourseModule[] @relation("CourseModules")
+  appFront AppFront?
+}
+
+model CourseModule {
+  id        String   @id @default(cuid())
+  title     String
+  summary   String?
   slug      String
-  order     Int        @default(0)
-  lessonId  String
-  lesson    Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  teachings Teaching[]
-  exams     Exam[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-
-  @@unique([lessonId, slug])
-  @@map("chapters")
-}
-
-model Teaching {
-  id        String   @id @default(cuid())
-  videoId   String
-  duration  Int      // 秒數
   order     Int      @default(0)
-  chapterId String
-  chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  courseId  String
+  isPublic  Boolean  @default(false)
+  isDraft   Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
 
-  @@map("teachings")
+  course  AppCourseProfile @relation("CourseModules", fields: [courseId], references: [appId], onDelete: Cascade)
+  lessons CourseLesson[]   @relation("CourseLessons")
+
+  @@unique([courseId, slug])
+  @@index([order])
+  @@index([courseId])
 }
 
-model Exam {
-  id        String   @id @default(cuid())
-  videoId   String
-  duration  Int      // 秒數
-  order     Int      @default(0)
-  chapterId String
-  chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("exams")
-}
-
-model EntranceExam {
-  id          String         @id @default(cuid())
+model CourseLesson {
+  id          String   @id @default(cuid())
   title       String
-  year        Int
-  subject     String
-  type        String         // A, B 等
+  summary     String?
+  slug        String
+  contentJson Json?    @map("content_json")
+  contentHtml String?  @map("content_html")
+  durationSec Int?
+  order       Int      @default(0)
+  moduleId    String
+  isPublic    Boolean  @default(false)
+  isDraft     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  module CourseModule @relation("CourseLessons", fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([moduleId, slug])
+  @@index([order])
+  @@index([moduleId])
+}
+
+model Media {
+  id          String  @id @default(cuid())
+  workspaceId String
+  creatorId   String?
+
+  // 儲存 key（例如 S3 object key / 本地路徑）
+  key       String
+  type      MediaType
+  filename  String?
+  mimeType  String?
+  size      Int? // bytes
+  alt       String?
+  meta      Json?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  workspace  Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator    User?        @relation("MediaCreator", fields: [creatorId], references: [id], onDelete: SetNull)
+  MediaUsage MediaUsage[]
+
+  @@index([type])
+  @@index([workspaceId])
+  @@index([creatorId])
+}
+
+model MediaUsage {
+  id          String     @id @default(cuid())
+  workspaceId String
+  mediaId     String
+  targetType  TargetType
+  targetId    String
+  relation    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  media     Media     @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, mediaId, targetType, targetId, relation])
+  @@index([workspaceId, targetType, targetId])
+  @@index([workspaceId, mediaId])
+}
+
+// ---------------- Appearance / Template ----------------
+
+model ReactTemplate {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  slug String @unique
+
+  versions ReactTemplateVersion[]
+}
+
+model ReactTemplateVersion {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  templateId      String
+  version         String
+  settingsSchema  Json?
+  defaultSettings Json?
+
+  template ReactTemplate         @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  configs  ReactTemplateConfig[]
+
+  @@unique([templateId, version])
+}
+
+model AppFront {
+  id        String   @id @default(cuid())
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  appCourseProfileId String    @unique
+  type               FrontType
+  liveType           FrontType @default(REACT)
+
+  react            AppFrontReact?
+  appCourseProfile AppCourseProfile @relation(fields: [appCourseProfileId], references: [appId], onDelete: Cascade)
+}
+
+model AppFrontReact {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  appFrontId   String  @unique
+  liveConfigId String? @unique
+
+  appFront   AppFront              @relation(fields: [appFrontId], references: [id], onDelete: Cascade)
+  liveConfig ReactTemplateConfig?  @relation("LiveConfig", fields: [liveConfigId], references: [id])
+  configs    ReactTemplateConfig[]
+}
+
+model ReactTemplateConfig {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastLivedAt DateTime @default(now())
+
+  appFrontReactId       String
+  baseTemplateVersionId String
+  name                  String
+  settings              Json?
+  status                ConfigStatus @default(DRAFT)
+
+  appFrontReact       AppFrontReact        @relation(fields: [appFrontReactId], references: [id], onDelete: Cascade)
+  baseTemplateVersion ReactTemplateVersion @relation(fields: [baseTemplateVersionId], references: [id], onDelete: Restrict)
+  liveFor             AppFrontReact?       @relation("LiveConfig")
+
+  @@index([appFrontReactId])
+}
+
+model AppPaymentIntegration {
+  id       String          @id @default(cuid())
+  appId    String          @unique
+  provider PaymentProvider
+
+  // 是否已驗證並啟用
+  isActive Boolean @default(false)
+
+  // 特定於 provider 的配置，使用 JSON 存儲
+  // Lemon Squeezy: { apiKey: string, webhookSecret: string, storeId?: string }
+  // Stripe: { publishableKey: string, secretKey: string, webhookSecret: string }
+  config Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  app      App          @relation(fields: [appId], references: [id], onDelete: Cascade)
+  variants AppVariant[]
+
+  @@index([appId])
+}
+
+model AppVariant {
+  id        String @id @default(cuid())
+  appId     String
+  productId String // Lemon Squeezy Product ID (或其他平台的產品 ID)
+  variantId String // Lemon Squeezy Variant ID (或其他平台的 variant ID)
+
+  // 用戶可自定義的顯示資訊
+  name        String
   description String?
-  order       Int            @default(0)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  questions   ExamQuestion[]
 
-  @@map("entrance_exams")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  paymentIntegration AppPaymentIntegration @relation(fields: [appId], references: [appId], onDelete: Cascade)
+  customers          AppCustomer[]
+
+  @@index([appId])
+  @@index([variantId])
 }
 
-model ExamQuestion {
-  id                String       @id @default(cuid())
-  title             String
-  fileType          String       // pdf, video 等
-  fileUrl           String?      // 用於 PDF 等檔案
-  downloadFilename  String?      // 下載檔案名稱
-  questionType      String       // single-choice, multiple-choice, fill-in
-  order             Int          @default(0)
-  examId            String
-  exam              EntranceExam @relation(fields: [examId], references: [id], onDelete: Cascade)
-  answers           ExamAnswer[]
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
+model AppCustomer {
+  id        String  @id @default(cuid())
+  appId     String
+  variantId String
+  email     String
+  name      String?
 
-  @@map("exam_questions")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  variant              AppVariant            @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  lemonSqueezyCustomer LemonSqueezyCustomer?
+  sessions             CustomerSession[]
+
+  @@index([appId])
+  @@index([email])
+  @@index([variantId])
 }
 
-model ExamAnswer {
-  id         String       @id @default(cuid())
-  title      String
-  fileType   String       // video, pdf 等
-  videoId    String?      // 用於影片
-  duration   Int?         // 影片時長（秒）
-  fileUrl    String?      // 用於其他檔案類型
-  order      Int          @default(0)
-  questionId String
-  question   ExamQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+model LemonSqueezyCustomer {
+  id         String @id @default(cuid())
+  customerId String @unique // 對應 AppCustomer.id
 
-  @@map("exam_answers")
+  // Lemon Squeezy 特定資訊
+  lemonSqueezyCustomerId String? // Lemon Squeezy Customer ID
+  lemonSqueezyOrderId    String  @unique // Lemon Squeezy Order ID
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  customer AppCustomer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+}
+
+model CustomerSession {
+  id         String    @id @default(cuid())
+  customerId String
+  appId      String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  lastUsedAt DateTime?
+  userAgent  String?
+  ipAddress  String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  customer AppCustomer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  app      App         @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([appId])
+  @@index([tokenHash])
+  @@index([expiresAt])
 }

@@ -1,25 +1,25 @@
 // 統一匯出所有資料庫服務
-export { prisma } from "./client";
+export { prisma } from "./prisma.server";
 
-// 用戶相關服務
+// 用戶相關服務（workspace users）
 export {
   createOrGetUser,
-  getUserWithPurchases,
-  checkUserAccess,
-  createMagicLinkSession,
-  verifyMagicLinkToken,
+  getUserByEmail,
+  createUserSession,
+  verifySession,
   cleanupExpiredSessions,
+  createEmailChallenge,
+  verifyEmailChallenge,
 } from "./users";
 
-// 購買相關服務
+// 購買相關服務（使用新的 AppCustomer / LemonSqueezyCustomer 結構）
 export {
   handleOrderCreated,
   handleOrderRefunded,
-  getUserActivePurchases,
-  verifyUserAccess,
+  checkCustomerAccess,
   findPurchaseByLemonSqueezyId,
   getPurchaseStats,
 } from "./purchases";
 
-// 類型匯出（當 Prisma 類型可用時）
-export type { UserWithPurchases } from "./users";
+// 課程相關服務
+export { getLessonBySlug } from "./course";

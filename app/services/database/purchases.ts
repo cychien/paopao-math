@@ -1,4 +1,4 @@
-import { prisma } from "./client";
+import { prisma } from "./prisma.server";
 import { withCache, cacheKeys } from "../cache/redis";
 
 /**
@@ -11,57 +11,62 @@ export async function handleOrderCreated(webhookData: any) {
 
     // 提取必要信息
     const email = attributes.user_email;
-    const amount = attributes.total;
-    const currency = attributes.currency || "TWD";
     const customerId = attributes.customer_id;
+    const variantId = attributes.first_order_item?.variant_id;
+    
+    // 從 custom data 獲取我們的 variant ID 和 app ID
+    const customData = attributes.custom_data || {};
+    const appId = customData.app_id;
+    const ourVariantId = customData.variant_id;
 
-    // 確保用戶存在
-    let user = await prisma.user.findUnique({
-      where: { email },
+    if (!appId || !ourVariantId) {
+      console.error("Missing app_id or variant_id in custom data");
+      throw new Error("Missing required custom data");
+    }
+
+    // 檢查是否已經處理過這個訂單
+    const existingCustomer = await prisma.lemonSqueezyCustomer.findUnique({
+      where: { lemonSqueezyOrderId: lemonsqueezyId.toString() },
     });
 
-    if (!user) {
-      user = await prisma.user.create({
+    if (existingCustomer) {
+      console.log(`訂單 ${lemonsqueezyId} 已經處理過`);
+      return existingCustomer;
+    }
+
+    // 創建或獲取 AppCustomer
+    let appCustomer = await prisma.appCustomer.findFirst({
+      where: {
+        appId,
+        email,
+        variantId: ourVariantId,
+      },
+    });
+
+    if (!appCustomer) {
+      appCustomer = await prisma.appCustomer.create({
         data: {
+          appId,
+          variantId: ourVariantId,
           email,
           name: attributes.user_name || null,
         },
       });
     }
 
-    // 檢查是否已經處理過這個訂單
-    const existingPurchase = await prisma.purchase.findUnique({
-      where: { lemonsqueezyId: lemonsqueezyId.toString() },
-    });
-
-    if (existingPurchase) {
-      console.log(`訂單 ${lemonsqueezyId} 已經處理過`);
-      return existingPurchase;
-    }
-
-    // 創建購買記錄
-    const purchase = await prisma.purchase.create({
+    // 創建 LemonSqueezyCustomer 記錄
+    const lsCustomer = await prisma.lemonSqueezyCustomer.create({
       data: {
-        userId: user.id,
-        email,
-        lemonsqueezyId: lemonsqueezyId.toString(),
-        customerId: customerId?.toString(),
-        status: "ACTIVE",
-        amount: Math.round(amount * 100), // 轉換為分
-        currency,
-        productName: "學測總複習班",
-        hasLifetimeAccess: true,
-        accessGrantedAt: new Date(),
-        webhookProcessed: true,
-        webhookData: webhookData,
-        orderNumber: attributes.order_number,
+        customerId: appCustomer.id,
+        lemonSqueezyCustomerId: customerId?.toString() || null,
+        lemonSqueezyOrderId: lemonsqueezyId.toString(),
       },
     });
 
     console.log(
-      `成功處理訂單 ${lemonsqueezyId}，用戶 ${email} 獲得一年訪問權限`
+      `成功處理訂單 ${lemonsqueezyId}，用戶 ${email} 獲得訪問權限`
     );
-    return purchase;
+    return lsCustomer;
   } catch (error) {
     console.error("處理訂單創建失敗:", error);
     throw new Error("處理訂單失敗");
@@ -77,30 +82,27 @@ export async function handleOrderRefunded(webhookData: any) {
     const { id: lemonsqueezyId } = data;
 
     // 查找對應的購買記錄
-    const purchase = await prisma.purchase.findUnique({
-      where: { lemonsqueezyId: lemonsqueezyId.toString() },
+    const lsCustomer = await prisma.lemonSqueezyCustomer.findUnique({
+      where: { lemonSqueezyOrderId: lemonsqueezyId.toString() },
+      include: {
+        customer: true,
+      },
     });
 
-    if (!purchase) {
+    if (!lsCustomer) {
       console.log(`找不到訂單 ${lemonsqueezyId} 的購買記錄`);
       return null;
     }
 
-    // 更新購買狀態為退款
-    const updatedPurchase = await prisma.purchase.update({
-      where: { id: purchase.id },
-      data: {
-        status: "REFUNDED",
-        hasLifetimeAccess: false,
-        refundedAt: new Date(),
-        webhookData: webhookData,
-      },
+    // 刪除 LemonSqueezyCustomer 記錄（這會撤銷訪問權限）
+    await prisma.lemonSqueezyCustomer.delete({
+      where: { id: lsCustomer.id },
     });
 
     console.log(
-      `成功處理退款 ${lemonsqueezyId}，撤銷用戶 ${purchase.email} 的訪問權限`
+      `成功處理退款 ${lemonsqueezyId}，撤銷用戶 ${lsCustomer.customer.email} 的訪問權限`
     );
-    return updatedPurchase;
+    return lsCustomer;
   } catch (error) {
     console.error("處理訂單退款失敗:", error);
     throw new Error("處理退款失敗");
@@ -108,44 +110,30 @@ export async function handleOrderRefunded(webhookData: any) {
 }
 
 /**
- * 根據 email 獲取用戶的有效購買記錄（快取版本）
+ * 根據 email 和 appId 檢查用戶是否有訪問權限
  */
-export async function getUserActivePurchases(email: string) {
-  return withCache(
-    `user_active_purchases:${email}`,
-    async () => {
-      try {
-        return await prisma.purchase.findMany({
-          where: {
-            email,
-            status: "ACTIVE",
-            hasLifetimeAccess: true,
-          },
-          orderBy: {
-            purchasedAt: "desc",
-          },
-        });
-      } catch (error) {
-        console.error("獲取用戶購買記錄失敗:", error);
-        throw new Error("獲取購買記錄失敗");
-      }
-    },
-    300 // 快取 5 分鐘
-  );
-}
-
-/**
- * 驗證用戶是否有課程訪問權限（快取版本）
- */
-export async function verifyUserAccess(email: string): Promise<boolean> {
+export async function checkCustomerAccess(
+  appId: string,
+  email: string
+): Promise<boolean> {
   return withCache(
     cacheKeys.userAccess(email),
     async () => {
       try {
-        const activePurchases = await getUserActivePurchases(email);
-        return activePurchases.length > 0;
+        const customer = await prisma.appCustomer.findFirst({
+          where: {
+            appId,
+            email,
+          },
+          include: {
+            lemonSqueezyCustomer: true,
+          },
+        });
+
+        // 有 AppCustomer 且有 LemonSqueezyCustomer 記錄表示已購買
+        return !!customer?.lemonSqueezyCustomer;
       } catch (error) {
-        console.error("驗證用戶權限失敗:", error);
+        console.error("檢查用戶權限失敗:", error);
         return false;
       }
     },
@@ -158,10 +146,10 @@ export async function verifyUserAccess(email: string): Promise<boolean> {
  */
 export async function findPurchaseByLemonSqueezyId(lemonsqueezyId: string) {
   try {
-    return await prisma.purchase.findUnique({
-      where: { lemonsqueezyId },
+    return await prisma.lemonSqueezyCustomer.findUnique({
+      where: { lemonSqueezyOrderId: lemonsqueezyId },
       include: {
-        user: true,
+        customer: true,
       },
     });
   } catch (error) {
@@ -178,26 +166,20 @@ export async function getPurchaseStats() {
     cacheKeys.purchaseStats(),
     async () => {
       try {
-        const [
-          totalPurchases,
-          activePurchases,
-          refundedPurchases,
-          totalRevenue,
-        ] = await Promise.all([
-          prisma.purchase.count(),
-          prisma.purchase.count({ where: { status: "ACTIVE" } }),
-          prisma.purchase.count({ where: { status: "REFUNDED" } }),
-          prisma.purchase.aggregate({
-            where: { status: "ACTIVE" },
-            _sum: { amount: true },
+        const [totalCustomers, activeCustomers] = await Promise.all([
+          prisma.appCustomer.count(),
+          prisma.appCustomer.count({
+            where: {
+              lemonSqueezyCustomer: {
+                isNot: null,
+              },
+            },
           }),
         ]);
 
         return {
-          totalPurchases,
-          activePurchases,
-          refundedPurchases,
-          totalRevenue: totalRevenue._sum.amount || 0,
+          totalCustomers,
+          activeCustomers,
         };
       } catch (error) {
         console.error("獲取購買統計失敗:", error);

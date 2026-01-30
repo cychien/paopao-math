@@ -32,19 +32,11 @@ function TeacherSection() {
         <div className="flex-1 mt-12 lg:mt-0">
           <Image
             alt="你的老師"
-            src="https://res.cloudinary.com/dgppby8lr/image/upload/w_1650,q_auto,f_auto,e_sharpen/v1746455426/paopao/paopao_jz9i86.jpg"
-            loading="eager"
-            aspectRatioClassName="aspect-[calc(2304/1927)]"
-            blurDataUri="data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUEAAAGNbWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAsaWxvYwAAAABEAAACAAEAAAABAAACMQAAAk4AAgAAAAEAAAG1AAAAfAAAAEJpaW5mAAAAAAACAAAAGmluZmUCAAAAAAEAAGF2MDFDb2xvcgAAAAAaaW5mZQIAAAAAAgAAYXYwMUFscGhhAAAAABppcmVmAAAAAAAAAA5hdXhsAAIAAQABAAAAw2lwcnAAAACdaXBjbwAAABRpc3BlAAAAAAAAARgAAADqAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgSAAAAAAABNjb2xybmNseAACAAIAAYAAAAAOcGl4aQAAAAABCAAAAAxhdjFDgQAcAAAAADhhdXhDAAAAAHVybjptcGVnOm1wZWdCOmNpY3A6c3lzdGVtczphdXhpbGlhcnk6YWxwaGEAAAAAHmlwbWEAAAAAAAAAAgABBAECgwQAAgQBBYYHAAAC0m1kYXQSAAoGGCHi/SwqMnBEaAGGFNgFmHl8EYFmsE3xzC18dSMwEI31GISiV6Pxq0OTTBtj0Jx1pDnW364LxGsLlaAhCmn++o/B3NeKqKtvJm96u+kinxcXIvn0yaY+wwEzKvIeCXanPtZb+5poCVLl0FTYUk8ucD/eYpvDduAgEgAKCTgh4v0sIEBAMjK+BBGgAYYYYQC1R7he9RxT3g97JbahHSGXI9GUoM4FeTtwab/G1lU+N1Bf3VApmeMT49vbP7nqR+pwBD+jajXwCC5+KiYhcoQquvVw3nQfydNEexDnIBI0mXiMXLQQjCnuDULQC5eDrMzsMPsObOVQsn6XpOglu2u+CSH/gCI1vUj75PJIjil2IzdVAFS1JtjTmyF2wnlCHeB5ouV3qgJsLTj4Tmhe+RYohVFMDW8JW/8Y6Nvp9w14RhyirLXfLgZbCAayuWQIJ7Hh4jdYvlknYqk7ii0CyuG4wo8uWauDCqU7oKSNQJr1iww0ea1wRj2PFji+tugvBdWsjWSF3Tbox9InDNqyaRWQAVEMdfAmo8O/SG1u5BTfcvyG0Pk1fhDp4oBSPz2o4WE+d76aAHkzm+Yapt3LbkDOgIaoSBtSH9utEyn1YotptpGRq12PNAVf/wOkUxmVA0GDGZg+/OvXZyd6OP/69/EP46yLdx6Ve1e5cFIgFauxUjfi+NiEsPBYuPvQJoXPZUB5zzLZVkhMCSbeQsRHgUXOk0D5qmQXm8KNmQOgvww0Q7lbub3gH9tlyyXaztV4iWlOP0yfFT77JaTJiO1MfsviWtBNHLiMgjaCSlJHy6+Lkk8GJqSn+uoQKhqVbwjk9hwnXdjIE7wX4ZSHwwGxFB56r77MU5srHenDMep1eao8WLawVL4bAM+6EG4qTk5wM9et4PhHxHnFVnkzCCTPFpcXLVwxMwEvWhut70ium9pFri/PPhzT0qU="
+            imageId="paopao_jz9i86.jpg"
+            provider="cloudinary"
+            priority
+            aspectRatio={2304 / 1927}
             className="rounded-[10px]"
-            srcSet="
-              https://res.cloudinary.com/dgppby8lr/image/upload/w_280,q_auto,f_auto,e_sharpen/v1746455426/paopao/paopao_jz9i86.jpg 280w,
-              https://res.cloudinary.com/dgppby8lr/image/upload/w_560,q_auto,f_auto,e_sharpen/v1746455426/paopao/paopao_jz9i86.jpg 560w,
-              https://res.cloudinary.com/dgppby8lr/image/upload/w_840,q_auto,f_auto,e_sharpen/v1746455426/paopao/paopao_jz9i86.jpg 840w,
-              https://res.cloudinary.com/dgppby8lr/image/upload/w_1100,q_auto,f_auto,e_sharpen/v1746455426/paopao/paopao_jz9i86.jpg 1100w,
-              https://res.cloudinary.com/dgppby8lr/image/upload/w_1650,q_auto,f_auto,e_sharpen/v1746455426/paopao/paopao_jz9i86.jpg 1650w,
-              https://res.cloudinary.com/dgppby8lr/image/upload/w_2100,q_auto,f_auto,e_sharpen/v1746455426/paopao/paopao_jz9i86.jpg 2100w,
-            "
             sizes="(min-width:640px) 100%, 100%"
           />
         </div>

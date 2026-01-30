@@ -2,8 +2,8 @@ import {
   isRouteErrorResponse,
   useParams,
   useRouteError,
-  type ErrorResponse,
-} from "@remix-run/react";
+} from "react-router";
+import type { ErrorResponse } from "react-router";
 import { getErrorMessage } from "~/utils/misc";
 
 type StatusHandler = (info: {
@@ -35,9 +35,9 @@ function GeneralErrorBoundary({
     <div className="container flex h-full w-full py-10 mx-auto">
       {isRouteErrorResponse(error)
         ? (statusHandlers?.[error.status] ?? defaultStatusHandler)({
-            error,
-            params,
-          })
+          error,
+          params,
+        })
         : unexpectedErrorHandler(error)}
     </div>
   );

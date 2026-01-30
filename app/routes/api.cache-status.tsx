@@ -1,4 +1,3 @@
-import { json } from "@remix-run/node";
 import { cacheManager } from "~/services/cache/redis";
 import { performanceMonitor } from "~/utils/performance";
 
@@ -9,7 +8,7 @@ export const loader = async () => {
     const connectionInfo = cacheManager.getConnectionInfo();
     const performanceStats = performanceMonitor.getStats();
 
-    return json({
+    return Response.json({
       cache: {
         healthy: isHealthy,
         connection: connectionInfo,
@@ -19,7 +18,7 @@ export const loader = async () => {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    return json(
+    return Response.json(
       {
         cache: {
           healthy: false,

@@ -1,4 +1,4 @@
-import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import { createCookieSessionStorage, redirect } from "react-router";
 import { getUserWithPurchases } from "../database/users";
 
 // 創建 cookie session storage
@@ -123,27 +123,3 @@ export async function getOptionalUser(request: Request) {
   return await getUserWithPurchases(userSession.userEmail);
 }
 
-/**
- * 檢查當前用戶是否為管理員
- */
-export async function isUserAdmin(request: Request): Promise<boolean> {
-  const user = await getOptionalUser(request);
-  return user?.role === "ADMIN";
-}
-
-/**
- * 要求管理員權限
- */
-export async function requireAdmin(request: Request) {
-  const user = await getOptionalUser(request);
-
-  if (!user) {
-    throw requireLogin("/auth/login");
-  }
-
-  if (user.role !== "ADMIN") {
-    throw redirect("/?error=access_denied");
-  }
-
-  return user;
-}

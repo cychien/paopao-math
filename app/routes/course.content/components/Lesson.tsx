@@ -1,145 +1,102 @@
-import format from "format-duration";
-import {
-  Clock,
-  ChevronDown,
-  ChevronUp,
-  BarChart3,
-  FileText,
-} from "lucide-react";
-import { Lock } from "~/components/icons/Lock";
-import { Syllabus } from "./Syllabus";
-import React from "react";
-import { Button } from "~/components/ui/Button";
+import { Link } from "react-router";
+import { Clock, BookOpen } from "lucide-react";
+import { cn } from "~/utils/style";
 
-type LessonProps = {
+interface LessonProps {
   lesson: {
     name: string;
-    description?: string | undefined;
+    description?: string;
     slug: string;
     totalDuration: number;
     examCount: number;
-    chapters: {
+    chapters: Array<{
       name: string;
       duration: number;
       slug: string;
       examCount: number;
-    }[];
+    }>;
   };
   index: number;
   isLoggedIn: boolean;
-};
+}
 
-function Lesson({ lesson, index, isLoggedIn }: LessonProps) {
-  const [mode, setMode] = React.useState<"normal" | "detailed">("normal");
+export function Lesson({ lesson, index, isLoggedIn }: LessonProps) {
+  const formatDuration = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
 
-  // 根據登入狀態決定是否鎖定
-  const isLocked = !isLoggedIn;
+    if (hours > 0) {
+      return `${hours} 小時 ${minutes} 分鐘`;
+    }
+    return `${minutes} 分鐘`;
+  };
 
   return (
     <div className="space-y-4">
-      {/* 單元頭部 */}
-      <div className="space-y-3">
-        {/* 單元標題行 */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-8 h-8 bg-brand-100 text-brand-700 rounded-md font-bold font-inter">
-              {index + 1}
-            </div>
+      {/* 模組標題和描述 */}
+      <div>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <h3 className="text-lg font-semibold text-gray-900">
+              {lesson.name}
+            </h3>
+            {lesson.description && (
+              <p className="mt-1 text-sm text-gray-600">{lesson.description}</p>
+            )}
           </div>
-
-          {isLocked && (
-            <div className="flex items-center space-x-1 px-2 py-1 bg-orange-50 border border-orange-300 rounded-md">
-              <Lock className="size-4 text-orange-500" />
-              <span className="text-xs text-orange-800 font-medium">
-                購買限定
-              </span>
-            </div>
-          )}
+          <div className="flex-shrink-0 flex items-center space-x-1 text-sm text-gray-500">
+            <Clock className="size-4" />
+            <span>{formatDuration(lesson.totalDuration)}</span>
+          </div>
         </div>
-
-        {/* 課程名稱 */}
-        <h3 className="text-lg font-bold text-gray-900 leading-tight">
-          {lesson.name}
-        </h3>
-
-        {/* 描述 */}
-        {lesson.description && (
-          <p className="text-gray-600 text-sm leading-relaxed">
-            {lesson.description}
-          </p>
-        )}
-
-        {/* 統計信息 */}
-        {!isLocked && (
-          <div className="flex flex-wrap gap-4">
-            <StatsItem
-              icon={<FileText className="size-4" />}
-              label="章節"
-              value={lesson.chapters.length}
-            />
-            <StatsItem
-              icon={<BarChart3 className="size-4" />}
-              label="例題"
-              value={lesson.examCount}
-            />
-            <StatsItem
-              icon={<Clock className="size-4" />}
-              label="時長"
-              value={format(lesson.totalDuration * 1000)}
-            />
-          </div>
-        )}
-
-        {/* 展開按鈕 - 只有登入且有章節時才顯示 */}
-        {!isLocked && lesson.chapters.length > 0 && (
-          <div className="pt-2">
-            <Button
-              // size=""
-              variant="outline"
-              className="w-full justify-center bg-gray-100 border-gray-200 hover:bg-gray-300/40"
-              onClick={() => setMode(mode === "normal" ? "detailed" : "normal")}
-            >
-              {mode === "normal" ? (
-                <>
-                  <span>查看課程內容</span>
-                  <ChevronDown className="size-4" />
-                </>
-              ) : (
-                <>
-                  <span>收合課程內容</span>
-                  <ChevronUp className="size-4" />
-                </>
-              )}
-            </Button>
-          </div>
-        )}
       </div>
 
-      {/* 展開的課程內容 - 只有登入用戶才能看到 */}
-      {!isLocked && mode === "detailed" && lesson.chapters.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-gray-200 animate-in fade-in-0 duration-200">
-          <Syllabus lessonSlug={lesson.slug} chapters={lesson.chapters} />
+      {/* 章節列表 */}
+      {lesson.chapters.length > 0 && (
+        <div className="space-y-1">
+          {lesson.chapters.map((chapter, chapterIndex) => (
+            <Link
+              key={chapter.slug}
+              to={
+                isLoggedIn
+                  ? `/course/content/${lesson.slug}/${chapter.slug}`
+                  : "/login"
+              }
+              className={cn(
+                "block py-2.5 px-3 rounded-lg transition-colors",
+                "hover:bg-gray-50 border border-transparent hover:border-gray-200"
+              )}
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <span className="flex-shrink-0 text-sm font-medium text-gray-400 mt-0.5">
+                    {chapterIndex + 1}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-medium text-gray-900 truncate">
+                      {chapter.name}
+                    </h4>
+                  </div>
+                </div>
+                {chapter.duration > 0 && (
+                  <div className="flex-shrink-0 flex items-center space-x-1 text-xs text-gray-500">
+                    <Clock className="size-3" />
+                    <span>{Math.round(chapter.duration / 60)} 分</span>
+                  </div>
+                )}
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {/* 無章節提示 */}
+      {lesson.chapters.length === 0 && (
+        <div className="py-8 text-center text-sm text-gray-500">
+          <BookOpen className="size-8 mx-auto mb-2 text-gray-400" />
+          <p>課程內容即將推出</p>
         </div>
       )}
     </div>
   );
 }
-
-type StatsItemProps = {
-  icon: React.ReactNode;
-  label: string;
-  value: string | number;
-};
-
-function StatsItem({ icon, label, value }: StatsItemProps) {
-  return (
-    <div className="flex items-center space-x-2">
-      <div className="text-gray-400">{icon}</div>
-      <span className="text-sm text-gray-600">
-        {value} {label}
-      </span>
-    </div>
-  );
-}
-
-export { Lesson };

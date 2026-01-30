@@ -10,3 +10,8 @@ node_modules
 .cursor/mcp.json
 
 *TASKS.md
+
+# Old monorepo directories (deprecated)
+/packages
+/lib
+/course

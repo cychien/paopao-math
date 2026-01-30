@@ -1,8 +1,11 @@
-import { json, useLoaderData } from "@remix-run/react";
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData } from "react-router";
+import { LoaderFunctionArgs } from "react-router";
 import { canUserAccessPath } from "~/services/auth/permissions";
-import { getAllLessonsWithDetails } from "~/services/database/course";
+import { getCourseByAppSlug } from "~/operations/get-course-by-app-slug";
 import { Lesson } from "./components/Lesson";
+
+// Default app slug for single-tenant mode
+const DEFAULT_APP_SLUG = "paopao-math";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -12,50 +15,43 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const canAccess = await canUserAccessPath(request, path);
 
   // 從數據庫獲取課程數據
-  const lessons = await getAllLessonsWithDetails();
+  const course = await getCourseByAppSlug(DEFAULT_APP_SLUG, {
+    configId: undefined,
+    isAdmin: false,
+  });
+
+  if (!course) {
+    throw new Error("Course not found");
+  }
 
   // 轉換數據格式以匹配前端組件需求
-  const syllabus = lessons.map((lesson) => {
-    const totalDuration = lesson.chapters.reduce(
-      (sum, chapter) =>
-        sum +
-        chapter.teachings.reduce(
-          (tSum, teaching) => tSum + teaching.duration,
-          0
-        ) +
-        chapter.exams.reduce((eSum, exam) => eSum + exam.duration, 0),
+  const syllabus = course.modules.map((module) => {
+    const totalDuration = module.lessons.reduce(
+      (sum, lesson) => sum + (lesson.durationSec || 0),
       0
     );
 
-    const examCount = lesson.chapters.reduce(
-      (sum, chapter) => sum + chapter.exams.length,
-      0
-    );
+    // 在新的數據結構中，沒有單獨的 exam 概念，所有內容都是 lessons
+    const examCount = 0;
 
     return {
-      name: lesson.name,
-      description: lesson.description || undefined, // 將 null 轉換為 undefined
-      slug: lesson.slug,
+      name: module.title,
+      description: module.summary || undefined,
+      slug: module.slug,
       totalDuration,
       examCount,
-      chapters: lesson.chapters.map((chapter) => {
-        const chapterDuration =
-          chapter.teachings.reduce(
-            (sum, teaching) => sum + teaching.duration,
-            0
-          ) + chapter.exams.reduce((sum, exam) => sum + exam.duration, 0);
-
+      chapters: module.lessons.map((lesson) => {
         return {
-          name: chapter.name,
-          duration: chapterDuration,
-          slug: chapter.slug,
-          examCount: chapter.exams.length,
+          name: lesson.title,
+          duration: lesson.durationSec || 0,
+          slug: lesson.slug,
+          examCount: 0, // 新結構沒有單獨的 exam
         };
       }),
     };
   });
 
-  return json({ syllabus, isLoggedIn: canAccess });
+  return { syllabus, isLoggedIn: canAccess };
 }
 
 export default function Page() {
