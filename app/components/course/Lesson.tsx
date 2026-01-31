@@ -1,8 +1,9 @@
 import { Link } from "react-router";
-import { Clock, BookOpen, PlayCircle } from "lucide-react";
+import { BookOpen, PlayCircle } from "lucide-react";
 import { cn } from "~/utils/style";
 import Icon from "~/components/ui/icon";
-import { TeachingIcon, Time04Icon } from "@hugeicons/core-free-icons";
+import { CheckmarkCircle03Icon, Progress03Icon, TeachingIcon, Time04Icon } from "@hugeicons/core-free-icons";
+import { CheckCircleSolid } from "~/components/icons/CheckCircleSolid";
 
 interface LessonProps {
   lesson: {
@@ -16,13 +17,15 @@ interface LessonProps {
       duration: number;
       slug: string;
       examCount: number;
+      id?: string;
     }>;
   };
   index: number;
   isPreview?: boolean;
+  completedLessonIds?: Set<string>;
 }
 
-export function Lesson({ lesson, index, isPreview = false }: LessonProps) {
+export function Lesson({ lesson, index, isPreview = false, completedLessonIds = new Set() }: LessonProps) {
   const formatDuration = (seconds: number, dense: boolean = false) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -32,6 +35,15 @@ export function Lesson({ lesson, index, isPreview = false }: LessonProps) {
     }
     return dense ? `${minutes}分鐘` : `${minutes} 分鐘`;
   };
+
+  // Calculate module completion
+  const completedChapters = lesson.chapters.filter(chapter =>
+    chapter.id && completedLessonIds.has(chapter.id)
+  ).length;
+  const totalChapters = lesson.chapters.length;
+  const completionPercentage = totalChapters > 0
+    ? Math.round((completedChapters / totalChapters) * 100)
+    : 0;
 
   return (
     <div className="space-y-5">
@@ -64,6 +76,12 @@ export function Lesson({ lesson, index, isPreview = false }: LessonProps) {
               <Icon icon={Time04Icon} className="size-4 translate-y-[0.5px]" />
               <span>{formatDuration(lesson.totalDuration, true)}</span>
             </div>
+            {completedChapters > 0 && (
+              <div className="flex items-center gap-1 text-green-600">
+                <Icon icon={completionPercentage === 100 ? CheckmarkCircle03Icon : Progress03Icon} className="size-4" />
+                <span>{completionPercentage}% 完成</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -71,32 +89,46 @@ export function Lesson({ lesson, index, isPreview = false }: LessonProps) {
       {/* 章節列表 */}
       {lesson.chapters.length > 0 && (
         <div className="space-y-1 bg-gray-50/80 group-hover:bg-gray-50 rounded-lg p-1 border border-gray-200/70">
-          {lesson.chapters.map((chapter, chapterIndex) => (
-            <Link
-              key={chapter.slug}
-              to={`/learn/content/${lesson.slug}/${chapter.slug}`}
-              className={cn(
-                "group flex items-center justify-between gap-4 py-2.5 px-3 rounded-md",
-                "hover:bg-blue-50 border border-transparent hover:border-blue-200"
-              )}
-            >
-              <div className="flex items-start gap-3 flex-1 min-w-0">
-                <div className="flex-shrink-0 mt-0.5">
-                  <PlayCircle className="size-4 text-brand-500 opacity-60 group-hover:opacity-100 transition-opacity" />
+          {lesson.chapters.map((chapter) => {
+            const isCompleted = chapter.id && completedLessonIds.has(chapter.id);
+            return (
+              <Link
+                key={chapter.slug}
+                to={`/learn/content/${lesson.slug}/${chapter.slug}`}
+                className={cn(
+                  "group flex items-center justify-between gap-4 py-2.5 px-3 rounded-md",
+                  isCompleted
+                    ? "hover:bg-success-700/8"
+                    : "hover:bg-blue-50 border border-transparent hover:border-blue-200"
+                )}
+              >
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <div className="flex-shrink-0 mt-0.5">
+                    {isCompleted ? (
+                      <CheckCircleSolid className="size-4 text-success-600" />
+                    ) : (
+                      <PlayCircle className="size-4 text-brand-500 opacity-60 group-hover:opacity-100 transition-opacity" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className={cn(
+                      "text-sm font-medium transition-colors truncate",
+                      isCompleted
+                        ? "text-success-700 group-hover:text-success-800"
+                        : "text-gray-700 group-hover:text-brand-600"
+                    )}>
+                      {chapter.name}
+                    </h4>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-medium text-gray-700 group-hover:text-brand-600 transition-colors truncate">
-                    {chapter.name}
-                  </h4>
-                </div>
-              </div>
-              {chapter.duration > 0 && (
-                <div className="flex-shrink-0 text-xs text-gray-400 group-hover:text-gray-500 font-medium tabular-nums">
-                  {formatDuration(chapter.duration)}
-                </div>
-              )}
-            </Link>
-          ))}
+                {chapter.duration > 0 && (
+                  <div className="flex-shrink-0 text-xs text-gray-400 group-hover:text-gray-500 font-medium tabular-nums">
+                    {formatDuration(chapter.duration)}
+                  </div>
+                )}
+              </Link>
+            );
+          })}
         </div>
       )}
 

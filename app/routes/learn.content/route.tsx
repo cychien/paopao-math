@@ -1,14 +1,21 @@
-import { useLoaderData } from "react-router";
+import { useLoaderData, Link } from "react-router";
 import { getCourseByAppSlug } from "~/operations/get-course-by-app-slug";
 import { Lesson } from "~/components/course/Lesson";
 import { ModuleConnector } from "~/components/course/ModuleConnector";
 import { Sparkles } from "lucide-react";
+import { customerContext } from "~/middleware/auth-context";
+import { prisma } from "~/services/database/prisma.server";
+import type { LoaderFunctionArgs } from "react-router";
+import { buttonVariants } from "~/components/ui/Button";
+import Icon from "~/components/ui/icon";
+import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
 
 // Default app slug for single-tenant mode
 const DEFAULT_APP_SLUG = "paopao-math";
 
-export const loader = async () => {
+export const loader = async ({ context }: LoaderFunctionArgs) => {
   // Customer data is now loaded by parent middleware and available in context
+  const customerData = context.get(customerContext);
 
   const course = await getCourseByAppSlug(DEFAULT_APP_SLUG, {
     configId: undefined,
@@ -19,11 +26,82 @@ export const loader = async () => {
     throw new Error("Course not found");
   }
 
-  return { course };
+  // Load customer's lesson progress
+  const progressRecords = await prisma.customerLessonProgress.findMany({
+    where: {
+      customerId: customerData.customerId,
+    },
+    select: {
+      lessonId: true,
+    },
+  });
+
+  const completedLessonIds = new Set(progressRecords.map((p: { lessonId: string }) => p.lessonId));
+
+  // Find the first incomplete lesson for "continue learning" button
+  let continueLesson: { moduleSlug: string; lessonSlug: string } | null = null;
+
+  for (const module of course.modules) {
+    for (const lesson of module.lessons) {
+      if (!completedLessonIds.has(lesson.id)) {
+        continueLesson = {
+          moduleSlug: module.slug,
+          lessonSlug: lesson.slug,
+        };
+        break;
+      }
+    }
+    if (continueLesson) break;
+  }
+
+  // If all lessons are complete, fall back to the last lesson
+  if (!continueLesson && course.modules.length > 0) {
+    const lastModule = course.modules[course.modules.length - 1];
+    if (lastModule.lessons.length > 0) {
+      const lastLesson = lastModule.lessons[lastModule.lessons.length - 1];
+      continueLesson = {
+        moduleSlug: lastModule.slug,
+        lessonSlug: lastLesson.slug,
+      };
+    }
+  }
+
+  // Get the continue lesson title
+  let continueLessonTitle = "";
+  let continueLessonModuleTitle = "";
+  if (continueLesson) {
+    const module = course.modules.find((m) => m.slug === continueLesson.moduleSlug);
+    const lesson = module?.lessons.find((l) => l.slug === continueLesson.lessonSlug);
+    if (lesson && module) {
+      continueLessonTitle = lesson.title;
+      continueLessonModuleTitle = module.title;
+    }
+  }
+
+  const completedLessonIdsArray = Array.from(completedLessonIds);
+
+  return {
+    course,
+    completedLessonIds: completedLessonIdsArray,
+    continueLesson,
+    continueLessonTitle,
+    continueLessonModuleTitle,
+    totalLessons: course.modules.reduce((sum, m) => sum + m.lessons.length, 0),
+    completedCount: completedLessonIdsArray.length,
+  };
 };
 
 export default function LearnContent() {
-  const { course } = useLoaderData<typeof loader>();
+  const {
+    course,
+    completedLessonIds,
+    continueLesson,
+    continueLessonTitle,
+    continueLessonModuleTitle,
+    totalLessons,
+    completedCount,
+  } = useLoaderData<typeof loader>();
+  const completedLessonIdsSet = new Set<string>(completedLessonIds);
 
   // Convert course modules to the format expected by Lesson component
   const syllabus = course.modules.map((module) => {
@@ -43,6 +121,7 @@ export default function LearnContent() {
         duration: lesson.durationSec || 0,
         slug: lesson.slug,
         examCount: 0,
+        id: lesson.id,
       })),
     };
   });
@@ -57,12 +136,48 @@ export default function LearnContent() {
           </div>
 
           <div className="px-8 py-6">
-            <h1 className="text-lg font-semibold tracking-tight text-gray-900 sm:text-xl">
-              主課程
-            </h1>
-            <p className="mt-2 text-sm text-gray-600">
-              循序漸進，掌握每一個核心知識點。請依照順序進行學習。
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+              <div className="flex-1">
+                <h1 className="text-lg font-semibold tracking-tight text-gray-900 sm:text-xl">
+                  主課程
+                </h1>
+                <p className="mt-2 text-sm text-gray-600">
+                  循序漸進，掌握每一個核心知識點。請依照順序進行學習。
+                </p>
+                <div className="mt-2 flex items-baseline">
+                  {/* <div className="text-sm font-medium text-gray-500">
+                    學習進度
+                  </div> */}
+                  <div className="flex items-baseline gap-0.5">
+                    <div className="font-medium text-success-700">
+                      {completedCount}
+                    </div>
+                    <span className="text-sm text-gray-400">/</span>
+                    <div className="text-gray-400 text-sm font-medium">
+                      {totalLessons}
+                    </div>
+                  </div>
+                  <div className="ml-1 text-xs text-gray-500">
+                    ({totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0}% 已完成)
+                  </div>
+                </div>
+              </div>
+              {continueLesson && (
+                <div className="flex gap-4">
+                  <div className="text-sm text-gray-600">
+                    <div className="text-gray-500/80 text-right">{continueLessonModuleTitle}</div>
+                    <div className="mt-0.5 text-gray-500/80 text-right">{continueLessonTitle}</div>
+                  </div>
+                  <Link
+                    to={`/learn/content/${continueLesson.moduleSlug}/${continueLesson.lessonSlug}`}
+                    className={buttonVariants()}
+                  >
+                    繼續學習
+                    <Icon icon={ArrowRight02Icon} className="size-4" />
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -80,7 +195,12 @@ export default function LearnContent() {
 
                 <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden h-full z-10 relative">
                   <div className="p-6">
-                    <Lesson lesson={module} index={index} isPreview={false} />
+                    <Lesson
+                      lesson={module}
+                      index={index}
+                      isPreview={false}
+                      completedLessonIds={completedLessonIdsSet}
+                    />
                   </div>
                 </div>
               </div>

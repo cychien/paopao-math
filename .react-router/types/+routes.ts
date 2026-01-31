@@ -20,6 +20,9 @@ type Pages = {
   "/auth/callback/google": {
     params: {};
   };
+  "/api/progress": {
+    params: {};
+  };
   "/api/purchase": {
     params: {};
   };
@@ -66,7 +69,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/api/webhooks/lemon-squeezy" | "/auth/callback/google" | "/api/purchase" | "/auth/logout" | "/auth/verify" | "/auth/login" | "/preview" | "/privacy" | "/refund" | "/learn" | "/learn/content/:moduleSlug/:lessonSlug" | "/learn/content" | "/terms" | "/*";
+    page: "/" | "/api/webhooks/lemon-squeezy" | "/auth/callback/google" | "/api/progress" | "/api/purchase" | "/auth/logout" | "/auth/verify" | "/auth/login" | "/preview" | "/privacy" | "/refund" | "/learn" | "/learn/content/:moduleSlug/:lessonSlug" | "/learn/content" | "/terms" | "/*";
   };
   "routes/api.webhooks.lemon-squeezy.tsx": {
     id: "routes/api.webhooks.lemon-squeezy";
@@ -75,6 +78,10 @@ type RouteFiles = {
   "routes/auth.callback.google.tsx": {
     id: "routes/auth.callback.google";
     page: "/auth/callback/google";
+  };
+  "routes/api.progress.tsx": {
+    id: "routes/api.progress";
+    page: "/api/progress";
   };
   "routes/api.purchase.tsx": {
     id: "routes/api.purchase";
@@ -138,6 +145,7 @@ type RouteModules = {
   "root": typeof import("./app/root.tsx");
   "routes/api.webhooks.lemon-squeezy": typeof import("./app/routes/api.webhooks.lemon-squeezy.tsx");
   "routes/auth.callback.google": typeof import("./app/routes/auth.callback.google.tsx");
+  "routes/api.progress": typeof import("./app/routes/api.progress.tsx");
   "routes/api.purchase": typeof import("./app/routes/api.purchase.tsx");
   "routes/auth.logout": typeof import("./app/routes/auth.logout.tsx");
   "routes/auth.verify": typeof import("./app/routes/auth.verify.tsx");

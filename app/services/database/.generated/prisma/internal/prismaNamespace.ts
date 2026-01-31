@@ -415,7 +415,8 @@ export const ModelName = {
   AppVariant: 'AppVariant',
   AppCustomer: 'AppCustomer',
   LemonSqueezyCustomer: 'LemonSqueezyCustomer',
-  CustomerSession: 'CustomerSession'
+  CustomerSession: 'CustomerSession',
+  CustomerLessonProgress: 'CustomerLessonProgress'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -431,7 +432,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "identity" | "session" | "emailChallenge" | "workspace" | "workspaceMember" | "app" | "appCourseProfile" | "courseModule" | "courseLesson" | "media" | "mediaUsage" | "reactTemplate" | "reactTemplateVersion" | "appFront" | "appFrontReact" | "reactTemplateConfig" | "appPaymentIntegration" | "appVariant" | "appCustomer" | "lemonSqueezyCustomer" | "customerSession"
+    modelProps: "user" | "identity" | "session" | "emailChallenge" | "workspace" | "workspaceMember" | "app" | "appCourseProfile" | "courseModule" | "courseLesson" | "media" | "mediaUsage" | "reactTemplate" | "reactTemplateVersion" | "appFront" | "appFrontReact" | "reactTemplateConfig" | "appPaymentIntegration" | "appVariant" | "appCustomer" | "lemonSqueezyCustomer" | "customerSession" | "customerLessonProgress"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2063,6 +2064,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CustomerLessonProgress: {
+      payload: Prisma.$CustomerLessonProgressPayload<ExtArgs>
+      fields: Prisma.CustomerLessonProgressFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CustomerLessonProgressFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerLessonProgressPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CustomerLessonProgressFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerLessonProgressPayload>
+        }
+        findFirst: {
+          args: Prisma.CustomerLessonProgressFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerLessonProgressPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CustomerLessonProgressFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerLessonProgressPayload>
+        }
+        findMany: {
+          args: Prisma.CustomerLessonProgressFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerLessonProgressPayload>[]
+        }
+        create: {
+          args: Prisma.CustomerLessonProgressCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerLessonProgressPayload>
+        }
+        createMany: {
+          args: Prisma.CustomerLessonProgressCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CustomerLessonProgressCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerLessonProgressPayload>[]
+        }
+        delete: {
+          args: Prisma.CustomerLessonProgressDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerLessonProgressPayload>
+        }
+        update: {
+          args: Prisma.CustomerLessonProgressUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerLessonProgressPayload>
+        }
+        deleteMany: {
+          args: Prisma.CustomerLessonProgressDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CustomerLessonProgressUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CustomerLessonProgressUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerLessonProgressPayload>[]
+        }
+        upsert: {
+          args: Prisma.CustomerLessonProgressUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CustomerLessonProgressPayload>
+        }
+        aggregate: {
+          args: Prisma.CustomerLessonProgressAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCustomerLessonProgress>
+        }
+        groupBy: {
+          args: Prisma.CustomerLessonProgressGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomerLessonProgressGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CustomerLessonProgressCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CustomerLessonProgressCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2405,6 +2480,18 @@ export const CustomerSessionScalarFieldEnum = {
 } as const
 
 export type CustomerSessionScalarFieldEnum = (typeof CustomerSessionScalarFieldEnum)[keyof typeof CustomerSessionScalarFieldEnum]
+
+
+export const CustomerLessonProgressScalarFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  lessonId: 'lessonId',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CustomerLessonProgressScalarFieldEnum = (typeof CustomerLessonProgressScalarFieldEnum)[keyof typeof CustomerLessonProgressScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2750,6 +2837,7 @@ export type GlobalOmitConfig = {
   appCustomer?: Prisma.AppCustomerOmit
   lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerOmit
   customerSession?: Prisma.CustomerSessionOmit
+  customerLessonProgress?: Prisma.CustomerLessonProgressOmit
 }
 
 /* Types for Logging */

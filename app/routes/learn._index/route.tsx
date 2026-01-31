@@ -2,8 +2,10 @@ import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData, Link } from "react-router";
 import { getCourseByAppSlug } from "~/operations/get-course-by-app-slug";
 import { PlayCircle } from "~/components/icons/PlayCircle";
-import { BookOpen, Clock } from "lucide-react";
+import { BookOpen, Clock, CheckCircle2 } from "lucide-react";
 import { cn } from "~/utils/style";
+import { customerContext } from "~/middleware/auth-context";
+import { prisma } from "~/services/database/prisma.server";
 
 // Default app slug for single-tenant mode
 const DEFAULT_APP_SLUG = "paopao-math";
@@ -29,11 +31,14 @@ type LoaderData = {
     totalLessons: number;
     totalModules: number;
     totalDuration: number;
+    completedLessons: number;
   };
+  continueLesson: { moduleSlug: string; lessonSlug: string } | null;
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request, context }: LoaderFunctionArgs) => {
   // Customer data is now loaded by parent middleware and available in context
+  const customerData = context.get(customerContext);
 
   // 從數據庫獲取課程數據
   const course = await getCourseByAppSlug(DEFAULT_APP_SLUG, {
@@ -44,6 +49,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (!course) {
     throw new Error("Course not found");
   }
+
+  // Load customer's lesson progress
+  const progressRecords = await prisma.customerLessonProgress.findMany({
+    where: {
+      customerId: customerData.customerId,
+    },
+    select: {
+      lessonId: true,
+    },
+  });
+
+  const completedLessonIds = new Set(progressRecords.map((p: { lessonId: string }) => p.lessonId));
 
   // Calculate statistics
   const totalModules = course.modules.length;
@@ -60,6 +77,35 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       ),
     0
   );
+  const completedLessons = completedLessonIds.size;
+
+  // Find the first incomplete lesson for "continue learning" button
+  let continueLesson: { moduleSlug: string; lessonSlug: string } | null = null;
+
+  for (const module of course.modules) {
+    for (const lesson of module.lessons) {
+      if (!completedLessonIds.has(lesson.id)) {
+        continueLesson = {
+          moduleSlug: module.slug,
+          lessonSlug: lesson.slug,
+        };
+        break;
+      }
+    }
+    if (continueLesson) break;
+  }
+
+  // If all lessons are complete, fall back to the last lesson
+  if (!continueLesson && course.modules.length > 0) {
+    const lastModule = course.modules[course.modules.length - 1];
+    if (lastModule.lessons.length > 0) {
+      const lastLesson = lastModule.lessons[lastModule.lessons.length - 1];
+      continueLesson = {
+        moduleSlug: lastModule.slug,
+        lessonSlug: lastLesson.slug,
+      };
+    }
+  }
 
   return {
     course,
@@ -67,12 +113,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       totalLessons,
       totalModules,
       totalDuration,
+      completedLessons,
     },
+    continueLesson,
   };
 };
 
 export default function LearnOverview() {
-  const { course, stats } = useLoaderData<LoaderData>();
+  const { course, stats, continueLesson } = useLoaderData<LoaderData>();
 
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -83,6 +131,10 @@ export default function LearnOverview() {
     }
     return `${minutes} 分鐘`;
   };
+
+  const progressPercentage = stats.totalLessons > 0
+    ? Math.round((stats.completedLessons / stats.totalLessons) * 100)
+    : 0;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
@@ -100,23 +152,30 @@ export default function LearnOverview() {
               探索數學的奧秘，掌握核心概念。準備好開始今天的課程了嗎？
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link
-                to="/learn/content"
-                className="inline-flex items-center px-6 py-3 bg-white text-brand-700 font-semibold rounded-lg shadow-sm hover:bg-brand-50 transition-colors"
-              >
-                <PlayCircle className="w-5 h-5 mr-2" />
-                開始學習
-              </Link>
-              {/* <button className="inline-flex items-center px-6 py-3 bg-brand-700/50 text-white font-medium rounded-lg border border-brand-500/30 hover:bg-brand-700/70 transition-colors backdrop-blur-sm">
-                查看進度
-              </button> */}
+              {continueLesson ? (
+                <Link
+                  to={`/learn/content/${continueLesson.moduleSlug}/${continueLesson.lessonSlug}`}
+                  className="inline-flex items-center px-6 py-3 bg-white text-brand-700 font-semibold rounded-lg shadow-sm hover:bg-brand-50 transition-colors"
+                >
+                  <PlayCircle className="w-5 h-5 mr-2" />
+                  {stats.completedLessons > 0 ? '繼續學習' : '開始學習'}
+                </Link>
+              ) : (
+                <Link
+                  to="/learn/content"
+                  className="inline-flex items-center px-6 py-3 bg-white text-brand-700 font-semibold rounded-lg shadow-sm hover:bg-brand-50 transition-colors"
+                >
+                  <PlayCircle className="w-5 h-5 mr-2" />
+                  開始學習
+                </Link>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       {/* Stats Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center space-x-4 hover:shadow-md transition-shadow">
           <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
             <BookOpen className="size-6" />
@@ -146,10 +205,25 @@ export default function LearnOverview() {
             <div className="text-2xl font-bold text-gray-900">{formatDuration(stats.totalDuration)}</div>
           </div>
         </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center space-x-4 hover:shadow-md transition-shadow">
+          <div className="p-3 bg-green-50 text-green-600 rounded-lg">
+            <CheckCircle2 className="size-6" />
+          </div>
+          <div>
+            <div className="text-sm text-gray-500 font-medium">學習進度</div>
+            <div className="text-2xl font-bold text-gray-900">
+              {progressPercentage}%
+            </div>
+            <div className="text-xs text-gray-500 mt-0.5">
+              {stats.completedLessons} / {stats.totalLessons} 單元
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Modules Grid */}
-      <div className="space-y-6">
+      {/* <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
             <BookOpen className="size-5 text-brand-600" />
@@ -204,7 +278,7 @@ export default function LearnOverview() {
             </Link>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

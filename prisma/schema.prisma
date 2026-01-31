@@ -232,7 +232,8 @@ model CourseLesson {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
 
-  module CourseModule @relation("CourseLessons", fields: [moduleId], references: [id], onDelete: Cascade)
+  module         CourseModule             @relation("CourseLessons", fields: [moduleId], references: [id], onDelete: Cascade)
+  lessonProgress CustomerLessonProgress[]
 
   @@unique([moduleId, slug])
   @@index([order])
@@ -410,9 +411,10 @@ model AppCustomer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  variant              AppVariant            @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  variant              AppVariant                 @relation(fields: [variantId], references: [id], onDelete: Cascade)
   lemonSqueezyCustomer LemonSqueezyCustomer?
   sessions             CustomerSession[]
+  lessonProgress       CustomerLessonProgress[]
 
   @@index([appId])
   @@index([email])
@@ -454,4 +456,20 @@ model CustomerSession {
   @@index([appId])
   @@index([tokenHash])
   @@index([expiresAt])
+}
+
+model CustomerLessonProgress {
+  id          String   @id @default(cuid())
+  customerId  String
+  lessonId    String
+  completedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  customer AppCustomer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  lesson   CourseLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, lessonId])
+  @@index([customerId])
+  @@index([lessonId])
 }

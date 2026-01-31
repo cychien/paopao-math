@@ -200,6 +200,7 @@ export type AppCustomerWhereInput = {
   variant?: Prisma.XOR<Prisma.AppVariantScalarRelationFilter, Prisma.AppVariantWhereInput>
   lemonSqueezyCustomer?: Prisma.XOR<Prisma.LemonSqueezyCustomerNullableScalarRelationFilter, Prisma.LemonSqueezyCustomerWhereInput> | null
   sessions?: Prisma.CustomerSessionListRelationFilter
+  lessonProgress?: Prisma.CustomerLessonProgressListRelationFilter
 }
 
 export type AppCustomerOrderByWithRelationInput = {
@@ -213,6 +214,7 @@ export type AppCustomerOrderByWithRelationInput = {
   variant?: Prisma.AppVariantOrderByWithRelationInput
   lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerOrderByWithRelationInput
   sessions?: Prisma.CustomerSessionOrderByRelationAggregateInput
+  lessonProgress?: Prisma.CustomerLessonProgressOrderByRelationAggregateInput
 }
 
 export type AppCustomerWhereUniqueInput = Prisma.AtLeast<{
@@ -229,6 +231,7 @@ export type AppCustomerWhereUniqueInput = Prisma.AtLeast<{
   variant?: Prisma.XOR<Prisma.AppVariantScalarRelationFilter, Prisma.AppVariantWhereInput>
   lemonSqueezyCustomer?: Prisma.XOR<Prisma.LemonSqueezyCustomerNullableScalarRelationFilter, Prisma.LemonSqueezyCustomerWhereInput> | null
   sessions?: Prisma.CustomerSessionListRelationFilter
+  lessonProgress?: Prisma.CustomerLessonProgressListRelationFilter
 }, "id">
 
 export type AppCustomerOrderByWithAggregationInput = {
@@ -267,6 +270,7 @@ export type AppCustomerCreateInput = {
   variant: Prisma.AppVariantCreateNestedOneWithoutCustomersInput
   lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerCreateNestedOneWithoutCustomerInput
   sessions?: Prisma.CustomerSessionCreateNestedManyWithoutCustomerInput
+  lessonProgress?: Prisma.CustomerLessonProgressCreateNestedManyWithoutCustomerInput
 }
 
 export type AppCustomerUncheckedCreateInput = {
@@ -279,6 +283,7 @@ export type AppCustomerUncheckedCreateInput = {
   updatedAt?: Date | string
   lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerUncheckedCreateNestedOneWithoutCustomerInput
   sessions?: Prisma.CustomerSessionUncheckedCreateNestedManyWithoutCustomerInput
+  lessonProgress?: Prisma.CustomerLessonProgressUncheckedCreateNestedManyWithoutCustomerInput
 }
 
 export type AppCustomerUpdateInput = {
@@ -291,6 +296,7 @@ export type AppCustomerUpdateInput = {
   variant?: Prisma.AppVariantUpdateOneRequiredWithoutCustomersNestedInput
   lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerUpdateOneWithoutCustomerNestedInput
   sessions?: Prisma.CustomerSessionUpdateManyWithoutCustomerNestedInput
+  lessonProgress?: Prisma.CustomerLessonProgressUpdateManyWithoutCustomerNestedInput
 }
 
 export type AppCustomerUncheckedUpdateInput = {
@@ -303,6 +309,7 @@ export type AppCustomerUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerUncheckedUpdateOneWithoutCustomerNestedInput
   sessions?: Prisma.CustomerSessionUncheckedUpdateManyWithoutCustomerNestedInput
+  lessonProgress?: Prisma.CustomerLessonProgressUncheckedUpdateManyWithoutCustomerNestedInput
 }
 
 export type AppCustomerCreateManyInput = {
@@ -449,6 +456,20 @@ export type AppCustomerUpdateOneRequiredWithoutSessionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AppCustomerUpdateToOneWithWhereWithoutSessionsInput, Prisma.AppCustomerUpdateWithoutSessionsInput>, Prisma.AppCustomerUncheckedUpdateWithoutSessionsInput>
 }
 
+export type AppCustomerCreateNestedOneWithoutLessonProgressInput = {
+  create?: Prisma.XOR<Prisma.AppCustomerCreateWithoutLessonProgressInput, Prisma.AppCustomerUncheckedCreateWithoutLessonProgressInput>
+  connectOrCreate?: Prisma.AppCustomerCreateOrConnectWithoutLessonProgressInput
+  connect?: Prisma.AppCustomerWhereUniqueInput
+}
+
+export type AppCustomerUpdateOneRequiredWithoutLessonProgressNestedInput = {
+  create?: Prisma.XOR<Prisma.AppCustomerCreateWithoutLessonProgressInput, Prisma.AppCustomerUncheckedCreateWithoutLessonProgressInput>
+  connectOrCreate?: Prisma.AppCustomerCreateOrConnectWithoutLessonProgressInput
+  upsert?: Prisma.AppCustomerUpsertWithoutLessonProgressInput
+  connect?: Prisma.AppCustomerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AppCustomerUpdateToOneWithWhereWithoutLessonProgressInput, Prisma.AppCustomerUpdateWithoutLessonProgressInput>, Prisma.AppCustomerUncheckedUpdateWithoutLessonProgressInput>
+}
+
 export type AppCustomerCreateWithoutVariantInput = {
   id?: string
   appId: string
@@ -458,6 +479,7 @@ export type AppCustomerCreateWithoutVariantInput = {
   updatedAt?: Date | string
   lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerCreateNestedOneWithoutCustomerInput
   sessions?: Prisma.CustomerSessionCreateNestedManyWithoutCustomerInput
+  lessonProgress?: Prisma.CustomerLessonProgressCreateNestedManyWithoutCustomerInput
 }
 
 export type AppCustomerUncheckedCreateWithoutVariantInput = {
@@ -469,6 +491,7 @@ export type AppCustomerUncheckedCreateWithoutVariantInput = {
   updatedAt?: Date | string
   lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerUncheckedCreateNestedOneWithoutCustomerInput
   sessions?: Prisma.CustomerSessionUncheckedCreateNestedManyWithoutCustomerInput
+  lessonProgress?: Prisma.CustomerLessonProgressUncheckedCreateNestedManyWithoutCustomerInput
 }
 
 export type AppCustomerCreateOrConnectWithoutVariantInput = {
@@ -519,6 +542,7 @@ export type AppCustomerCreateWithoutLemonSqueezyCustomerInput = {
   updatedAt?: Date | string
   variant: Prisma.AppVariantCreateNestedOneWithoutCustomersInput
   sessions?: Prisma.CustomerSessionCreateNestedManyWithoutCustomerInput
+  lessonProgress?: Prisma.CustomerLessonProgressCreateNestedManyWithoutCustomerInput
 }
 
 export type AppCustomerUncheckedCreateWithoutLemonSqueezyCustomerInput = {
@@ -530,6 +554,7 @@ export type AppCustomerUncheckedCreateWithoutLemonSqueezyCustomerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sessions?: Prisma.CustomerSessionUncheckedCreateNestedManyWithoutCustomerInput
+  lessonProgress?: Prisma.CustomerLessonProgressUncheckedCreateNestedManyWithoutCustomerInput
 }
 
 export type AppCustomerCreateOrConnectWithoutLemonSqueezyCustomerInput = {
@@ -557,6 +582,7 @@ export type AppCustomerUpdateWithoutLemonSqueezyCustomerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   variant?: Prisma.AppVariantUpdateOneRequiredWithoutCustomersNestedInput
   sessions?: Prisma.CustomerSessionUpdateManyWithoutCustomerNestedInput
+  lessonProgress?: Prisma.CustomerLessonProgressUpdateManyWithoutCustomerNestedInput
 }
 
 export type AppCustomerUncheckedUpdateWithoutLemonSqueezyCustomerInput = {
@@ -568,6 +594,7 @@ export type AppCustomerUncheckedUpdateWithoutLemonSqueezyCustomerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.CustomerSessionUncheckedUpdateManyWithoutCustomerNestedInput
+  lessonProgress?: Prisma.CustomerLessonProgressUncheckedUpdateManyWithoutCustomerNestedInput
 }
 
 export type AppCustomerCreateWithoutSessionsInput = {
@@ -579,6 +606,7 @@ export type AppCustomerCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   variant: Prisma.AppVariantCreateNestedOneWithoutCustomersInput
   lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerCreateNestedOneWithoutCustomerInput
+  lessonProgress?: Prisma.CustomerLessonProgressCreateNestedManyWithoutCustomerInput
 }
 
 export type AppCustomerUncheckedCreateWithoutSessionsInput = {
@@ -590,6 +618,7 @@ export type AppCustomerUncheckedCreateWithoutSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerUncheckedCreateNestedOneWithoutCustomerInput
+  lessonProgress?: Prisma.CustomerLessonProgressUncheckedCreateNestedManyWithoutCustomerInput
 }
 
 export type AppCustomerCreateOrConnectWithoutSessionsInput = {
@@ -617,6 +646,7 @@ export type AppCustomerUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   variant?: Prisma.AppVariantUpdateOneRequiredWithoutCustomersNestedInput
   lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerUpdateOneWithoutCustomerNestedInput
+  lessonProgress?: Prisma.CustomerLessonProgressUpdateManyWithoutCustomerNestedInput
 }
 
 export type AppCustomerUncheckedUpdateWithoutSessionsInput = {
@@ -628,6 +658,71 @@ export type AppCustomerUncheckedUpdateWithoutSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerUncheckedUpdateOneWithoutCustomerNestedInput
+  lessonProgress?: Prisma.CustomerLessonProgressUncheckedUpdateManyWithoutCustomerNestedInput
+}
+
+export type AppCustomerCreateWithoutLessonProgressInput = {
+  id?: string
+  appId: string
+  email: string
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  variant: Prisma.AppVariantCreateNestedOneWithoutCustomersInput
+  lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerCreateNestedOneWithoutCustomerInput
+  sessions?: Prisma.CustomerSessionCreateNestedManyWithoutCustomerInput
+}
+
+export type AppCustomerUncheckedCreateWithoutLessonProgressInput = {
+  id?: string
+  appId: string
+  variantId: string
+  email: string
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerUncheckedCreateNestedOneWithoutCustomerInput
+  sessions?: Prisma.CustomerSessionUncheckedCreateNestedManyWithoutCustomerInput
+}
+
+export type AppCustomerCreateOrConnectWithoutLessonProgressInput = {
+  where: Prisma.AppCustomerWhereUniqueInput
+  create: Prisma.XOR<Prisma.AppCustomerCreateWithoutLessonProgressInput, Prisma.AppCustomerUncheckedCreateWithoutLessonProgressInput>
+}
+
+export type AppCustomerUpsertWithoutLessonProgressInput = {
+  update: Prisma.XOR<Prisma.AppCustomerUpdateWithoutLessonProgressInput, Prisma.AppCustomerUncheckedUpdateWithoutLessonProgressInput>
+  create: Prisma.XOR<Prisma.AppCustomerCreateWithoutLessonProgressInput, Prisma.AppCustomerUncheckedCreateWithoutLessonProgressInput>
+  where?: Prisma.AppCustomerWhereInput
+}
+
+export type AppCustomerUpdateToOneWithWhereWithoutLessonProgressInput = {
+  where?: Prisma.AppCustomerWhereInput
+  data: Prisma.XOR<Prisma.AppCustomerUpdateWithoutLessonProgressInput, Prisma.AppCustomerUncheckedUpdateWithoutLessonProgressInput>
+}
+
+export type AppCustomerUpdateWithoutLessonProgressInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  appId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  variant?: Prisma.AppVariantUpdateOneRequiredWithoutCustomersNestedInput
+  lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerUpdateOneWithoutCustomerNestedInput
+  sessions?: Prisma.CustomerSessionUpdateManyWithoutCustomerNestedInput
+}
+
+export type AppCustomerUncheckedUpdateWithoutLessonProgressInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  appId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerUncheckedUpdateOneWithoutCustomerNestedInput
+  sessions?: Prisma.CustomerSessionUncheckedUpdateManyWithoutCustomerNestedInput
 }
 
 export type AppCustomerCreateManyVariantInput = {
@@ -648,6 +743,7 @@ export type AppCustomerUpdateWithoutVariantInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerUpdateOneWithoutCustomerNestedInput
   sessions?: Prisma.CustomerSessionUpdateManyWithoutCustomerNestedInput
+  lessonProgress?: Prisma.CustomerLessonProgressUpdateManyWithoutCustomerNestedInput
 }
 
 export type AppCustomerUncheckedUpdateWithoutVariantInput = {
@@ -659,6 +755,7 @@ export type AppCustomerUncheckedUpdateWithoutVariantInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lemonSqueezyCustomer?: Prisma.LemonSqueezyCustomerUncheckedUpdateOneWithoutCustomerNestedInput
   sessions?: Prisma.CustomerSessionUncheckedUpdateManyWithoutCustomerNestedInput
+  lessonProgress?: Prisma.CustomerLessonProgressUncheckedUpdateManyWithoutCustomerNestedInput
 }
 
 export type AppCustomerUncheckedUpdateManyWithoutVariantInput = {
@@ -677,10 +774,12 @@ export type AppCustomerUncheckedUpdateManyWithoutVariantInput = {
 
 export type AppCustomerCountOutputType = {
   sessions: number
+  lessonProgress: number
 }
 
 export type AppCustomerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | AppCustomerCountOutputTypeCountSessionsArgs
+  lessonProgress?: boolean | AppCustomerCountOutputTypeCountLessonProgressArgs
 }
 
 /**
@@ -700,6 +799,13 @@ export type AppCustomerCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.
   where?: Prisma.CustomerSessionWhereInput
 }
 
+/**
+ * AppCustomerCountOutputType without action
+ */
+export type AppCustomerCountOutputTypeCountLessonProgressArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CustomerLessonProgressWhereInput
+}
+
 
 export type AppCustomerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -712,6 +818,7 @@ export type AppCustomerSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   variant?: boolean | Prisma.AppVariantDefaultArgs<ExtArgs>
   lemonSqueezyCustomer?: boolean | Prisma.AppCustomer$lemonSqueezyCustomerArgs<ExtArgs>
   sessions?: boolean | Prisma.AppCustomer$sessionsArgs<ExtArgs>
+  lessonProgress?: boolean | Prisma.AppCustomer$lessonProgressArgs<ExtArgs>
   _count?: boolean | Prisma.AppCustomerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["appCustomer"]>
 
@@ -752,6 +859,7 @@ export type AppCustomerInclude<ExtArgs extends runtime.Types.Extensions.Internal
   variant?: boolean | Prisma.AppVariantDefaultArgs<ExtArgs>
   lemonSqueezyCustomer?: boolean | Prisma.AppCustomer$lemonSqueezyCustomerArgs<ExtArgs>
   sessions?: boolean | Prisma.AppCustomer$sessionsArgs<ExtArgs>
+  lessonProgress?: boolean | Prisma.AppCustomer$lessonProgressArgs<ExtArgs>
   _count?: boolean | Prisma.AppCustomerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AppCustomerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -767,6 +875,7 @@ export type $AppCustomerPayload<ExtArgs extends runtime.Types.Extensions.Interna
     variant: Prisma.$AppVariantPayload<ExtArgs>
     lemonSqueezyCustomer: Prisma.$LemonSqueezyCustomerPayload<ExtArgs> | null
     sessions: Prisma.$CustomerSessionPayload<ExtArgs>[]
+    lessonProgress: Prisma.$CustomerLessonProgressPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1173,6 +1282,7 @@ export interface Prisma__AppCustomerClient<T, Null = never, ExtArgs extends runt
   variant<T extends Prisma.AppVariantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppVariantDefaultArgs<ExtArgs>>): Prisma.Prisma__AppVariantClient<runtime.Types.Result.GetResult<Prisma.$AppVariantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   lemonSqueezyCustomer<T extends Prisma.AppCustomer$lemonSqueezyCustomerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppCustomer$lemonSqueezyCustomerArgs<ExtArgs>>): Prisma.Prisma__LemonSqueezyCustomerClient<runtime.Types.Result.GetResult<Prisma.$LemonSqueezyCustomerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   sessions<T extends Prisma.AppCustomer$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppCustomer$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CustomerSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  lessonProgress<T extends Prisma.AppCustomer$lessonProgressArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppCustomer$lessonProgressArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CustomerLessonProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1645,6 +1755,30 @@ export type AppCustomer$sessionsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.CustomerSessionScalarFieldEnum | Prisma.CustomerSessionScalarFieldEnum[]
+}
+
+/**
+ * AppCustomer.lessonProgress
+ */
+export type AppCustomer$lessonProgressArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CustomerLessonProgress
+   */
+  select?: Prisma.CustomerLessonProgressSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CustomerLessonProgress
+   */
+  omit?: Prisma.CustomerLessonProgressOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CustomerLessonProgressInclude<ExtArgs> | null
+  where?: Prisma.CustomerLessonProgressWhereInput
+  orderBy?: Prisma.CustomerLessonProgressOrderByWithRelationInput | Prisma.CustomerLessonProgressOrderByWithRelationInput[]
+  cursor?: Prisma.CustomerLessonProgressWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CustomerLessonProgressScalarFieldEnum | Prisma.CustomerLessonProgressScalarFieldEnum[]
 }
 
 /**

@@ -151,6 +151,11 @@ export type LemonSqueezyCustomer = Prisma.LemonSqueezyCustomerModel
  * 
  */
 export type CustomerSession = Prisma.CustomerSessionModel
+/**
+ * Model CustomerLessonProgress
+ * 
+ */
+export type CustomerLessonProgress = Prisma.CustomerLessonProgressModel
 
 export type WorkspaceRole = $Enums.WorkspaceRole
 export const WorkspaceRole = $Enums.WorkspaceRole

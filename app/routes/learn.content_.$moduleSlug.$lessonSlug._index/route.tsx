@@ -1,14 +1,16 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData, useNavigation } from "react-router";
+import { useLoaderData, useNavigation, useFetcher } from "react-router";
 import { prisma } from "~/services/database/prisma.server";
 import { customerContext } from "~/middleware/auth-context";
 import { cn } from "~/utils/style";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
 import { Separator } from "~/components/ui/separator";
 import { buttonVariants } from "~/components/ui/Button";
 import { FreePreviewBadge, PremiumBadge } from "~/components/course/identity-badge";
 import { InternalLink } from "~/components/course/internal-link";
 import { getAppBySlug } from "~/services/cache/cached-queries.server";
+import { Badge } from "~/components/ui/badge";
+import { CheckCircleSolid } from "~/components/icons/CheckCircleSolid";
 
 // Default app slug for single-tenant mode
 const DEFAULT_APP_SLUG = "paopao-math";
@@ -56,6 +58,14 @@ export async function loader({ params, context }: LoaderFunctionArgs) {
       ? true
       : head.module.isPublic === true ||
       (head.module.isPublic === false && head.isPublic === true);
+
+  // Check if the current lesson is completed
+  const isCompleted = await prisma.customerLessonProgress.findFirst({
+    where: {
+      customerId: customerData.customerId,
+      lessonId: head.id,
+    },
+  });
 
   // Execute all dependent queries in parallel (prev, next, and content if visible)
   const [prev, next, content] = await Promise.all([
@@ -112,6 +122,7 @@ export async function loader({ params, context }: LoaderFunctionArgs) {
       isAdmin: false,
       isCustomer,
       isFree,
+      isCompleted: !!isCompleted,
       lesson: {
         id: head.id,
         title: head.title,
@@ -131,6 +142,7 @@ export async function loader({ params, context }: LoaderFunctionArgs) {
     isAdmin: false,
     isCustomer,
     isFree,
+    isCompleted: !!isCompleted,
     lesson: {
       ...head,
       ...content,
@@ -142,11 +154,22 @@ export async function loader({ params, context }: LoaderFunctionArgs) {
 }
 
 function Page() {
-  const { lesson, prev, next, isCustomer, isFree } = useLoaderData<typeof loader>();
+  const { lesson, prev, next, isCustomer, isFree, isCompleted } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
+  const progressFetcher = useFetcher();
 
   // 當正在導航時（loading 新頁面），立即隱藏當前內容以避免 iframe 閃爍
   const isNavigating = navigation.state === "loading";
+
+  // Function to mark lesson as complete
+  const markLessonComplete = () => {
+    if (lesson?.id) {
+      progressFetcher.submit(
+        { lessonId: lesson.id },
+        { method: "POST", action: "/api/progress", encType: "application/json" }
+      );
+    }
+  };
 
   if (!lesson) {
     return null;
@@ -213,7 +236,7 @@ function Page() {
       {/* Main Content */}
       <div className="px-4 sm:px-6">
         <div className="mx-auto max-w-7xl">
-          <div className="mx-auto flex max-w-2xl gap-x-20 pt-4 lg:max-w-6xl">
+          <div className="mx-auto flex max-w-2xl gap-x-20 pt-4 lg:max-w-3xl">
             <div className="w-full flex-1">
               {!canAccessPrivate && (
                 <div>
@@ -222,7 +245,18 @@ function Page() {
               )}
 
               <div className="mt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <h1 className="text-3xl font-bold">{lesson.title}</h1>
+                <div>
+                  <h1 className="text-3xl font-bold">{lesson.title}</h1>
+                  {isCompleted && (
+                    <div className='mt-3'>
+                      <Badge className="bg-success-50 text-success-700 px-1 pr-2 py-1 rounded-full border border-success-600/20">
+                        <CheckCircleSolid className="size-4! text-success-600" />
+                        已完成
+                      </Badge>
+                    </div>
+                  )}
+                </div>
+
                 {lesson.summary && (
                   <p className="mt-4 text-gray-500 sm:hidden">{lesson.summary}</p>
                 )}
@@ -233,6 +267,7 @@ function Page() {
                         prev ? `/learn/content/${lesson.module.slug}/${prev.slug}` : ""
                       }
                       data-disabled={!prev}
+                      onClick={prev ? markLessonComplete : undefined}
                       className={cn(
                         buttonVariants({ variant: "outline", size: "icon" }),
                         "group rounded-r-none active:bg-gray-100 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed data-[disabled=true]:bg-gray-100",
@@ -246,6 +281,7 @@ function Page() {
                         next ? `/learn/content/${lesson.module.slug}/${next.slug}` : ""
                       }
                       data-disabled={!next}
+                      onClick={next ? markLessonComplete : undefined}
                       className={cn(
                         buttonVariants({ variant: "outline", size: "icon" }),
                         "group -ml-[1px] rounded-l-none active:bg-gray-100 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed data-[disabled=true]:bg-gray-100",
@@ -311,13 +347,14 @@ function Page() {
                       to={
                         prev ? `/learn/content/${lesson.module.slug}/${prev.slug}` : ""
                       }
+                      onClick={prev ? markLessonComplete : undefined}
                       className={cn(
                         "border-border flex w-[48%] cursor-pointer flex-col items-start gap-1 rounded-md border p-3 shadow-xs transition-colors hover:bg-gray-50 active:bg-gray-100 sm:w-[45%]",
                         !prev && "invisible",
                       )}
                     >
                       <div className="text-sm font-medium text-gray-400">
-                        前一章
+                        完成並返回上一章
                       </div>
                       <span className="flex items-center gap-2 text-sm font-medium">
                         {prev?.title}
@@ -328,13 +365,14 @@ function Page() {
                       to={
                         next ? `/learn/content/${lesson.module.slug}/${next.slug}` : ""
                       }
+                      onClick={next ? markLessonComplete : undefined}
                       className={cn(
                         "border-border flex w-[48%] cursor-pointer flex-col items-end gap-1 rounded-md border p-3 shadow-xs transition-colors hover:bg-gray-50 active:bg-gray-100 sm:w-[45%]",
                         !next && "invisible",
                       )}
                     >
                       <div className="text-sm font-medium text-gray-400">
-                        下一章
+                        完成並前往下一章
                       </div>
                       <span className="flex items-center gap-2 text-sm font-medium">
                         {next?.title}
@@ -344,12 +382,12 @@ function Page() {
                 </div>
               )}
             </div>
-            <div className="hidden w-66 pt-4 lg:block">
+            {/* <div className="hidden w-66 pt-4 lg:block">
               <div className="sticky top-18 text-sm">
                 <div className="font-medium">重點段落</div>
                 <div className="mt-4">Table of contents here</div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
