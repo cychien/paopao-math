@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
-import { getSession, destroySession } from "~/services/auth/session";
+import { destroyCustomerSession, getCustomerSession } from "~/services/customer-session.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   // 處理 GET 請求的登出
@@ -14,18 +14,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 async function handleLogout(request: Request) {
   try {
-    // 獲取當前 session
-    const session = await getSession(request.headers.get("Cookie"));
+    // 獲取當前 customer session
+    const { customerId, appId } = await getCustomerSession(request);
 
     console.log("🚪 User logging out:", {
-      email: session.get("email"),
-      hasSession: session.has("email"),
+      customerId,
+      appId,
+      hasSession: !!customerId,
     });
 
-    // 銷毀 session 並重導向到首頁
+    // 銷毀 customer session（會刪除數據庫記錄和 cookie）
+    const cookieHeader = await destroyCustomerSession(request);
+
+    // 重導向到首頁
     return redirect("/", {
       headers: {
-        "Set-Cookie": await destroySession(session),
+        "Set-Cookie": cookieHeader,
       },
     });
   } catch (error) {

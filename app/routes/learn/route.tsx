@@ -4,6 +4,7 @@ import { cn } from "~/utils/style";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -15,7 +16,7 @@ import {
   useSidebar,
 } from "~/components/ui/sidebar";
 import logoSrc from "~/assets/logo.png";
-import { Home01Icon, PanelLeftOpenIcon, PanelRightCloseIcon, SchoolIcon } from "@hugeicons/core-free-icons";
+import { Home01Icon, Logout03Icon, PanelLeftOpenIcon, PanelRightCloseIcon, SchoolIcon } from "@hugeicons/core-free-icons";
 import Icon from "~/components/ui/icon";
 import { Button } from "~/components/ui/Button";
 import { Separator } from "~/components/ui/separator";
@@ -90,6 +91,19 @@ export default function Layout() {
                 </SidebarGroupContent>
               </SidebarGroup>
             </SidebarContent>
+
+            <SidebarFooter>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarItem
+                    icon={Logout03Icon}
+                    label='登出'
+                    link='/auth/logout'
+                    isActive={false}
+                  />
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarFooter>
           </Sidebar>
 
           <SidebarInset className="bg-white">
