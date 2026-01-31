@@ -8,6 +8,7 @@ import { Separator } from "~/components/ui/separator";
 import { buttonVariants } from "~/components/ui/Button";
 import { FreePreviewBadge, PremiumBadge } from "~/components/course/identity-badge";
 import { InternalLink } from "~/components/course/internal-link";
+import { getAppBySlug } from "~/services/cache/cached-queries.server";
 
 // Default app slug for single-tenant mode
 const DEFAULT_APP_SLUG = "paopao-math";
@@ -21,15 +22,8 @@ export async function loader({ params, context }: LoaderFunctionArgs) {
   const isCustomer = true; // Always true since middleware ensures authentication
   const isFree = customerData.isFree;
 
-  const app = await prisma.app.findFirst({
-    where: {
-      slug: DEFAULT_APP_SLUG,
-    },
-    select: {
-      id: true,
-      isFree: true,
-    },
-  });
+  // Use cached query for per-request deduplication
+  const app = await getAppBySlug(DEFAULT_APP_SLUG);
 
   if (!app) {
     throw new Error("App not found");
@@ -63,7 +57,8 @@ export async function loader({ params, context }: LoaderFunctionArgs) {
       : head.module.isPublic === true ||
       (head.module.isPublic === false && head.isPublic === true);
 
-  const [prev, next] = await Promise.all([
+  // Execute all dependent queries in parallel (prev, next, and content if visible)
+  const [prev, next, content] = await Promise.all([
     prisma.courseLesson.findFirst({
       where: {
         moduleId: head.moduleId,
@@ -94,6 +89,12 @@ export async function loader({ params, context }: LoaderFunctionArgs) {
         order: true,
       },
     }),
+    isVisible ? prisma.courseLesson.findUnique({
+      where: { id: head.id },
+      select: {
+        contentHtml: true,
+      },
+    }) : Promise.resolve(null),
   ]);
 
   const decorate = (
@@ -126,20 +127,13 @@ export async function loader({ params, context }: LoaderFunctionArgs) {
     };
   }
 
-  const lesson = await prisma.courseLesson.findUnique({
-    where: { id: head.id },
-    select: {
-      contentHtml: true,
-    },
-  });
-
   return {
     isAdmin: false,
     isCustomer,
     isFree,
     lesson: {
       ...head,
-      ...lesson,
+      ...content,
       isVisible: true,
     },
     prev: decorate(prev),

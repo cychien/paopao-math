@@ -1,6 +1,7 @@
 import { prisma } from "~/services/database/prisma.server";
 import { createCookieSessionStorage } from "react-router";
 import { randomBytes, createHash as createHashCrypto } from "node:crypto";
+import { getAppBySlug, getCustomerById } from "./cache/cached-queries.server";
 
 export const customerSessionStorage = createCookieSessionStorage({
   cookie: {
@@ -130,25 +131,17 @@ export async function checkIsCustomer({
     return false;
   }
 
-  // Verify the customer has access to this app
-  const app = await prisma.app.findUnique({
-    where: { slug },
-    select: { id: true },
-  });
+  // Use cached queries for per-request deduplication
+  const [app, customer] = await Promise.all([
+    getAppBySlug(slug),
+    getCustomerById(customerId, appId),
+  ]);
 
-  if (!app || app.id !== appId) {
+  if (!app || app.id !== appId || !customer) {
     return false;
   }
 
-  // Verify customer exists and has access
-  const customer = await prisma.appCustomer.findFirst({
-    where: {
-      id: customerId,
-      appId: app.id,
-    },
-  });
-
-  return !!customer;
+  return true;
 }
 
 export async function getCustomerData({
@@ -170,30 +163,13 @@ export async function getCustomerData({
     return null;
   }
 
-  // Get app info including isFree flag
-  const app = await prisma.app.findUnique({
-    where: { slug },
-    select: { id: true, isFree: true },
-  });
+  // Use cached queries for per-request deduplication
+  const [app, customer] = await Promise.all([
+    getAppBySlug(slug),
+    getCustomerById(customerId, appId),
+  ]);
 
-  if (!app || app.id !== appId) {
-    return null;
-  }
-
-  // Get customer data
-  const customer = await prisma.appCustomer.findFirst({
-    where: {
-      id: customerId,
-      appId: app.id,
-    },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-    },
-  });
-
-  if (!customer) {
+  if (!app || app.id !== appId || !customer) {
     return null;
   }
 

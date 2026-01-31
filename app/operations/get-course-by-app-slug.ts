@@ -1,4 +1,5 @@
 import { prisma } from "~/services/database/prisma.server";
+import { getCachedAppConfig } from "~/services/cache/lru-cache.server";
 
 type SettingField =
   | { type: "text" | "textarea"; key: string }
@@ -73,6 +74,14 @@ export async function getCourseByAppSlug(
         }
       : {};
 
+  // Use LRU cached app config lookup
+  const appBasic = await getCachedAppConfig(slug);
+  
+  if (!appBasic) {
+    return null;
+  }
+
+  // Now fetch the full course data
   const app = await prisma.app.findUnique({
     where: { slug },
     select: {
