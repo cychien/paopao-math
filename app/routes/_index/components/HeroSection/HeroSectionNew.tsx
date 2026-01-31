@@ -85,7 +85,7 @@ function HeroSection() {
                 </Button>
               </Link>
 
-              <Link to="/course/content" className="focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 rounded-xl">
+              <Link to="/learn/preview" className="focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 rounded-xl">
                 <Button
                   variant="outline"
                   size="lg"

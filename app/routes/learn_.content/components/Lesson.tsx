@@ -17,10 +17,10 @@ interface LessonProps {
     }>;
   };
   index: number;
-  isLoggedIn: boolean;
+  isLoggedIn?: boolean;
 }
 
-export function Lesson({ lesson, index, isLoggedIn }: LessonProps) {
+export function Lesson({ lesson, index, isLoggedIn = true }: LessonProps) {
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);

@@ -20,6 +20,15 @@ type Pages = {
   "/api/cache-status": {
     params: {};
   };
+  "/preview": {
+    params: {};
+  };
+  "/learn/content": {
+    params: {};
+  };
+  "/learn/preview": {
+    params: {};
+  };
   "/auth/logout": {
     params: {};
   };
@@ -32,6 +41,12 @@ type Pages = {
   "/purchase": {
     params: {};
   };
+  "/privacy": {
+    params: {};
+  };
+  "/refund": {
+    params: {};
+  };
   "/learn": {
     params: {};
   };
@@ -41,31 +56,7 @@ type Pages = {
       "lessonSlug": string;
     };
   };
-  "/course": {
-    params: {};
-  };
-  "/course/content/:lesson/:chapter": {
-    params: {
-      "lesson": string;
-      "chapter": string;
-    };
-  };
-  "/course/overview": {
-    params: {};
-  };
-  "/course/content": {
-    params: {};
-  };
-  "/course/curated": {
-    params: {};
-  };
-  "/logout": {
-    params: {};
-  };
-  "/login": {
-    params: {};
-  };
-  "/aaa": {
+  "/terms": {
     params: {};
   };
   "/*": {
@@ -78,7 +69,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/api/webhooks/lemon-squeezy" | "/api/cache-status" | "/auth/logout" | "/auth/verify" | "/auth/login" | "/purchase" | "/learn" | "/learn/:moduleSlug/:lessonSlug" | "/course" | "/course/content/:lesson/:chapter" | "/course/overview" | "/course/content" | "/course/curated" | "/logout" | "/login" | "/aaa" | "/*";
+    page: "/" | "/api/webhooks/lemon-squeezy" | "/api/cache-status" | "/preview" | "/learn/content" | "/learn/preview" | "/auth/logout" | "/auth/verify" | "/auth/login" | "/purchase" | "/privacy" | "/refund" | "/learn" | "/learn/:moduleSlug/:lessonSlug" | "/terms" | "/*";
   };
   "routes/api.webhooks.lemon-squeezy.tsx": {
     id: "routes/api.webhooks.lemon-squeezy";
@@ -87,6 +78,18 @@ type RouteFiles = {
   "routes/api.cache-status.tsx": {
     id: "routes/api.cache-status";
     page: "/api/cache-status";
+  };
+  "routes/_learn.preview/route.tsx": {
+    id: "routes/_learn.preview";
+    page: "/preview";
+  };
+  "routes/learn_.content/route.tsx": {
+    id: "routes/learn_.content";
+    page: "/learn/content";
+  };
+  "routes/learn_.preview/route.tsx": {
+    id: "routes/learn_.preview";
+    page: "/learn/preview";
   };
   "routes/auth.logout.tsx": {
     id: "routes/auth.logout";
@@ -104,57 +107,33 @@ type RouteFiles = {
     id: "routes/purchase";
     page: "/purchase";
   };
-  "routes/_course.tsx": {
-    id: "routes/_course";
-    page: "/learn" | "/learn/:moduleSlug/:lessonSlug";
-  };
-  "routes/_course.learn.tsx": {
-    id: "routes/_course.learn";
-    page: "/learn" | "/learn/:moduleSlug/:lessonSlug";
-  };
-  "routes/_course.learn.$moduleSlug.$lessonSlug.tsx": {
-    id: "routes/_course.learn.$moduleSlug.$lessonSlug";
-    page: "/learn/:moduleSlug/:lessonSlug";
-  };
-  "routes/_course.learn.$moduleSlug.$lessonSlug._index.tsx": {
-    id: "routes/_course.learn.$moduleSlug.$lessonSlug._index";
-    page: "/learn/:moduleSlug/:lessonSlug";
+  "routes/privacy.tsx": {
+    id: "routes/privacy";
+    page: "/privacy";
   };
   "routes/_index/route.tsx": {
     id: "routes/_index";
     page: "/";
   };
-  "routes/course/route.tsx": {
-    id: "routes/course";
-    page: "/course" | "/course/content/:lesson/:chapter" | "/course/overview" | "/course/content" | "/course/curated";
+  "routes/refund.tsx": {
+    id: "routes/refund";
+    page: "/refund";
   };
-  "routes/course.content_.$lesson.$chapter/route.tsx": {
-    id: "routes/course.content_.$lesson.$chapter";
-    page: "/course/content/:lesson/:chapter";
+  "routes/learn/route.tsx": {
+    id: "routes/learn";
+    page: "/learn" | "/learn/:moduleSlug/:lessonSlug";
   };
-  "routes/course.overview/route.tsx": {
-    id: "routes/course.overview";
-    page: "/course/overview";
+  "routes/learn.$moduleSlug.$lessonSlug/route.tsx": {
+    id: "routes/learn.$moduleSlug.$lessonSlug";
+    page: "/learn/:moduleSlug/:lessonSlug";
   };
-  "routes/course.content/route.tsx": {
-    id: "routes/course.content";
-    page: "/course/content";
+  "routes/learn.$moduleSlug.$lessonSlug._index/route.tsx": {
+    id: "routes/learn.$moduleSlug.$lessonSlug._index";
+    page: "/learn/:moduleSlug/:lessonSlug";
   };
-  "routes/course.curated/route.tsx": {
-    id: "routes/course.curated";
-    page: "/course/curated";
-  };
-  "routes/logout.tsx": {
-    id: "routes/logout";
-    page: "/logout";
-  };
-  "routes/login.tsx": {
-    id: "routes/login";
-    page: "/login";
-  };
-  "routes/aaa.tsx": {
-    id: "routes/aaa";
-    page: "/aaa";
+  "routes/terms.tsx": {
+    id: "routes/terms";
+    page: "/terms";
   };
   "routes/$.tsx": {
     id: "routes/$";
@@ -166,22 +145,19 @@ type RouteModules = {
   "root": typeof import("./app/root.tsx");
   "routes/api.webhooks.lemon-squeezy": typeof import("./app/routes/api.webhooks.lemon-squeezy.tsx");
   "routes/api.cache-status": typeof import("./app/routes/api.cache-status.tsx");
+  "routes/_learn.preview": typeof import("./app/routes/_learn.preview/route.tsx");
+  "routes/learn_.content": typeof import("./app/routes/learn_.content/route.tsx");
+  "routes/learn_.preview": typeof import("./app/routes/learn_.preview/route.tsx");
   "routes/auth.logout": typeof import("./app/routes/auth.logout.tsx");
   "routes/auth.verify": typeof import("./app/routes/auth.verify.tsx");
   "routes/auth.login": typeof import("./app/routes/auth.login.tsx");
   "routes/purchase": typeof import("./app/routes/purchase.tsx");
-  "routes/_course": typeof import("./app/routes/_course.tsx");
-  "routes/_course.learn": typeof import("./app/routes/_course.learn.tsx");
-  "routes/_course.learn.$moduleSlug.$lessonSlug": typeof import("./app/routes/_course.learn.$moduleSlug.$lessonSlug.tsx");
-  "routes/_course.learn.$moduleSlug.$lessonSlug._index": typeof import("./app/routes/_course.learn.$moduleSlug.$lessonSlug._index.tsx");
+  "routes/privacy": typeof import("./app/routes/privacy.tsx");
   "routes/_index": typeof import("./app/routes/_index/route.tsx");
-  "routes/course": typeof import("./app/routes/course/route.tsx");
-  "routes/course.content_.$lesson.$chapter": typeof import("./app/routes/course.content_.$lesson.$chapter/route.tsx");
-  "routes/course.overview": typeof import("./app/routes/course.overview/route.tsx");
-  "routes/course.content": typeof import("./app/routes/course.content/route.tsx");
-  "routes/course.curated": typeof import("./app/routes/course.curated/route.tsx");
-  "routes/logout": typeof import("./app/routes/logout.tsx");
-  "routes/login": typeof import("./app/routes/login.tsx");
-  "routes/aaa": typeof import("./app/routes/aaa.tsx");
+  "routes/refund": typeof import("./app/routes/refund.tsx");
+  "routes/learn": typeof import("./app/routes/learn/route.tsx");
+  "routes/learn.$moduleSlug.$lessonSlug": typeof import("./app/routes/learn.$moduleSlug.$lessonSlug/route.tsx");
+  "routes/learn.$moduleSlug.$lessonSlug._index": typeof import("./app/routes/learn.$moduleSlug.$lessonSlug._index/route.tsx");
+  "routes/terms": typeof import("./app/routes/terms.tsx");
   "routes/$": typeof import("./app/routes/$.tsx");
 };

@@ -17,10 +17,10 @@ interface LessonProps {
     }>;
   };
   index: number;
-  isLoggedIn: boolean;
+  isPreview?: boolean;
 }
 
-export function Lesson({ lesson, index, isLoggedIn }: LessonProps) {
+export function Lesson({ lesson, index, isPreview = false }: LessonProps) {
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -57,11 +57,7 @@ export function Lesson({ lesson, index, isLoggedIn }: LessonProps) {
           {lesson.chapters.map((chapter, chapterIndex) => (
             <Link
               key={chapter.slug}
-              to={
-                isLoggedIn
-                  ? `/learn/content/${lesson.slug}/${chapter.slug}`
-                  : "/login"
-              }
+              to={`/learn/content/${lesson.slug}/${chapter.slug}`}
               className={cn(
                 "block py-2.5 px-3 rounded-lg transition-colors",
                 "hover:bg-gray-50 border border-transparent hover:border-gray-200"

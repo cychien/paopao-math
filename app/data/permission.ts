@@ -6,12 +6,12 @@ type Permission = {
 // 試用用戶權限 - 限制訪問
 const trialPermissions: Permission = {
   paths: [
-    "/course/content",
-    "/course/content/real-number-log/*",
-    "/course/content/polynomial/*",
-    "/course/content/line-circle/*",
-    "/course/entrance-exams",
-    "/course/entrance-exams/*",
+    "/learn/content",
+    "/learn/content/real-number-log/*",
+    "/learn/content/polynomial/*",
+    "/learn/content/line-circle/*",
+    "/learn/preview",
+    "/learn/preview/*",
   ],
   features: [],
 };

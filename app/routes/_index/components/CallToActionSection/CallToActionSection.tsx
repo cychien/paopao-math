@@ -49,7 +49,7 @@ function CallToActionSection() {
                 </Button>
               </Link>
               <Link
-                to="/course/overview"
+                to="/learn/preview"
                 className="group flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors py-3 px-4"
               >
                 查看課程大綱

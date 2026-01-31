@@ -47,7 +47,7 @@ function Header({ user }: HeaderProps) {
                 <NavigationMenu.Item className="flex items-center space-x-1.5">
                   <NavigationMenu.Link asChild>
                     <Link
-                      to="/course/content"
+                      to="/learn/preview"
                       className={cn(
                         "font-medium text-gray-900 group flex items-center gap-1.5 transition-colors text-sm"
                       )}
@@ -57,7 +57,7 @@ function Header({ user }: HeaderProps) {
                           "text-gray-500 group-hover:text-brand-600 transition-colors",
                           {
                             "text-brand-600":
-                              location.pathname.startsWith("/course"),
+                              location.pathname.startsWith("/learn/preview"),
                           }
                         )}
                       />
@@ -111,7 +111,7 @@ function Header({ user }: HeaderProps) {
             {!user && (
               <NavigationMenu.Link asChild>
                 <Link
-                  to="/course/content"
+                  to="/learn/preview"
                   className={cn(
                     "font-medium text-gray-900 hover:text-gray-900 group flex items-center gap-1.5 transition-colors text-sm"
                   )}
@@ -121,7 +121,7 @@ function Header({ user }: HeaderProps) {
                       "text-gray-400 group-hover:text-brand-600 transition-colors translate-y-px",
                       {
                         "text-brand-600":
-                          location.pathname.startsWith("/course"),
+                          location.pathname.startsWith("/learn/preview"),
                       }
                     )}
                   />

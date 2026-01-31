@@ -5,4 +5,4 @@ export { FeaturesSection } from "./FeaturesSection/FeaturesSectionNew";
 export { TeacherSection } from "./TeacherSection/TeacherSectionNew";
 export { PricingSection } from "./PricingSection/PricingSectionNew";
 export { CallToActionSection } from "./CallToActionSection/CallToActionSectionNew";
-export { FooterSection } from "./FooterSection/FooterSection";
+export { FooterSection } from "~/components/layout/FooterSection";

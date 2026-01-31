@@ -4,7 +4,7 @@ import { FeaturesSectionNew } from "./components/FeaturesSection";
 import { TeacherSection, TeacherSectionNew } from "./components/TeacherSection";
 import { PricingSection, PricingSectionNew } from "./components/PricingSection";
 import { CallToActionSection } from "./components/CallToActionSection";
-import { FooterSection } from "./components/FooterSection";
+import { FooterSection } from "~/components/layout/FooterSection";
 import { parse } from "@conform-to/zod";
 import { EmailSchema, SchoolNameSchema } from "~/utils/validation";
 import { z } from "zod";
@@ -37,7 +37,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   });
 
   if (isCustomer) {
-    throw redirect("/course/overview");
+    throw redirect("/learn");
   }
 
   return data({

@@ -26,7 +26,7 @@ export const loader = async ({ request }: { request: Request }) => {
       (purchase) => purchase.status === "ACTIVE" && purchase.hasLifetimeAccess
     )
   ) {
-    throw redirect("/course/overview");
+    throw redirect("/learn");
   }
 
   return {};
