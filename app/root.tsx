@@ -16,6 +16,7 @@ import { FlashProvider } from "./context/flash-context";
 import { cn } from "./utils/style";
 import { getCustomerSession } from "./services/customer-session.server";
 import { prisma } from "~/services/database/prisma.server";
+import { FooterSection } from "./components/layout/FooterSection/FooterSection.js";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -91,6 +92,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           >
             <Header user={loaderData?.user ?? null} />
             <div className="flex-1">{children}</div>
+            <FooterSection />
           </div>
         </FlashProvider>
         <ScrollRestoration />

@@ -3,8 +3,11 @@ import { Link } from "react-router";
 import { Check, Sparkles } from "lucide-react";
 import { ArrowRight02Icon, ArrowRightIcon, CheckmarkCircle03Icon, Tick01Icon } from "@hugeicons/core-free-icons";
 import Icon from "~/components/ui/icon";
+import { usePurchase } from "~/hooks/use-purchase";
 
 function PricingCard() {
+  const { purchase, isLoading } = usePurchase();
+  
   const features = [
     "超過 200 部詳解影片",
     "實體學習參考書",
@@ -76,12 +79,15 @@ function PricingCard() {
         <div className="my-8 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
 
         {/* CTA */}
-        <Link to="/purchase" className="relative z-10 block focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 rounded-xl">
-          <Button className="w-full h-14 text-lg font-semibold rounded-xl shadow-lg shadow-brand-600/20 hover:shadow-brand-600/30 transition-all duration-200" size="lg">
-            立即購買
-            <Icon icon={ArrowRight02Icon} className="size-5 translate-y-px" />
-          </Button>
-        </Link>
+        <Button 
+          className="relative z-10 w-full h-14 text-lg font-semibold rounded-xl shadow-lg shadow-brand-600/20 hover:shadow-brand-600/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2" 
+          size="lg"
+          onClick={purchase}
+          disabled={isLoading}
+        >
+          {isLoading ? "處理中..." : "立即購買"}
+          <Icon icon={ArrowRight02Icon} className="size-5 translate-y-px" />
+        </Button>
 
         {/* Trust badges */}
         <div className="mt-6 flex items-center justify-center gap-4 text-sm text-gray-400 flex-wrap">

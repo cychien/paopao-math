@@ -10,8 +10,8 @@ const trialPermissions: Permission = {
     "/learn/content/real-number-log/*",
     "/learn/content/polynomial/*",
     "/learn/content/line-circle/*",
-    "/learn/preview",
-    "/learn/preview/*",
+    "/preview",
+    "/preview/*",
   ],
   features: [],
 };

@@ -9,7 +9,6 @@ export function PolicyLayout({ title, children }: { title: string; children: Rea
           {children}
         </div>
       </main>
-      <FooterSection />
     </div>
   );
 }

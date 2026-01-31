@@ -3,6 +3,7 @@ import { Button } from "~/components/ui/Button";
 import { ArrowRight } from "lucide-react";
 import { type Variants } from 'motion/react';
 import { motion } from "motion/react";
+import { usePurchase } from "~/hooks/use-purchase";
 
 const topAnimationGroup: Variants = {
   hidden: {},
@@ -40,6 +41,8 @@ const buttons: Variants = {
 };
 
 function HeroSection() {
+  const { purchase, isLoading } = usePurchase();
+
   return (
     <section className="relative overflow-hidden">
       {/* Background with gradient mesh */}
@@ -95,15 +98,15 @@ function HeroSection() {
             variants={buttons}
             className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
           >
-            <Link to="/purchase" className="w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 rounded-lg">
-              <Button size="lg" className="w-full sm:w-auto h-14 px-8! text-base font-semibold rounded-lg shadow-sm group">
-                立即加入課程
-                <ArrowRight className="size-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
-            <Link to="#features" className="w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 rounded-lg">
+            {/* <Link to="/purchase" className="w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 rounded-lg"> */}
+            <Button size="lg" className="w-full sm:w-auto h-14 px-8! text-base font-semibold rounded-lg shadow-sm group" onClick={purchase} disabled={isLoading}>
+              {isLoading ? "處理中..." : "立即加入課程"}
+              <ArrowRight className="size-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+            {/* </Link> */}
+            <Link to="/preview" className="w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 rounded-lg">
               <Button variant="outline" size="lg" className="w-full sm:w-auto h-14 px-8! text-base font-semibold rounded-lg bg-white hover:bg-gray-50 ">
-                了解課程詳情
+                查看課程大綱
               </Button>
             </Link>
           </motion.div>

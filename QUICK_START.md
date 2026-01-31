@@ -1,279 +1,163 @@
-# 🚀 Quick Start - Preview Your New Landing Page
+# Quick Start Guide: OTP and Google OAuth Login
 
-## TL;DR - 3 Commands to Preview
+## 🚀 Setup (5 minutes)
 
-```bash
-# 1. Backup original (safety first!)
-cp app/routes/_index/route.tsx app/routes/_index/route.old.tsx
+### 1. Add Environment Variables
 
-# 2. Activate new design
-cp app/routes/_index/route.new.tsx app/routes/_index/route.tsx
-
-# 3. Start development server
-npm run dev
-```
-
-Then open: **http://localhost:5173**
-
----
-
-## 🎨 What You'll See
-
-### New Sections (in order):
-
-1. **Hero** - Modern bento grid with countdown timer
-2. **Social Proof** - Student testimonials (NEW!)
-3. **Features** - Enhanced with comparison table
-4. **Teacher** - Expanded credentials section
-5. **Pricing** - Clear pricing with urgency
-6. **Call-to-Action** - Final conversion push
-7. **Footer** - Same as before
-
----
-
-## 📱 Test These Key Features
-
-### ✅ Countdown Timers
-- **Hero section** - Orange gradient card (top right)
-- **Pricing section** - Full-width banner at top
-- **What to check**: Numbers update every second/minute
-
-### ✅ Hover Effects
-- **Stat cards** in Hero - Should scale and show shadow
-- **Feature cards** - Border color changes to brand color
-- **Testimonial cards** - Shadow increases on hover
-- **Pricing card** - Glow effect intensifies
-
-### ✅ CTAs (Call-to-Actions)
-- **Hero section**: 2 buttons (Purchase + Free Trial)
-- **Pricing section**: 1 large button in pricing card
-- **CTA section**: 1 main button + 1 text link
-- **All should have focus rings** when tabbed to
-
-### ✅ Responsive Design
-Test at these widths:
-- **375px** - iPhone SE (mobile)
-- **768px** - iPad (tablet)
-- **1024px** - Desktop
-- **1440px** - Large desktop
-
----
-
-## 🔄 To Revert (Go Back to Original)
+Add to your `.env` file:
 
 ```bash
-cp app/routes/_index/route.old.tsx app/routes/_index/route.tsx
+# Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+
+# Loops.so OTP Email
+LOOPS_OTP_TRANSACTIONAL_ID=your_loops_transactional_id_here
+```
+
+### 2. Run Database Migration
+
+```bash
+npx prisma migrate dev --name add_otp_fields
+```
+
+### 3. Done! 🎉
+
+The login page is ready to use at `/auth/login`.
+
+---
+
+## 📧 Setting Up Loops.so Email Template
+
+1. Log in to [Loops.so](https://loops.so)
+2. Go to **Transactional** → **Create template**
+3. Add these variables to your template:
+   - `{{otp}}` - The 6-digit code
+   - `{{expiryMinutes}}` - Expiry time (usually "10")
+   - `{{email}}` - Recipient email
+
+**Example Email Template:**
+
+```
+Hi there! 👋
+
+Your verification code is: {{otp}}
+
+This code will expire in {{expiryMinutes}} minutes.
+
+If you didn't request this code, please ignore this email.
+
+---
+Paopao Math Class
+```
+
+4. Copy the **Transactional ID** to `LOOPS_OTP_TRANSACTIONAL_ID` in your `.env`
+
+---
+
+## 🔐 Setting Up Google OAuth
+
+### Development
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create/select project → **APIs & Services** → **Credentials**
+3. Create **OAuth 2.0 Client ID** (Web application)
+4. Add authorized redirect URI:
+   ```
+   http://localhost:3000/auth/callback/google
+   ```
+5. Copy **Client ID** and **Client Secret** to `.env`
+
+### Production
+
+Add your production redirect URI:
+```
+https://yourdomain.com/auth/callback/google
 ```
 
 ---
 
-## 📊 Side-by-Side Comparison
+## 🧪 Testing in Development
 
-| Feature | Original | New Design |
-|---------|----------|------------|
-| Countdown Timer | ❌ None | ✅ 2 timers (Hero + Pricing) |
-| Testimonials | ❌ None | ✅ 3 detailed cards |
-| Comparison Table | ❌ None | ✅ 2 tables (Features + Pricing) |
-| Trust Indicators | ~8 | 25+ |
-| Interactive Cards | 4 | 20+ |
-| Social Proof Section | ❌ | ✅ New section |
+### Without Loops.so configured:
+- OTP codes will be **printed to the console**
+- You can still test the full flow
+
+### With Loops.so configured:
+- Real emails will be sent
+- Check spam folder if not received
+
+### Testing Google OAuth:
+- Works immediately after adding credentials
+- Make sure the test email exists in `AppCustomer` table
 
 ---
 
-## 🎯 Key Changes to Review
+## 🔒 Security Features
 
-### 1. Hero Section
-- **Before**: Simple hero with text and buttons
-- **After**: Bento grid with stats, countdown, and trust badges
-- **Check**: Does countdown timer work? Do stats cards hover properly?
-
-### 2. Social Proof (NEW!)
-- **Before**: Didn't exist
-- **After**: Full section with testimonials and aggregate metrics
-- **Check**: Are testimonial cards visually appealing? Good spacing?
-
-### 3. Features Section
-- **Before**: Basic feature cards
-- **After**: 3 large highlighted cards + 6 additional features + comparison table
-- **Check**: Is comparison table readable? Feature hierarchy clear?
-
-### 4. Teacher Section
-- **Before**: Simple two-column layout
-- **After**: Enhanced with credentials, books, achievements, quote
-- **Check**: Is teacher credibility well-established? Good visual balance?
-
-### 5. Pricing Section
-- **Before**: Single pricing card
-- **After**: Countdown banner + detailed pricing card + comparison table
-- **Check**: Is pricing clear? Countdown working? Urgency effective?
-
-### 6. CTA Section
-- **Before**: Dark section with basic CTA
-- **After**: Enhanced with quick benefits, dual CTAs, trust indicators
-- **Check**: Is dark theme effective? Benefits clear? CTAs prominent?
+✅ Rate limiting: 3 attempts per 15 minutes  
+✅ OTP expires in 10 minutes  
+✅ Hashed storage (SHA-256)  
+✅ One-time use codes  
+✅ IP-based tracking  
+✅ Purchase verification (must be in AppCustomer table)
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Issue: Countdown timer shows 00:00:00
-**Fix**: Update the target date in these files:
-- `app/routes/_index/components/HeroSection/HeroSectionNew.tsx` (line ~15)
-- `app/routes/_index/components/PricingSection/PricingSectionNew.tsx` (line ~30)
+### "此信箱尚未購買課程"
+→ Email not found in `AppCustomer` table. They need to purchase first.
 
-```typescript
-// Change this:
-targetDate.setDate(targetDate.getDate() + 7);
+### "驗證碼錯誤次數過多"
+→ Rate limit hit. Wait 15 minutes or restart server to clear Redis cache in dev.
 
-// To your actual deadline:
-const targetDate = new Date('2024-12-31T23:59:59');
-```
+### "郵件發送失敗"
+→ Check `LOOPS_API_KEY` and `LOOPS_OTP_TRANSACTIONAL_ID` are set correctly.
 
-### Issue: Layout looks broken
-**Fix**: Make sure you copied the route file correctly:
-```bash
-cat app/routes/_index/route.tsx | grep "SocialProofSection"
-```
-Should show the import. If not, re-copy the route file.
+### Google OAuth "invalid_oauth_callback"
+→ Redirect URI mismatch. Check Google Console settings match your app URL.
 
-### Issue: Images not loading
-**Fix**: Teacher image uses Cloudinary. Check that the image ID is correct:
-- File: `TeacherSectionNew.tsx`
-- Line: Look for `imageId="paopao_jz9i86.jpg"`
-
-### Issue: Build errors
-**Fix**: Make sure all imports are correct. Check:
-```bash
-npm run build
-```
-If errors, they'll show which imports are broken.
+### OTP not received
+→ In development without Loops configured, check console logs for OTP code.
 
 ---
 
-## 📝 Customization Quick Wins
+## 📱 User Experience
 
-### 1. Update Countdown Deadline
-Files: `HeroSectionNew.tsx`, `PricingSectionNew.tsx`
-```typescript
-const targetDate = new Date('2024-12-31T23:59:59');
-```
+### Email + OTP Flow (< 30 seconds)
+1. User enters email
+2. Receives 6-digit code
+3. Enters code (auto-submits)
+4. Logged in! ✨
 
-### 2. Change Pricing
-File: `PricingSectionNew.tsx`
-```typescript
-// Line ~155
-<div className="text-2xl text-gray-400 line-through">NT$ 7,999</div>
-<span className="text-5xl font-bold">NT$ 4,995</span>
-```
-
-### 3. Update Testimonials
-File: `SocialProofSection.tsx`
-```typescript
-// Line ~4
-const testimonials = [
-  {
-    name: "Your Student Name",
-    school: "School Name",
-    score: "15 級分",
-    improvement: "+5 級分",
-    text: "Testimonial text...",
-    avatar: "bg-gradient-to-br from-blue-400 to-blue-600",
-  },
-  // ... add more
-];
-```
-
-### 4. Adjust Stats
-File: `SocialProofSection.tsx`
-```typescript
-// Line ~30
-const stats = [
-  {
-    value: "平均提升 4.2 級分", // Change this
-    label: "學生成績進步",
-    // ...
-  },
-  // ... more stats
-];
-```
+### Google OAuth Flow (< 10 seconds)
+1. Click "使用 Google 登入"
+2. Authorize on Google
+3. Logged in! ✨
 
 ---
 
-## ✅ Final Checklist Before Going Live
+## 📚 More Information
 
-### Content
-- [ ] Countdown timers set to actual deadline
-- [ ] Real student testimonials (replace placeholders)
-- [ ] Pricing verified (NT$4,995 correct?)
-- [ ] All CTAs link to correct pages
-- [ ] Teacher bio and achievements accurate
-
-### Testing
-- [ ] Mobile view (375px) looks good
-- [ ] Tablet view (768px) responsive
-- [ ] Desktop view (1024px+) clean
-- [ ] Countdown timers working
-- [ ] All hover effects smooth
-- [ ] No console errors
-
-### Performance
-- [ ] Images optimized
-- [ ] Page loads < 3 seconds
-- [ ] No layout shift
-- [ ] Animations smooth
-
-### Accessibility
-- [ ] Can tab through all buttons
-- [ ] Focus rings visible
-- [ ] Colors pass contrast check
-- [ ] Works with keyboard only
+- **Full setup guide:** `ENV_SETUP.md`
+- **Implementation details:** `IMPLEMENTATION_SUMMARY.md`
+- **Code files:**
+  - OTP service: `app/services/auth/otp.server.ts`
+  - Google OAuth: `app/services/auth/google-oauth.server.ts`
+  - Login page: `app/routes/auth.login.tsx`
 
 ---
 
-## 📞 Need Help?
+## 💡 Tips
 
-1. **Read Documentation**:
-   - `REDESIGN_GUIDE.md` - Comprehensive guide
-   - `REDESIGN_SUMMARY.md` - Executive summary
-
-2. **Check Component Files**:
-   - Each component has inline comments
-   - Look for `// TODO:` for customization points
-
-3. **Common Issues**:
-   - Countdown not working? Check target date
-   - Layout broken? Verify route file copied correctly
-   - Build errors? Check imports in component files
+- Test both flows before deploying
+- OTP codes are case-insensitive (all digits)
+- Google OAuth updates customer name automatically
+- Rate limits reset after 15 minutes
+- OTP emails include expiry time in email
+- Both methods verify against the same `AppCustomer` table
 
 ---
 
-## 🎉 Ready to Launch!
-
-Once you're happy with the preview:
-
-1. **Test thoroughly** on all devices
-2. **Update content** (testimonials, dates, etc.)
-3. **Run build**: `npm run build`
-4. **Deploy** to production
-
-Your new landing page is ready to convert visitors into students! 🚀
-
----
-
-**Quick Commands Reference**:
-
-```bash
-# Preview new design
-cp app/routes/_index/route.new.tsx app/routes/_index/route.tsx && npm run dev
-
-# Revert to original
-cp app/routes/_index/route.old.tsx app/routes/_index/route.tsx
-
-# Build for production
-npm run build
-
-# Check for errors
-npm run type-check
-```
-
-Good luck! 🎓
+Need help? Check the error messages in the console logs for detailed debugging info.

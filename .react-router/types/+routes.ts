@@ -17,16 +17,16 @@ type Pages = {
   "/api/webhooks/lemon-squeezy": {
     params: {};
   };
-  "/api/cache-status": {
+  "/auth/callback/google": {
     params: {};
   };
-  "/preview": {
+  "/api/cache-status": {
     params: {};
   };
   "/learn/content": {
     params: {};
   };
-  "/learn/preview": {
+  "/api/purchase": {
     params: {};
   };
   "/auth/logout": {
@@ -38,7 +38,7 @@ type Pages = {
   "/auth/login": {
     params: {};
   };
-  "/purchase": {
+  "/preview": {
     params: {};
   };
   "/privacy": {
@@ -69,27 +69,27 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/api/webhooks/lemon-squeezy" | "/api/cache-status" | "/preview" | "/learn/content" | "/learn/preview" | "/auth/logout" | "/auth/verify" | "/auth/login" | "/purchase" | "/privacy" | "/refund" | "/learn" | "/learn/:moduleSlug/:lessonSlug" | "/terms" | "/*";
+    page: "/" | "/api/webhooks/lemon-squeezy" | "/auth/callback/google" | "/api/cache-status" | "/learn/content" | "/api/purchase" | "/auth/logout" | "/auth/verify" | "/auth/login" | "/preview" | "/privacy" | "/refund" | "/learn" | "/learn/:moduleSlug/:lessonSlug" | "/terms" | "/*";
   };
   "routes/api.webhooks.lemon-squeezy.tsx": {
     id: "routes/api.webhooks.lemon-squeezy";
     page: "/api/webhooks/lemon-squeezy";
   };
+  "routes/auth.callback.google.tsx": {
+    id: "routes/auth.callback.google";
+    page: "/auth/callback/google";
+  };
   "routes/api.cache-status.tsx": {
     id: "routes/api.cache-status";
     page: "/api/cache-status";
-  };
-  "routes/_learn.preview/route.tsx": {
-    id: "routes/_learn.preview";
-    page: "/preview";
   };
   "routes/learn_.content/route.tsx": {
     id: "routes/learn_.content";
     page: "/learn/content";
   };
-  "routes/learn_.preview/route.tsx": {
-    id: "routes/learn_.preview";
-    page: "/learn/preview";
+  "routes/api.purchase.tsx": {
+    id: "routes/api.purchase";
+    page: "/api/purchase";
   };
   "routes/auth.logout.tsx": {
     id: "routes/auth.logout";
@@ -103,9 +103,9 @@ type RouteFiles = {
     id: "routes/auth.login";
     page: "/auth/login";
   };
-  "routes/purchase.tsx": {
-    id: "routes/purchase";
-    page: "/purchase";
+  "routes/preview/route.tsx": {
+    id: "routes/preview";
+    page: "/preview";
   };
   "routes/privacy.tsx": {
     id: "routes/privacy";
@@ -144,14 +144,14 @@ type RouteFiles = {
 type RouteModules = {
   "root": typeof import("./app/root.tsx");
   "routes/api.webhooks.lemon-squeezy": typeof import("./app/routes/api.webhooks.lemon-squeezy.tsx");
+  "routes/auth.callback.google": typeof import("./app/routes/auth.callback.google.tsx");
   "routes/api.cache-status": typeof import("./app/routes/api.cache-status.tsx");
-  "routes/_learn.preview": typeof import("./app/routes/_learn.preview/route.tsx");
   "routes/learn_.content": typeof import("./app/routes/learn_.content/route.tsx");
-  "routes/learn_.preview": typeof import("./app/routes/learn_.preview/route.tsx");
+  "routes/api.purchase": typeof import("./app/routes/api.purchase.tsx");
   "routes/auth.logout": typeof import("./app/routes/auth.logout.tsx");
   "routes/auth.verify": typeof import("./app/routes/auth.verify.tsx");
   "routes/auth.login": typeof import("./app/routes/auth.login.tsx");
-  "routes/purchase": typeof import("./app/routes/purchase.tsx");
+  "routes/preview": typeof import("./app/routes/preview/route.tsx");
   "routes/privacy": typeof import("./app/routes/privacy.tsx");
   "routes/_index": typeof import("./app/routes/_index/route.tsx");
   "routes/refund": typeof import("./app/routes/refund.tsx");

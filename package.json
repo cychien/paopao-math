@@ -9,7 +9,7 @@
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "node ./server.js",
     "typecheck": "react-router typegen && tsc",
-    "prisma:generate": "prisma generate && prisma generate --schema prisma-legacy/schema.prisma"
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.826.0",
@@ -50,6 +50,7 @@
     "express": "^4.21.2",
     "format-duration": "^3.0.2",
     "framer-motion": "^12.12.1",
+    "input-otp": "^1.4.2",
     "ioredis": "^5.6.1",
     "isbot": "^5.1.27",
     "jose": "^6.1.0",

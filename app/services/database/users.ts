@@ -212,3 +212,35 @@ export async function verifyEmailChallenge(email: string, tokenHash: string) {
     return null;
   }
 }
+
+/**
+ * 獲取用戶及其購買記錄
+ * @param email 用戶 email
+ */
+export async function getUserWithPurchases(email: string) {
+  try {
+    const customers = await prisma.appCustomer.findMany({
+      where: { email },
+      include: {
+        lemonSqueezyCustomer: true,
+        variant: true,
+      },
+    });
+
+    if (customers.length === 0) {
+      return null;
+    }
+
+    return {
+      email,
+      purchases: customers.map((c) => ({
+        status: c.lemonSqueezyCustomer ? "ACTIVE" : "EXPIRED",
+        hasLifetimeAccess: true, // 目前假設所有購買都是終身制
+        variantName: c.variant.name,
+      })),
+    };
+  } catch (error) {
+    console.error("獲取用戶購買記錄失敗:", error);
+    return null;
+  }
+}

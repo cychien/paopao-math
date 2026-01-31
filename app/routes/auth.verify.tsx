@@ -1,105 +1,45 @@
 import type { Route } from "./+types/auth.verify";
 import { prisma } from "~/services/database/prisma.server";
 import { redirect } from "react-router";
-import { createHash as createHashCrypto } from "node:crypto";
+import { verifyOTP } from "~/services/auth/otp.server";
 import {
   createCustomerSession,
   customerSessionStorage,
 } from "~/services/customer-session.server";
 
-const DEFAULT_APP_SLUG = "paopao-math";
-
-function createHash(input: string) {
-  return createHashCrypto("sha256").update(input).digest("base64url");
-}
-
+/**
+ * Verify OTP code and create customer session
+ */
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const challengeId = url.searchParams.get("c");
-  const token = url.searchParams.get("t");
+  const otp = url.searchParams.get("otp");
 
-  if (!challengeId || !token) {
-    return redirect("/login?error=invalid_link");
+  if (!challengeId || !otp) {
+    return redirect("/auth/login?error=invalid_verification");
   }
 
-  const tokenHash = createHash(token);
+  // Get client IP for rate limiting
+  const ipAddress =
+    request.headers.get("x-forwarded-for") ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
 
-  // Find the challenge
-  const challenge = await prisma.emailChallenge.findUnique({
-    where: { id: challengeId },
-    select: {
-      id: true,
-      email: true,
-      tokenHash: true,
-      status: true,
-      expiresAt: true,
-      appId: true,
-    },
-  });
+  // Verify OTP
+  const result = await verifyOTP(challengeId, otp, ipAddress);
 
-  if (!challenge) {
-    return redirect("/login?error=invalid_link");
+  if (!result.success || !result.customerId || !result.appId) {
+    // Redirect back to login with error
+    const errorParam = result.error
+      ? encodeURIComponent(result.error)
+      : "verification_failed";
+    return redirect(`/auth/login?error=${errorParam}&c=${challengeId}`);
   }
-
-  // Verify token hash matches
-  if (challenge.tokenHash !== tokenHash) {
-    return redirect("/login?error=invalid_link");
-  }
-
-  // Check if challenge is expired
-  if (challenge.expiresAt < new Date()) {
-    await prisma.emailChallenge.update({
-      where: { id: challengeId },
-      data: { status: "EXPIRED" },
-    });
-    return redirect("/login?error=expired");
-  }
-
-  // Check if challenge is already consumed
-  if (challenge.status !== "PENDING") {
-    return redirect("/login?error=already_used");
-  }
-
-  // Verify this is a customer login challenge (has appId)
-  if (!challenge.appId) {
-    return redirect("/login?error=invalid_link");
-  }
-
-  // Verify the app matches
-  const app = await prisma.app.findUnique({
-    where: { slug: DEFAULT_APP_SLUG },
-    select: { id: true },
-  });
-
-  if (!app || app.id !== challenge.appId) {
-    return redirect("/login?error=invalid_link");
-  }
-
-  // Find the customer
-  const customer = await prisma.appCustomer.findFirst({
-    where: {
-      appId: app.id,
-      email: challenge.email,
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  if (!customer) {
-    return redirect("/login?error=no_access");
-  }
-
-  // Mark challenge as consumed
-  await prisma.emailChallenge.update({
-    where: { id: challengeId },
-    data: { status: "CONSUMED" },
-  });
 
   // Create customer session
   const cookie = await createCustomerSession({
-    customerId: customer.id,
-    appId: app.id,
+    customerId: result.customerId,
+    appId: result.appId,
     request,
   });
 
@@ -107,6 +47,8 @@ export async function loader({ request }: Route.LoaderArgs) {
   const session = await customerSessionStorage.getSession(cookie);
   session.flash("welcome", "true");
   const newCookie = await customerSessionStorage.commitSession(session);
+
+  console.log(`✅ Login successful for: ${result.email}`);
 
   // Redirect to course home with session cookie
   return redirect("/learn", {

@@ -8,7 +8,7 @@ function FooterSection() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-gray-200 bg-gray-50 text-gray-900">
+    <footer className="border-t border-gray-200 bg-gray-25 text-gray-900">
       {/* Main footer content */}
       <div className="container mx-auto px-6 pt-16 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
@@ -38,9 +38,9 @@ function FooterSection() {
             </h4>
             <ul className="space-y-3">
               {[
-                { label: "免費試讀", href: "/learn/preview" },
-                { label: "課程大綱", href: "/learn" },
-                { label: "購買課程", href: "/purchase" },
+                { label: "免費試讀", href: "/preview" },
+                // { label: "課程大綱", href: "/learn" },
+                // { label: "購買課程", href: "/purchase" },
                 { label: "登入", href: "/login" },
               ].map((link) => (
                 <li key={link.label}>

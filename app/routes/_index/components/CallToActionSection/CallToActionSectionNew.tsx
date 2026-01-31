@@ -1,8 +1,11 @@
 import { Link } from "react-router";
 import { Button } from "~/components/ui/Button";
 import { ArrowRight, Sparkles, CheckCircle2, TrendingUp, Shield, Zap } from "lucide-react";
+import { usePurchase } from "~/hooks/use-purchase";
 
 function CallToActionSectionNew() {
+  const { purchase, isLoading } = usePurchase();
+
   return (
     <section className="py-16 lg:py-20 bg-[#fbfcfe] relative">
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-100 to-transparent" />
@@ -96,17 +99,17 @@ function CallToActionSectionNew() {
                 </Link>
               </div> */}
               <div className="my-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link to="/purchase" className="focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900 rounded-xl">
-                  <Button
-                    size="lg"
-                    className="h-14 px-8! text-base font-bold rounded-xl bg-white text-gray-900 hover:bg-gray-100 shadow-xl shadow-black/20 hover:-translate-y-0.5 transition-all duration-200"
-                  >
-                    立即購買課程
-                    <ArrowRight className="size-5 ml-1" />
-                  </Button>
-                </Link>
+                <Button
+                  size="lg"
+                  className="h-14 px-8! text-base font-bold rounded-xl bg-white text-gray-900 hover:bg-gray-100 shadow-xl shadow-black/20 hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900"
+                  onClick={purchase}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "處理中..." : "立即購買課程"}
+                  <ArrowRight className="size-5 ml-1" />
+                </Button>
                 <Link
-                  to="/learn/preview"
+                  to="/preview"
                   className="group flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors py-3 px-4"
                 >
                   查看課程大綱

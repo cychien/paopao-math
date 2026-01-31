@@ -2,8 +2,11 @@ import { Link } from "react-router";
 import { Button } from "~/components/ui/Button";
 import { BookOpen, Play, Users, Award, Clock, CheckCircle2 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { usePurchase } from "~/hooks/use-purchase";
 
 function HeroSection() {
+  const { purchase, isLoading } = usePurchase();
+  
   // Countdown timer for early bird offer (example: 7 days from now)
   const [timeLeft, setTimeLeft] = useState({
     days: 7,
@@ -73,19 +76,19 @@ function HeroSection() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/purchase" className="focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2 rounded-xl">
-                <Button
-                  size="lg"
-                  className="w-full sm:w-auto h-14 px-8 text-lg font-bold rounded-xl shadow-xl shadow-brand-600/30 hover:shadow-2xl hover:shadow-brand-600/40 hover:-translate-y-1 transition-all duration-200"
-                >
-                  立即購買課程
-                  <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </Button>
-              </Link>
+              <Button
+                size="lg"
+                className="w-full sm:w-auto h-14 px-8 text-lg font-bold rounded-xl shadow-xl shadow-brand-600/30 hover:shadow-2xl hover:shadow-brand-600/40 hover:-translate-y-1 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
+                onClick={purchase}
+                disabled={isLoading}
+              >
+                {isLoading ? "處理中..." : "立即購買課程"}
+                <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Button>
 
-              <Link to="/learn/preview" className="focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 rounded-xl">
+              <Link to="/preview" className="focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 rounded-xl">
                 <Button
                   variant="outline"
                   size="lg"

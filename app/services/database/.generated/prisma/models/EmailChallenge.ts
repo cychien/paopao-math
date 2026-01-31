@@ -19,8 +19,18 @@ export type EmailChallengeModel = runtime.Types.Result.DefaultSelection<Prisma.$
 
 export type AggregateEmailChallenge = {
   _count: EmailChallengeCountAggregateOutputType | null
+  _avg: EmailChallengeAvgAggregateOutputType | null
+  _sum: EmailChallengeSumAggregateOutputType | null
   _min: EmailChallengeMinAggregateOutputType | null
   _max: EmailChallengeMaxAggregateOutputType | null
+}
+
+export type EmailChallengeAvgAggregateOutputType = {
+  attempts: number | null
+}
+
+export type EmailChallengeSumAggregateOutputType = {
+  attempts: number | null
 }
 
 export type EmailChallengeMinAggregateOutputType = {
@@ -31,6 +41,9 @@ export type EmailChallengeMinAggregateOutputType = {
   status: $Enums.EmailChallengeStatus | null
   issuedAt: Date | null
   expiresAt: Date | null
+  otp: string | null
+  attempts: number | null
+  lockedUntil: Date | null
   appId: string | null
 }
 
@@ -42,6 +55,9 @@ export type EmailChallengeMaxAggregateOutputType = {
   status: $Enums.EmailChallengeStatus | null
   issuedAt: Date | null
   expiresAt: Date | null
+  otp: string | null
+  attempts: number | null
+  lockedUntil: Date | null
   appId: string | null
 }
 
@@ -53,10 +69,21 @@ export type EmailChallengeCountAggregateOutputType = {
   status: number
   issuedAt: number
   expiresAt: number
+  otp: number
+  attempts: number
+  lockedUntil: number
   appId: number
   _all: number
 }
 
+
+export type EmailChallengeAvgAggregateInputType = {
+  attempts?: true
+}
+
+export type EmailChallengeSumAggregateInputType = {
+  attempts?: true
+}
 
 export type EmailChallengeMinAggregateInputType = {
   id?: true
@@ -66,6 +93,9 @@ export type EmailChallengeMinAggregateInputType = {
   status?: true
   issuedAt?: true
   expiresAt?: true
+  otp?: true
+  attempts?: true
+  lockedUntil?: true
   appId?: true
 }
 
@@ -77,6 +107,9 @@ export type EmailChallengeMaxAggregateInputType = {
   status?: true
   issuedAt?: true
   expiresAt?: true
+  otp?: true
+  attempts?: true
+  lockedUntil?: true
   appId?: true
 }
 
@@ -88,6 +121,9 @@ export type EmailChallengeCountAggregateInputType = {
   status?: true
   issuedAt?: true
   expiresAt?: true
+  otp?: true
+  attempts?: true
+  lockedUntil?: true
   appId?: true
   _all?: true
 }
@@ -130,6 +166,18 @@ export type EmailChallengeAggregateArgs<ExtArgs extends runtime.Types.Extensions
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: EmailChallengeAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: EmailChallengeSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: EmailChallengeMinAggregateInputType
@@ -160,6 +208,8 @@ export type EmailChallengeGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   _count?: EmailChallengeCountAggregateInputType | true
+  _avg?: EmailChallengeAvgAggregateInputType
+  _sum?: EmailChallengeSumAggregateInputType
   _min?: EmailChallengeMinAggregateInputType
   _max?: EmailChallengeMaxAggregateInputType
 }
@@ -172,8 +222,13 @@ export type EmailChallengeGroupByOutputType = {
   status: $Enums.EmailChallengeStatus
   issuedAt: Date
   expiresAt: Date
+  otp: string | null
+  attempts: number
+  lockedUntil: Date | null
   appId: string | null
   _count: EmailChallengeCountAggregateOutputType | null
+  _avg: EmailChallengeAvgAggregateOutputType | null
+  _sum: EmailChallengeSumAggregateOutputType | null
   _min: EmailChallengeMinAggregateOutputType | null
   _max: EmailChallengeMaxAggregateOutputType | null
 }
@@ -204,6 +259,9 @@ export type EmailChallengeWhereInput = {
   status?: Prisma.EnumEmailChallengeStatusFilter<"EmailChallenge"> | $Enums.EmailChallengeStatus
   issuedAt?: Prisma.DateTimeFilter<"EmailChallenge"> | Date | string
   expiresAt?: Prisma.DateTimeFilter<"EmailChallenge"> | Date | string
+  otp?: Prisma.StringNullableFilter<"EmailChallenge"> | string | null
+  attempts?: Prisma.IntFilter<"EmailChallenge"> | number
+  lockedUntil?: Prisma.DateTimeNullableFilter<"EmailChallenge"> | Date | string | null
   appId?: Prisma.StringNullableFilter<"EmailChallenge"> | string | null
   app?: Prisma.XOR<Prisma.AppNullableScalarRelationFilter, Prisma.AppWhereInput> | null
 }
@@ -216,6 +274,9 @@ export type EmailChallengeOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   issuedAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
+  otp?: Prisma.SortOrderInput | Prisma.SortOrder
+  attempts?: Prisma.SortOrder
+  lockedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   appId?: Prisma.SortOrderInput | Prisma.SortOrder
   app?: Prisma.AppOrderByWithRelationInput
 }
@@ -232,6 +293,9 @@ export type EmailChallengeWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumEmailChallengeStatusFilter<"EmailChallenge"> | $Enums.EmailChallengeStatus
   issuedAt?: Prisma.DateTimeFilter<"EmailChallenge"> | Date | string
   expiresAt?: Prisma.DateTimeFilter<"EmailChallenge"> | Date | string
+  otp?: Prisma.StringNullableFilter<"EmailChallenge"> | string | null
+  attempts?: Prisma.IntFilter<"EmailChallenge"> | number
+  lockedUntil?: Prisma.DateTimeNullableFilter<"EmailChallenge"> | Date | string | null
   appId?: Prisma.StringNullableFilter<"EmailChallenge"> | string | null
   app?: Prisma.XOR<Prisma.AppNullableScalarRelationFilter, Prisma.AppWhereInput> | null
 }, "id" | "email_tokenHash">
@@ -244,10 +308,15 @@ export type EmailChallengeOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   issuedAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
+  otp?: Prisma.SortOrderInput | Prisma.SortOrder
+  attempts?: Prisma.SortOrder
+  lockedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   appId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.EmailChallengeCountOrderByAggregateInput
+  _avg?: Prisma.EmailChallengeAvgOrderByAggregateInput
   _max?: Prisma.EmailChallengeMaxOrderByAggregateInput
   _min?: Prisma.EmailChallengeMinOrderByAggregateInput
+  _sum?: Prisma.EmailChallengeSumOrderByAggregateInput
 }
 
 export type EmailChallengeScalarWhereWithAggregatesInput = {
@@ -261,6 +330,9 @@ export type EmailChallengeScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumEmailChallengeStatusWithAggregatesFilter<"EmailChallenge"> | $Enums.EmailChallengeStatus
   issuedAt?: Prisma.DateTimeWithAggregatesFilter<"EmailChallenge"> | Date | string
   expiresAt?: Prisma.DateTimeWithAggregatesFilter<"EmailChallenge"> | Date | string
+  otp?: Prisma.StringNullableWithAggregatesFilter<"EmailChallenge"> | string | null
+  attempts?: Prisma.IntWithAggregatesFilter<"EmailChallenge"> | number
+  lockedUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"EmailChallenge"> | Date | string | null
   appId?: Prisma.StringNullableWithAggregatesFilter<"EmailChallenge"> | string | null
 }
 
@@ -272,6 +344,9 @@ export type EmailChallengeCreateInput = {
   status?: $Enums.EmailChallengeStatus
   issuedAt?: Date | string
   expiresAt: Date | string
+  otp?: string | null
+  attempts?: number
+  lockedUntil?: Date | string | null
   app?: Prisma.AppCreateNestedOneWithoutEmailChallengesInput
 }
 
@@ -283,6 +358,9 @@ export type EmailChallengeUncheckedCreateInput = {
   status?: $Enums.EmailChallengeStatus
   issuedAt?: Date | string
   expiresAt: Date | string
+  otp?: string | null
+  attempts?: number
+  lockedUntil?: Date | string | null
   appId?: string | null
 }
 
@@ -294,6 +372,9 @@ export type EmailChallengeUpdateInput = {
   status?: Prisma.EnumEmailChallengeStatusFieldUpdateOperationsInput | $Enums.EmailChallengeStatus
   issuedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  otp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   app?: Prisma.AppUpdateOneWithoutEmailChallengesNestedInput
 }
 
@@ -305,6 +386,9 @@ export type EmailChallengeUncheckedUpdateInput = {
   status?: Prisma.EnumEmailChallengeStatusFieldUpdateOperationsInput | $Enums.EmailChallengeStatus
   issuedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  otp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   appId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -316,6 +400,9 @@ export type EmailChallengeCreateManyInput = {
   status?: $Enums.EmailChallengeStatus
   issuedAt?: Date | string
   expiresAt: Date | string
+  otp?: string | null
+  attempts?: number
+  lockedUntil?: Date | string | null
   appId?: string | null
 }
 
@@ -327,6 +414,9 @@ export type EmailChallengeUpdateManyMutationInput = {
   status?: Prisma.EnumEmailChallengeStatusFieldUpdateOperationsInput | $Enums.EmailChallengeStatus
   issuedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  otp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type EmailChallengeUncheckedUpdateManyInput = {
@@ -337,6 +427,9 @@ export type EmailChallengeUncheckedUpdateManyInput = {
   status?: Prisma.EnumEmailChallengeStatusFieldUpdateOperationsInput | $Enums.EmailChallengeStatus
   issuedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  otp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   appId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -353,7 +446,14 @@ export type EmailChallengeCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   issuedAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
+  otp?: Prisma.SortOrder
+  attempts?: Prisma.SortOrder
+  lockedUntil?: Prisma.SortOrder
   appId?: Prisma.SortOrder
+}
+
+export type EmailChallengeAvgOrderByAggregateInput = {
+  attempts?: Prisma.SortOrder
 }
 
 export type EmailChallengeMaxOrderByAggregateInput = {
@@ -364,6 +464,9 @@ export type EmailChallengeMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   issuedAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
+  otp?: Prisma.SortOrder
+  attempts?: Prisma.SortOrder
+  lockedUntil?: Prisma.SortOrder
   appId?: Prisma.SortOrder
 }
 
@@ -375,7 +478,14 @@ export type EmailChallengeMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   issuedAt?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
+  otp?: Prisma.SortOrder
+  attempts?: Prisma.SortOrder
+  lockedUntil?: Prisma.SortOrder
   appId?: Prisma.SortOrder
+}
+
+export type EmailChallengeSumOrderByAggregateInput = {
+  attempts?: Prisma.SortOrder
 }
 
 export type EmailChallengeListRelationFilter = {
@@ -390,6 +500,14 @@ export type EmailChallengeOrderByRelationAggregateInput = {
 
 export type EnumEmailChallengeStatusFieldUpdateOperationsInput = {
   set?: $Enums.EmailChallengeStatus
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type EmailChallengeCreateNestedManyWithoutAppInput = {
@@ -442,6 +560,9 @@ export type EmailChallengeCreateWithoutAppInput = {
   status?: $Enums.EmailChallengeStatus
   issuedAt?: Date | string
   expiresAt: Date | string
+  otp?: string | null
+  attempts?: number
+  lockedUntil?: Date | string | null
 }
 
 export type EmailChallengeUncheckedCreateWithoutAppInput = {
@@ -452,6 +573,9 @@ export type EmailChallengeUncheckedCreateWithoutAppInput = {
   status?: $Enums.EmailChallengeStatus
   issuedAt?: Date | string
   expiresAt: Date | string
+  otp?: string | null
+  attempts?: number
+  lockedUntil?: Date | string | null
 }
 
 export type EmailChallengeCreateOrConnectWithoutAppInput = {
@@ -491,6 +615,9 @@ export type EmailChallengeScalarWhereInput = {
   status?: Prisma.EnumEmailChallengeStatusFilter<"EmailChallenge"> | $Enums.EmailChallengeStatus
   issuedAt?: Prisma.DateTimeFilter<"EmailChallenge"> | Date | string
   expiresAt?: Prisma.DateTimeFilter<"EmailChallenge"> | Date | string
+  otp?: Prisma.StringNullableFilter<"EmailChallenge"> | string | null
+  attempts?: Prisma.IntFilter<"EmailChallenge"> | number
+  lockedUntil?: Prisma.DateTimeNullableFilter<"EmailChallenge"> | Date | string | null
   appId?: Prisma.StringNullableFilter<"EmailChallenge"> | string | null
 }
 
@@ -502,6 +629,9 @@ export type EmailChallengeCreateManyAppInput = {
   status?: $Enums.EmailChallengeStatus
   issuedAt?: Date | string
   expiresAt: Date | string
+  otp?: string | null
+  attempts?: number
+  lockedUntil?: Date | string | null
 }
 
 export type EmailChallengeUpdateWithoutAppInput = {
@@ -512,6 +642,9 @@ export type EmailChallengeUpdateWithoutAppInput = {
   status?: Prisma.EnumEmailChallengeStatusFieldUpdateOperationsInput | $Enums.EmailChallengeStatus
   issuedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  otp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type EmailChallengeUncheckedUpdateWithoutAppInput = {
@@ -522,6 +655,9 @@ export type EmailChallengeUncheckedUpdateWithoutAppInput = {
   status?: Prisma.EnumEmailChallengeStatusFieldUpdateOperationsInput | $Enums.EmailChallengeStatus
   issuedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  otp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type EmailChallengeUncheckedUpdateManyWithoutAppInput = {
@@ -532,6 +668,9 @@ export type EmailChallengeUncheckedUpdateManyWithoutAppInput = {
   status?: Prisma.EnumEmailChallengeStatusFieldUpdateOperationsInput | $Enums.EmailChallengeStatus
   issuedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  otp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -544,6 +683,9 @@ export type EmailChallengeSelect<ExtArgs extends runtime.Types.Extensions.Intern
   status?: boolean
   issuedAt?: boolean
   expiresAt?: boolean
+  otp?: boolean
+  attempts?: boolean
+  lockedUntil?: boolean
   appId?: boolean
   app?: boolean | Prisma.EmailChallenge$appArgs<ExtArgs>
 }, ExtArgs["result"]["emailChallenge"]>
@@ -556,6 +698,9 @@ export type EmailChallengeSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   status?: boolean
   issuedAt?: boolean
   expiresAt?: boolean
+  otp?: boolean
+  attempts?: boolean
+  lockedUntil?: boolean
   appId?: boolean
   app?: boolean | Prisma.EmailChallenge$appArgs<ExtArgs>
 }, ExtArgs["result"]["emailChallenge"]>
@@ -568,6 +713,9 @@ export type EmailChallengeSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   status?: boolean
   issuedAt?: boolean
   expiresAt?: boolean
+  otp?: boolean
+  attempts?: boolean
+  lockedUntil?: boolean
   appId?: boolean
   app?: boolean | Prisma.EmailChallenge$appArgs<ExtArgs>
 }, ExtArgs["result"]["emailChallenge"]>
@@ -580,10 +728,13 @@ export type EmailChallengeSelectScalar = {
   status?: boolean
   issuedAt?: boolean
   expiresAt?: boolean
+  otp?: boolean
+  attempts?: boolean
+  lockedUntil?: boolean
   appId?: boolean
 }
 
-export type EmailChallengeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "username" | "tokenHash" | "status" | "issuedAt" | "expiresAt" | "appId", ExtArgs["result"]["emailChallenge"]>
+export type EmailChallengeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "username" | "tokenHash" | "status" | "issuedAt" | "expiresAt" | "otp" | "attempts" | "lockedUntil" | "appId", ExtArgs["result"]["emailChallenge"]>
 export type EmailChallengeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   app?: boolean | Prisma.EmailChallenge$appArgs<ExtArgs>
 }
@@ -607,6 +758,9 @@ export type $EmailChallengePayload<ExtArgs extends runtime.Types.Extensions.Inte
     status: $Enums.EmailChallengeStatus
     issuedAt: Date
     expiresAt: Date
+    otp: string | null
+    attempts: number
+    lockedUntil: Date | null
     appId: string | null
   }, ExtArgs["result"]["emailChallenge"]>
   composites: {}
@@ -1039,6 +1193,9 @@ export interface EmailChallengeFieldRefs {
   readonly status: Prisma.FieldRef<"EmailChallenge", 'EmailChallengeStatus'>
   readonly issuedAt: Prisma.FieldRef<"EmailChallenge", 'DateTime'>
   readonly expiresAt: Prisma.FieldRef<"EmailChallenge", 'DateTime'>
+  readonly otp: Prisma.FieldRef<"EmailChallenge", 'String'>
+  readonly attempts: Prisma.FieldRef<"EmailChallenge", 'Int'>
+  readonly lockedUntil: Prisma.FieldRef<"EmailChallenge", 'DateTime'>
   readonly appId: Prisma.FieldRef<"EmailChallenge", 'String'>
 }
     

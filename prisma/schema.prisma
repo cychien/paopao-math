@@ -117,6 +117,11 @@ model EmailChallenge {
   issuedAt  DateTime             @default(now())
   expiresAt DateTime
 
+  // OTP-specific fields
+  otp         String? // Hashed 6-digit OTP code
+  attempts    Int     @default(0) // Number of verification attempts
+  lockedUntil DateTime? // Lockout expiry time for rate limiting
+
   // For customer login - links to the app they're logging into
   appId String?
   app   App?    @relation(fields: [appId], references: [id], onDelete: Cascade)

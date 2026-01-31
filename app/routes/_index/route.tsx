@@ -90,7 +90,7 @@ export default function Index() {
       {/* <PricingSectionNew /> */}
       {/* <CallToActionSection /> */}
       <CallToActionSectionNew />
-      <FooterSection />
+      {/* <FooterSection /> */}
     </div>
   );
 }

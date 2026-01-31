@@ -4,9 +4,10 @@ import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { Menu, X } from "lucide-react";
 import logoSrc from "~/assets/logo-with-text.png";
 import { Button, buttonVariants } from "~/components/ui/Button";
-import { useLocation, Form, Link } from "react-router";
+import { useLocation, Link } from "react-router";
 import { cn } from "~/utils/style";
 import { PlayCircleSolid } from "~/components/icons/PlayCircleSolid";
+import { usePurchase } from "~/hooks/use-purchase";
 
 interface HeaderProps {
   user?: {
@@ -22,6 +23,7 @@ function Header({ user }: HeaderProps) {
   const headerRef = React.useRef<HTMLDivElement>(null);
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+  const { purchase, isLoading } = usePurchase();
 
   return (
     <div
@@ -47,7 +49,7 @@ function Header({ user }: HeaderProps) {
                 <NavigationMenu.Item className="flex items-center space-x-1.5">
                   <NavigationMenu.Link asChild>
                     <Link
-                      to="/learn/preview"
+                      to="/preview"
                       className={cn(
                         "font-medium text-gray-900 group flex items-center gap-1.5 transition-colors text-sm"
                       )}
@@ -57,7 +59,7 @@ function Header({ user }: HeaderProps) {
                           "text-gray-500 group-hover:text-brand-600 transition-colors",
                           {
                             "text-brand-600":
-                              location.pathname.startsWith("/learn/preview"),
+                              location.pathname.startsWith("/preview"),
                           }
                         )}
                       />
@@ -88,7 +90,7 @@ function Header({ user }: HeaderProps) {
             ) : (
               <div className="flex items-center gap-4">
                 <Link
-                  to="/login"
+                  to="/auth/login"
                   className={cn(
                     buttonVariants({ variant: "ghost", size: "lg" }),
                     "hover:bg-gray-900/5"
@@ -96,12 +98,13 @@ function Header({ user }: HeaderProps) {
                 >
                   登入
                 </Link>
-                <Link
-                  to="/purchase"
-                  className={cn(buttonVariants({ size: "lg" }))}
+                <Button
+                  size="lg"
+                  onClick={purchase}
+                  disabled={isLoading}
                 >
-                  立即購買
-                </Link>
+                  {isLoading ? "處理中..." : "立即購買"}
+                </Button>
               </div>
             )}
           </div>
@@ -111,7 +114,7 @@ function Header({ user }: HeaderProps) {
             {!user && (
               <NavigationMenu.Link asChild>
                 <Link
-                  to="/learn/preview"
+                  to="/preview"
                   className={cn(
                     "font-medium text-gray-900 hover:text-gray-900 group flex items-center gap-1.5 transition-colors text-sm"
                   )}
@@ -121,7 +124,7 @@ function Header({ user }: HeaderProps) {
                       "text-gray-400 group-hover:text-brand-600 transition-colors translate-y-px",
                       {
                         "text-brand-600":
-                          location.pathname.startsWith("/learn/preview"),
+                          location.pathname.startsWith("/preview"),
                       }
                     )}
                   />
@@ -195,7 +198,7 @@ function Header({ user }: HeaderProps) {
                           ) : (
                             <NavigationMenu.Link asChild>
                               <Link
-                                to="/login"
+                                to="/auth/login"
                                 className={cn(
                                   buttonVariants({ variant: "link" }),
                                   "-mx-3 block h-full rounded-lg px-3 py-2 font-medium text-text-tertiary hover:bg-bg-primary-hover"
