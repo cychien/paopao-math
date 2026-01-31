@@ -618,8 +618,8 @@ export async function deleteUser(userId: string) {
 ```typescript
 'use server'
 
-import { verifySession } from '~/lib/auth'
-import { unauthorized } from '~/lib/errors'
+import { verifySession } from '@/lib/auth'
+import { unauthorized } from '@/lib/errors'
 
 export async function deleteUser(userId: string) {
   // Always check auth inside the action
@@ -644,7 +644,7 @@ export async function deleteUser(userId: string) {
 ```typescript
 'use server'
 
-import { verifySession } from '~/lib/auth'
+import { verifySession } from '@/lib/auth'
 import { z } from 'zod'
 
 const updateProfileSchema = z.object({
@@ -969,7 +969,7 @@ Use Next.js's `after()` to schedule work that should execute after a response is
 **Incorrect: blocks response**
 
 ```tsx
-import { logUserAction } from '~/app/utils'
+import { logUserAction } from '@/app/utils'
 
 export async function POST(request: Request) {
   // Perform mutation
@@ -991,7 +991,7 @@ export async function POST(request: Request) {
 ```tsx
 import { after } from 'next/server'
 import { headers, cookies } from 'next/headers'
-import { logUserAction } from '~/app/utils'
+import { logUserAction } from '@/app/utils'
 
 export async function POST(request: Request) {
   // Perform mutation
@@ -1188,7 +1188,7 @@ function UserList() {
 **For immutable data:**
 
 ```tsx
-import { useImmutableSWR } from '~/lib/swr'
+import { useImmutableSWR } from '@/lib/swr'
 
 function StaticContent() {
   const { data } = useImmutableSWR('/api/config', fetcher)

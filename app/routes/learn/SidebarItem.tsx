@@ -1,41 +1,49 @@
 import { Link } from "react-router";
-import { Lock } from "~/components/icons/Lock";
-import { SvgProps } from "~/components/icons/types";
-import { Permission, hasPathPermission } from "~/data/permission";
+import { SidebarMenuButton } from "~/components/ui/sidebar";
+import { cn } from "~/utils/style";
+import Icon from "~/components/ui/icon";
+import { IconSvgElement } from "@hugeicons/react";
 
 type SidebarItemProps = {
-  icon: React.ComponentType<SvgProps>;
+  icon: IconSvgElement;
   label: string;
   link: string;
   isActive: boolean;
-  userPermissions: Permission;
 };
 
 function SidebarItem({
-  icon: Icon,
+  icon,
   label,
   link,
   isActive,
-  userPermissions,
 }: SidebarItemProps) {
-  const canAccess = hasPathPermission(userPermissions, link);
-  const isLocked = !canAccess;
-
   return (
-    <Link
-      to={link}
-      data-active={isActive}
-      className="text-sm flex px-3 py-2 group data-[active=true]:bg-gray-200 rounded-md items-center hover:bg-gray-100 transition-colors"
-      prefetch="intent"
+    <SidebarMenuButton
+      asChild
+      isActive={isActive}
+      tooltip={label}
+      className={cn(
+        "relative group/item transition-all duration-200",
+        isActive && "bg-brand-50 hover:bg-brand-100",
+        !isActive && "hover:bg-brand-100/50"
+      )}
     >
-      <div className="flex-1 flex items-center space-x-2">
-        <Icon className="size-5 text-gray-500 group-data-[active=true]:text-brand-600 group-hover:text-brand-600 group-data-[active=true]:scale-110 group-hover:scale-110 transition-all" />
-        <div className="font-medium text-gray-700 group-data-[active=true]:text-gray-900 group-hover:text-gray-700 transition-colors">
+      <Link to={link} prefetch="intent" className="flex items-center gap-2.5 w-full">
+        <Icon icon={icon} className={cn('size-5', isActive
+          ? "text-brand-600 scale-110"
+          : "text-gray-500 group-hover/item:text-brand-500 group-hover/item:scale-105")} />
+        <span
+          className={cn(
+            "flex-1 font-medium transition-colors duration-200",
+            isActive
+              ? "text-gray-900"
+              : "text-gray-700 group-hover/item:text-gray-900"
+          )}
+        >
           {label}
-        </div>
-      </div>
-      {isLocked && <Lock className="size-4 text-[#FBBF24]" />}
-    </Link>
+        </span>
+      </Link>
+    </SidebarMenuButton>
   );
 }
 

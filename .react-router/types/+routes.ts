@@ -20,12 +20,6 @@ type Pages = {
   "/auth/callback/google": {
     params: {};
   };
-  "/api/cache-status": {
-    params: {};
-  };
-  "/learn/content": {
-    params: {};
-  };
   "/api/purchase": {
     params: {};
   };
@@ -50,11 +44,14 @@ type Pages = {
   "/learn": {
     params: {};
   };
-  "/learn/:moduleSlug/:lessonSlug": {
+  "/learn/content/:moduleSlug/:lessonSlug": {
     params: {
       "moduleSlug": string;
       "lessonSlug": string;
     };
+  };
+  "/learn/content": {
+    params: {};
   };
   "/terms": {
     params: {};
@@ -69,7 +66,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/api/webhooks/lemon-squeezy" | "/auth/callback/google" | "/api/cache-status" | "/learn/content" | "/api/purchase" | "/auth/logout" | "/auth/verify" | "/auth/login" | "/preview" | "/privacy" | "/refund" | "/learn" | "/learn/:moduleSlug/:lessonSlug" | "/terms" | "/*";
+    page: "/" | "/api/webhooks/lemon-squeezy" | "/auth/callback/google" | "/api/purchase" | "/auth/logout" | "/auth/verify" | "/auth/login" | "/preview" | "/privacy" | "/refund" | "/learn" | "/learn/content/:moduleSlug/:lessonSlug" | "/learn/content" | "/terms" | "/*";
   };
   "routes/api.webhooks.lemon-squeezy.tsx": {
     id: "routes/api.webhooks.lemon-squeezy";
@@ -78,14 +75,6 @@ type RouteFiles = {
   "routes/auth.callback.google.tsx": {
     id: "routes/auth.callback.google";
     page: "/auth/callback/google";
-  };
-  "routes/api.cache-status.tsx": {
-    id: "routes/api.cache-status";
-    page: "/api/cache-status";
-  };
-  "routes/learn_.content/route.tsx": {
-    id: "routes/learn_.content";
-    page: "/learn/content";
   };
   "routes/api.purchase.tsx": {
     id: "routes/api.purchase";
@@ -121,15 +110,19 @@ type RouteFiles = {
   };
   "routes/learn/route.tsx": {
     id: "routes/learn";
-    page: "/learn" | "/learn/:moduleSlug/:lessonSlug";
+    page: "/learn" | "/learn/content/:moduleSlug/:lessonSlug" | "/learn/content";
   };
-  "routes/learn.$moduleSlug.$lessonSlug/route.tsx": {
-    id: "routes/learn.$moduleSlug.$lessonSlug";
-    page: "/learn/:moduleSlug/:lessonSlug";
+  "routes/learn.content_.$moduleSlug.$lessonSlug._index/route.tsx": {
+    id: "routes/learn.content_.$moduleSlug.$lessonSlug._index";
+    page: "/learn/content/:moduleSlug/:lessonSlug";
   };
-  "routes/learn.$moduleSlug.$lessonSlug._index/route.tsx": {
-    id: "routes/learn.$moduleSlug.$lessonSlug._index";
-    page: "/learn/:moduleSlug/:lessonSlug";
+  "routes/learn.content/route.tsx": {
+    id: "routes/learn.content";
+    page: "/learn/content";
+  };
+  "routes/learn._index/route.tsx": {
+    id: "routes/learn._index";
+    page: "/learn";
   };
   "routes/terms.tsx": {
     id: "routes/terms";
@@ -145,8 +138,6 @@ type RouteModules = {
   "root": typeof import("./app/root.tsx");
   "routes/api.webhooks.lemon-squeezy": typeof import("./app/routes/api.webhooks.lemon-squeezy.tsx");
   "routes/auth.callback.google": typeof import("./app/routes/auth.callback.google.tsx");
-  "routes/api.cache-status": typeof import("./app/routes/api.cache-status.tsx");
-  "routes/learn_.content": typeof import("./app/routes/learn_.content/route.tsx");
   "routes/api.purchase": typeof import("./app/routes/api.purchase.tsx");
   "routes/auth.logout": typeof import("./app/routes/auth.logout.tsx");
   "routes/auth.verify": typeof import("./app/routes/auth.verify.tsx");
@@ -156,8 +147,9 @@ type RouteModules = {
   "routes/_index": typeof import("./app/routes/_index/route.tsx");
   "routes/refund": typeof import("./app/routes/refund.tsx");
   "routes/learn": typeof import("./app/routes/learn/route.tsx");
-  "routes/learn.$moduleSlug.$lessonSlug": typeof import("./app/routes/learn.$moduleSlug.$lessonSlug/route.tsx");
-  "routes/learn.$moduleSlug.$lessonSlug._index": typeof import("./app/routes/learn.$moduleSlug.$lessonSlug._index/route.tsx");
+  "routes/learn.content_.$moduleSlug.$lessonSlug._index": typeof import("./app/routes/learn.content_.$moduleSlug.$lessonSlug._index/route.tsx");
+  "routes/learn.content": typeof import("./app/routes/learn.content/route.tsx");
+  "routes/learn._index": typeof import("./app/routes/learn._index/route.tsx");
   "routes/terms": typeof import("./app/routes/terms.tsx");
   "routes/$": typeof import("./app/routes/$.tsx");
 };

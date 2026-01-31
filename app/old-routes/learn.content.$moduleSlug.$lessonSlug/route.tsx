@@ -1,4 +1,4 @@
-import type { Route } from "./+types/_course.learn.$moduleSlug.$lessonSlug";
+import type { Route } from "./+types/route";
 import { SidebarTrigger } from "~/components/ui/sidebar";
 import { prisma } from "~/services/database/prisma.server";
 import { Separator } from "~/components/ui/separator";
@@ -152,7 +152,6 @@ export default function Page({ loaderData }: Route.ComponentProps) {
     <main className="flex-1 pb-20">
       <div className="sticky top-0 z-10 flex justify-between bg-white/90 px-3 py-2.5 backdrop-blur-sm sm:py-3.5">
         <div className="flex items-center gap-2">
-          <SidebarTrigger className="cursor-pointer" />
           <Separator
             orientation="vertical"
             className="data-[orientation=vertical]:h-4"
@@ -171,19 +170,19 @@ export default function Page({ loaderData }: Route.ComponentProps) {
             <span>{lesson?.title}</span>
           </div>
         </div>
-        {!isFree && (
+        {/* {!isFree && (
           <>
             {/* Mobile hamburger menu */}
             <MobileNav isCustomer={isCustomer} />
           </>
-        )}
+        )} */}
         {/* Desktop navigation */}
-        <div className="hidden items-center gap-5 px-3 font-medium text-gray-700 sm:flex">
+        {/* <div className="hidden items-center gap-5 px-3 font-medium text-gray-700 sm:flex">
           {!isCustomer && !isFree && (
             <>
               <div className="text-sm">
                 <InternalLink
-                  to="/login"
+                  to="/auth/login"
                   className="hover:underline hover:underline-offset-4"
                 >
                   登入
@@ -202,16 +201,16 @@ export default function Page({ loaderData }: Route.ComponentProps) {
           {isCustomer && !isFree && (
             <div className="text-sm">
               <InternalLink
-                to="/logout"
+                to="/auth/logout"
                 className="hover:underline hover:underline-offset-4"
               >
                 登出
               </InternalLink>
             </div>
           )}
-        </div>
+        </div> */}
       </div>
       <Outlet />
-    </main>
+    </main >
   );
 }

@@ -150,3 +150,58 @@ export async function checkIsCustomer({
 
   return !!customer;
 }
+
+export async function getCustomerData({
+  slug,
+  request,
+}: {
+  slug: string;
+  request: Request;
+}): Promise<{
+  customerId: string;
+  appId: string;
+  email: string;
+  name: string | null;
+  isFree: boolean;
+} | null> {
+  const { customerId, appId } = await getCustomerSession(request);
+
+  if (!customerId || !appId) {
+    return null;
+  }
+
+  // Get app info including isFree flag
+  const app = await prisma.app.findUnique({
+    where: { slug },
+    select: { id: true, isFree: true },
+  });
+
+  if (!app || app.id !== appId) {
+    return null;
+  }
+
+  // Get customer data
+  const customer = await prisma.appCustomer.findFirst({
+    where: {
+      id: customerId,
+      appId: app.id,
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+    },
+  });
+
+  if (!customer) {
+    return null;
+  }
+
+  return {
+    customerId: customer.id,
+    appId: app.id,
+    email: customer.email,
+    name: customer.name,
+    isFree: app.isFree,
+  };
+}

@@ -41,7 +41,7 @@ function FooterSection() {
                 { label: "免費試讀", href: "/preview" },
                 // { label: "課程大綱", href: "/learn" },
                 // { label: "購買課程", href: "/purchase" },
-                { label: "登入", href: "/login" },
+                { label: "登入", href: "/auth/login" },
               ].map((link) => (
                 <li key={link.label}>
                   <Link

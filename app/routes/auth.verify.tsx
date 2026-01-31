@@ -14,6 +14,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const challengeId = url.searchParams.get("c");
   const otp = url.searchParams.get("otp");
+  const redirectTo = url.searchParams.get("redirectTo") || "/learn";
 
   if (!challengeId || !otp) {
     return redirect("/auth/login?error=invalid_verification");
@@ -50,8 +51,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   console.log(`✅ Login successful for: ${result.email}`);
 
-  // Redirect to course home with session cookie
-  return redirect("/learn", {
+  // Redirect to original destination or course home with session cookie
+  return redirect(redirectTo, {
     headers: {
       "Set-Cookie": newCookie,
     },

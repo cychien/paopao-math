@@ -1,5 +1,4 @@
 import { prisma } from "./prisma.server";
-import { withCache, cacheKeys } from "../cache/redis";
 
 /**
  * 處理 Lemon Squeezy 訂單創建 webhook
@@ -116,29 +115,23 @@ export async function checkCustomerAccess(
   appId: string,
   email: string
 ): Promise<boolean> {
-  return withCache(
-    cacheKeys.userAccess(email),
-    async () => {
-      try {
-        const customer = await prisma.appCustomer.findFirst({
-          where: {
-            appId,
-            email,
-          },
-          include: {
-            lemonSqueezyCustomer: true,
-          },
-        });
+  try {
+    const customer = await prisma.appCustomer.findFirst({
+      where: {
+        appId,
+        email,
+      },
+      include: {
+        lemonSqueezyCustomer: true,
+      },
+    });
 
-        // 有 AppCustomer 且有 LemonSqueezyCustomer 記錄表示已購買
-        return !!customer?.lemonSqueezyCustomer;
-      } catch (error) {
-        console.error("檢查用戶權限失敗:", error);
-        return false;
-      }
-    },
-    600 // 快取 10 分鐘
-  );
+    // 有 AppCustomer 且有 LemonSqueezyCustomer 記錄表示已購買
+    return !!customer?.lemonSqueezyCustomer;
+  } catch (error) {
+    console.error("檢查用戶權限失敗:", error);
+    return false;
+  }
 }
 
 /**
@@ -159,33 +152,27 @@ export async function findPurchaseByLemonSqueezyId(lemonsqueezyId: string) {
 }
 
 /**
- * 獲取購買統計信息（快取版本）
+ * 獲取購買統計信息
  */
 export async function getPurchaseStats() {
-  return withCache(
-    cacheKeys.purchaseStats(),
-    async () => {
-      try {
-        const [totalCustomers, activeCustomers] = await Promise.all([
-          prisma.appCustomer.count(),
-          prisma.appCustomer.count({
-            where: {
-              lemonSqueezyCustomer: {
-                isNot: null,
-              },
-            },
-          }),
-        ]);
+  try {
+    const [totalCustomers, activeCustomers] = await Promise.all([
+      prisma.appCustomer.count(),
+      prisma.appCustomer.count({
+        where: {
+          lemonSqueezyCustomer: {
+            isNot: null,
+          },
+        },
+      }),
+    ]);
 
-        return {
-          totalCustomers,
-          activeCustomers,
-        };
-      } catch (error) {
-        console.error("獲取購買統計失敗:", error);
-        throw new Error("獲取統計信息失敗");
-      }
-    },
-    1800 // 快取 30 分鐘
-  );
+    return {
+      totalCustomers,
+      activeCustomers,
+    };
+  } catch (error) {
+    console.error("獲取購買統計失敗:", error);
+    throw new Error("獲取統計信息失敗");
+  }
 }

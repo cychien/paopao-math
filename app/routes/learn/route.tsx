@@ -1,80 +1,113 @@
-import type { LoaderFunctionArgs } from "react-router";
-import { Outlet, useLocation, useLoaderData, Link } from "react-router";
-import { CheckDone } from "~/components/icons/CheckDone";
-import { File } from "~/components/icons/File";
-import { HomeLine } from "~/components/icons/HomeLine";
+import { Outlet, useLocation } from "react-router";
 import { SidebarItem } from "./SidebarItem";
-import { PlayCircle } from "~/components/icons/PlayCircle";
 import { cn } from "~/utils/style";
-import { LayersTwo } from "~/components/icons/LayersTwo";
-import { getUserPermissionData } from "~/services/auth/permissions";
-import type { Permission } from "~/data/permission";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarProvider,
+  useSidebar,
+} from "~/components/ui/sidebar";
+import logoSrc from "~/assets/logo.png";
+import { Home01Icon, PanelLeftOpenIcon, PanelRightCloseIcon, SchoolIcon } from "@hugeicons/core-free-icons";
+import Icon from "~/components/ui/icon";
+import { Button } from "~/components/ui/Button";
+import { Separator } from "~/components/ui/separator";
+import { authMiddleware } from "~/middleware/auth.middleware";
 
-type LoaderData = {
-  userPermissions: Permission;
-  hasPurchase: boolean;
-};
+export const middleware = [authMiddleware];
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { permissions, hasPurchase } = await getUserPermissionData(request);
-
-  return {
-    userPermissions: permissions,
-    hasPurchase,
-  };
+export const loader = async () => {
+  // Customer data is now loaded by middleware and available in context
+  return {};
 };
 
 export default function Layout() {
   const location = useLocation();
-  const { userPermissions } = useLoaderData<LoaderData>();
 
   // 基本導航項目
   const navigations = [
-    { icon: HomeLine, label: "總覽", link: "/learn" },
-    { icon: PlayCircle, label: "課程", link: "/learn/content" },
-    { icon: File, label: "模擬試題", link: "/learn/exams" },
-    { icon: LayersTwo, label: "歷屆聯考題", link: "/learn/entrance-exams" },
-    { icon: CheckDone, label: "問答討論區", link: "/learn/curated" },
+    { icon: SchoolIcon, label: "主課程", link: "/learn/content", exact: false },
+    // { icon: File, label: "模擬試題", link: "/learn/exams" },
+    // { icon: LayersTwo, label: "歷屆聯考題", link: "/learn/entrance-exams" },
+    // { icon: CheckDone, label: "問答討論區", link: "/learn/curated" },
   ];
+
+  const isActive = (link: string, exact?: boolean) => {
+    if (exact) {
+      return location.pathname === link;
+    }
+    return location.pathname.startsWith(link);
+  };
 
   return (
     <>
-      <div className="h-full hidden lg:block bg-gray-100">
-        <div className="container mx-auto h-full">
-          <div className="h-full">
-            <div className="flex h-full">
-              <aside className="w-[240px] pr-6 py-9 h-full sticky top-0 bottom-0 self-start max-h-[calc(100dvh)] flex flex-col">
-                <div className="text-gray-700 text-sm font-medium">
-                  學測總複習班
-                </div>
+      {/* Desktop Layout with Sidebar */}
+      <div className="hidden lg:block">
+        <SidebarProvider defaultOpen={true}>
+          <Sidebar collapsible="icon" className="border-r">
+            <SidebarHeader>
+              <SidebarHeaderContent />
+            </SidebarHeader>
 
-                {/* 基本導航項目 */}
-                <div className="mt-4 space-y-1 -mx-3 flex-1">
-                  {navigations.map((nav) => (
-                    <SidebarItem
-                      key={nav.label}
-                      icon={nav.icon}
-                      label={nav.label}
-                      link={nav.link}
-                      isActive={location.pathname.startsWith(nav.link)}
-                      userPermissions={userPermissions}
-                    />
-                  ))}
-                </div>
-              </aside>
-
-              {/* <div className="w-8 col-start-2 row-span-5 row-start-1 bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5" /> */}
-
-              <main className="border-x border-gray-200 flex-1 px-12 py-9 bg-white shadow-sm">
-                <Outlet />
-              </main>
+            <div>
+              <Separator className='bg-gray-200' />
             </div>
-          </div>
-        </div>
+
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarMenuItem>
+                  <SidebarItem
+                    icon={Home01Icon}
+                    label='總覽'
+                    link='/learn'
+                    isActive={isActive('/learn', true)}
+                  />
+                </SidebarMenuItem>
+
+                <SidebarGroupLabel className="text-xs uppercase tracking-wider text-gray-500 font-semibold mt-3">
+                  基礎知識
+                </SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {navigations.map((nav) => (
+                      <SidebarMenuItem key={nav.label}>
+                        <SidebarItem
+                          icon={nav.icon}
+                          label={nav.label}
+                          link={nav.link}
+                          isActive={isActive(nav.link, nav.exact)}
+                        />
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
+          </Sidebar>
+
+          <SidebarInset className="bg-white">
+            {/* <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-2 border-b bg-white px-4">
+              <SidebarTrigger />
+              <Separator orientation="vertical" className="h-6" />
+              <div className="flex-1" />
+            </header> */}
+            <main className="flex-1">
+              <Outlet />
+            </main>
+          </SidebarInset>
+        </SidebarProvider>
       </div>
 
+      {/* Mobile Layout */}
       <div className="lg:hidden">
-        <div className="border-b border-gray-200 overflow-x-auto sticky top-0 bg-white z-10">
+        <div className="border-b border-gray-200 overflow-x-auto sticky top-0 bg-white z-10 shadow-sm">
           <div className="container mx-auto flex space-x-3 sm:space-x-4 md:space-x-4">
             {navigations.map((nav) => (
               <a
@@ -83,21 +116,15 @@ export default function Layout() {
                 className="relative px-1 py-4 font-medium text-gray-500 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-gray-900 group shrink-0 text-sm"
               >
                 <span className="flex items-center space-x-1.5">
-                  <nav.icon
-                    className={cn(
-                      "size-5 text-gray-400 group-hover:text-brand-500 transition-colors",
-                      {
-                        "text-brand-500": location.pathname.startsWith(
-                          nav.link
-                        ),
-                      }
-                    )}
-                  />
+                  <Icon icon={nav.icon}
+                    className={cn('size-5', isActive(nav.link, nav.exact)
+                      ? "text-brand-600 scale-110"
+                      : "text-gray-500 group-hover/item:text-brand-500 group-hover/item:scale-105")} />
                   <span
                     className={cn(
                       "group-hover:text-gray-700 transition-colors",
                       {
-                        "text-gray-700": location.pathname.startsWith(nav.link),
+                        "text-gray-700": isActive(nav.link, nav.exact),
                       }
                     )}
                   >
@@ -105,20 +132,71 @@ export default function Layout() {
                   </span>
                 </span>
 
-                {location.pathname.startsWith(nav.link) && (
-                  <div className="absolute inset-x-0 bottom-0 h-[3px] bg-brand-500" />
+                {isActive(nav.link, nav.exact) && (
+                  <div className="absolute inset-x-0 bottom-0 h-[3px] bg-brand-500 rounded-t-full" />
                 )}
               </a>
             ))}
           </div>
         </div>
-        <div className="col-start-2 row-span-5 row-start-1 bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed [--pattern-fg:var(--color-gray-950)]/5 h-8" />
-        <main className="isolate border-t border-gray-200">
-          <div className="container mx-auto py-6">
+        <div className="bg-gradient-to-b from-gray-50 to-transparent h-8" />
+        <main className="isolate">
+          <div className="container mx-auto py-6 px-4">
             <Outlet />
           </div>
         </main>
       </div>
     </>
   );
+}
+
+function SidebarHeaderContent() {
+  const { open, toggleSidebar } = useSidebar();
+
+  if (open) {
+    return (
+      <div className="flex flex-row justify-between items-center">
+        <div className="flex items-center gap-2.5 px-2 py-1" >
+          <img src={logoSrc} alt="logo" className="h-7 shrink-0" />
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <span className="truncate font-semibold text-gray-900">
+              學測總複習班
+            </span>
+            <span className="truncate text-xs text-gray-500">
+              數學課程
+            </span>
+          </div>
+        </div>
+        <Button
+          data-sidebar="trigger"
+          data-slot="sidebar-trigger"
+          variant="ghost"
+          size="icon"
+          className={cn("size-7")}
+          onClick={() => {
+            toggleSidebar();
+          }}
+        >
+          <Icon icon={PanelLeftOpenIcon} />
+          <span className="sr-only">Toggle Sidebar</span>
+        </Button>
+      </div>
+    )
+  }
+
+  return (
+    <Button
+      data-sidebar="trigger"
+      data-slot="sidebar-trigger"
+      variant="ghost"
+      size="icon"
+      className='size-8'
+      onClick={() => {
+        toggleSidebar();
+      }}
+    >
+      <Icon icon={PanelRightCloseIcon} className='size-4.5' />
+      <span className="sr-only">Toggle Sidebar</span>
+    </Button>
+  )
 }

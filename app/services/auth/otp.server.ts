@@ -1,6 +1,5 @@
 import { randomInt , createHash as createHashCrypto } from "node:crypto";
 import { prisma } from "~/services/database/prisma.server";
-import { cache } from "~/services/cache/redis";
 
 const DEFAULT_APP_SLUG = "paopao-math";
 
@@ -27,69 +26,12 @@ export function generateOTP(): string {
 }
 
 /**
- * Get rate limit cache key
- */
-function getRateLimitKey(email: string, ipAddress: string): string {
-  return `otp_attempts:${email}:${ipAddress}`;
-}
-
-/**
- * Check if email/IP is rate limited
- */
-export async function checkRateLimit(
-  email: string,
-  ipAddress: string
-): Promise<{ allowed: boolean; remainingAttempts?: number; lockedUntil?: Date }> {
-  const cacheKey = getRateLimitKey(email, ipAddress);
-  const attempts = (await cache.get<number>(cacheKey)) || 0;
-
-  if (attempts >= MAX_ATTEMPTS) {
-    // Calculate lockout end time
-    const lockedUntil = new Date(Date.now() + LOCKOUT_DURATION_MINUTES * 60 * 1000);
-    return {
-      allowed: false,
-      lockedUntil,
-    };
-  }
-
-  return {
-    allowed: true,
-    remainingAttempts: MAX_ATTEMPTS - attempts,
-  };
-}
-
-/**
- * Increment rate limit counter
- */
-async function incrementRateLimit(email: string, ipAddress: string): Promise<void> {
-  const cacheKey = getRateLimitKey(email, ipAddress);
-  const attempts = (await cache.get<number>(cacheKey)) || 0;
-  await cache.set(cacheKey, attempts + 1, LOCKOUT_DURATION_MINUTES * 60);
-}
-
-/**
- * Reset rate limit counter
- */
-async function resetRateLimit(email: string, ipAddress: string): Promise<void> {
-  const cacheKey = getRateLimitKey(email, ipAddress);
-  await cache.del(cacheKey);
-}
-
-/**
  * Create OTP challenge for email login
  */
 export async function createOTPChallenge(
   email: string,
   ipAddress: string = "unknown"
 ): Promise<{ challengeId: string; otp: string; expiresAt: Date }> {
-  // Check rate limit before creating challenge
-  const rateLimit = await checkRateLimit(email, ipAddress);
-  if (!rateLimit.allowed) {
-    throw new Error(
-      `太多嘗試次數，請在 ${LOCKOUT_DURATION_MINUTES} 分鐘後再試`
-    );
-  }
-
   // Get the app
   const app = await prisma.app.findUnique({
     where: { slug: DEFAULT_APP_SLUG },
@@ -220,29 +162,11 @@ export async function verifyOTP(
     };
   }
 
-  // Check rate limit
-  const rateLimit = await checkRateLimit(challenge.email, ipAddress);
-  if (!rateLimit.allowed) {
-    // Lock the challenge
-    await prisma.emailChallenge.update({
-      where: { id: challengeId },
-      data: {
-        status: "LOCKED",
-        lockedUntil: new Date(Date.now() + LOCKOUT_DURATION_MINUTES * 60 * 1000),
-      },
-    });
-    return {
-      success: false,
-      error: `太多錯誤嘗試，請在 ${LOCKOUT_DURATION_MINUTES} 分鐘後再試`,
-    };
-  }
-
   // Verify OTP
   const otpHash = createHash(otp);
   if (challenge.otp !== otpHash) {
     // Increment attempts
     const newAttempts = challenge.attempts + 1;
-    await incrementRateLimit(challenge.email, ipAddress);
 
     // Check if we should lock the challenge
     if (newAttempts >= MAX_ATTEMPTS) {
@@ -277,9 +201,6 @@ export async function verifyOTP(
     where: { id: challengeId },
     data: { status: "CONSUMED" },
   });
-
-  // Reset rate limit for this email/IP
-  await resetRateLimit(challenge.email, ipAddress);
 
   // Get the customer
   const customer = await prisma.appCustomer.findFirst({

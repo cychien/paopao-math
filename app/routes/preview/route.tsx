@@ -1,11 +1,11 @@
 import { useLoaderData, Link } from "react-router";
 import { getCourseByAppSlug } from "~/operations/get-course-by-app-slug";
-import { Lesson } from "./components/Lesson";
+import { Lesson } from "~/components/course/Lesson";
 import { Button } from "~/components/ui/Button/Button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Icon from "~/components/ui/icon";
 import { SparklesIcon } from "@hugeicons/core-free-icons";
-import { ModuleConnector } from "./components/ModuleConnector";
+import { ModuleConnector } from "~/components/course/ModuleConnector";
 import { usePurchase } from "~/hooks/use-purchase";
 
 // Default app slug for single-tenant mode

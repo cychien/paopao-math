@@ -77,7 +77,7 @@ export function Lesson({ lesson, index, isPreview = false }: LessonProps) {
               to={`/learn/content/${lesson.slug}/${chapter.slug}`}
               className={cn(
                 "group flex items-center justify-between gap-4 py-2.5 px-3 rounded-md",
-                "hover:bg-brand-50 border border-transparent hover:border-brand-200"
+                "hover:bg-blue-50 border border-transparent hover:border-blue-200"
               )}
             >
               <div className="flex items-start gap-3 flex-1 min-w-0">

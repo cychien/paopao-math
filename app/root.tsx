@@ -74,6 +74,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const loaderData = useLoaderData<typeof loader>();
   const location = useLocation();
 
+  // Hide header and footer for /learn routes (student-only pages)
+  const hideHeaderFooter = location.pathname.startsWith("/learn");
+
   return (
     <html lang="en">
       <head>
@@ -90,9 +93,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
               wide: location.pathname.startsWith("/course"),
             })}
           >
-            <Header user={loaderData?.user ?? null} />
+            {!hideHeaderFooter && <Header user={loaderData?.user ?? null} />}
             <div className="flex-1">{children}</div>
-            <FooterSection />
+            {!hideHeaderFooter && <FooterSection />}
           </div>
         </FlashProvider>
         <ScrollRestoration />

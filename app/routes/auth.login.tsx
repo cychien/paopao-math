@@ -114,6 +114,7 @@ export default function LoginPage() {
   // Get error from URL params (from verify redirect)
   const urlError = searchParams.get("error");
   const urlChallengeId = searchParams.get("c");
+  const redirectTo = searchParams.get("redirectTo");
   // const urlEmail = searchParams.get("email");
 
   // Initialize state based on URL params to avoid flash
@@ -145,11 +146,18 @@ export default function LoginPage() {
   // Auto-submit when OTP is complete
   useEffect(() => {
     if (otp.length === 6 && challengeId) {
-      // Redirect to verify with OTP
-      const verifyUrl = `/auth/verify?c=${challengeId}&otp=${otp}`;
+      // Redirect to verify with OTP and preserve redirectTo
+      const params = new URLSearchParams({
+        c: challengeId,
+        otp: otp,
+      });
+      if (redirectTo) {
+        params.set("redirectTo", redirectTo);
+      }
+      const verifyUrl = `/auth/verify?${params.toString()}`;
       window.location.href = verifyUrl;
     }
-  }, [otp, challengeId]);
+  }, [otp, challengeId, redirectTo]);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value.trim());

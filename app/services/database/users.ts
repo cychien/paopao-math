@@ -1,5 +1,4 @@
 import { prisma } from "./prisma.server";
-import { withCache, cacheKeys, cache } from "../cache/redis";
 
 /**
  * 根據 email 創建或獲取 workspace 用戶
@@ -29,30 +28,24 @@ export async function createOrGetUser(email: string, name?: string) {
 }
 
 /**
- * 根據 email 獲取 workspace 用戶（快取版本）
+ * 根據 email 獲取 workspace 用戶
  */
 export async function getUserByEmail(email: string) {
-  return withCache(
-    cacheKeys.userWithPurchases(email), // 保持相同的 cache key
-    async () => {
-      try {
-        return await prisma.user.findUnique({
-          where: { email },
+  try {
+    return await prisma.user.findUnique({
+      where: { email },
+      include: {
+        memberships: {
           include: {
-            memberships: {
-              include: {
-                workspace: true,
-              },
-            },
+            workspace: true,
           },
-        });
-      } catch (error) {
-        console.error("獲取用戶失敗:", error);
-        throw new Error("獲取用戶數據失敗");
-      }
-    },
-    300 // 快取 5 分鐘
-  );
+        },
+      },
+    });
+  } catch (error) {
+    console.error("獲取用戶失敗:", error);
+    throw new Error("獲取用戶數據失敗");
+  }
 }
 
 /**

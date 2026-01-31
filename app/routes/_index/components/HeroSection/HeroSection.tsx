@@ -90,7 +90,7 @@ function HeroSection() {
           >
             多年暢銷參考書作者親自編授，
             <br className="hidden sm:inline" />
-            濃縮 30 年教學精華，用最少的時間，換取最高的分數。
+            濃縮 30 年教學精華，用最少的時間，換取最高的分數
           </motion.p>
 
           {/* CTA Buttons */}
