@@ -7,7 +7,7 @@ import { usePurchase } from "~/hooks/use-purchase";
 
 function PricingCard() {
   const { purchase, isLoading } = usePurchase();
-  
+
   const features = [
     "超過 200 部詳解影片",
     "實體學習參考書",
@@ -15,6 +15,7 @@ function PricingCard() {
     "學習進度規劃表",
     "歷屆大考試題及講解",
     "考前模擬測驗",
+    "免費加入互動討論區"
   ];
 
   return (
@@ -35,7 +36,7 @@ function PricingCard() {
               <Sparkles className="w-4 h-4" />
               早鳥限定
             </span>
-            <span className="text-sm text-gray-400 font-medium">省 NT$3,546</span>
+            <span className="text-sm text-gray-400 font-medium">省 NT$2,599</span>
           </div>
 
           {/* Title and Price */}
@@ -45,10 +46,10 @@ function PricingCard() {
               <p className="text-gray-500 mt-2">解鎖全課程與未來功能更新</p>
             </div>
             <div className="text-right">
-              <div className="text-gray-400 text-sm line-through font-medium">NT$ 4,995</div>
+              <div className="text-gray-400 text-sm line-through font-medium">NT$ 5,499</div>
               <div className="flex items-baseline gap-1 justify-end">
                 <span className="text-2xl font-bold text-gray-900">NT$</span>
-                <span className="text-5xl font-bold text-gray-900 tracking-tight">1,449</span>
+                <span className="text-5xl font-bold text-gray-900 tracking-tight">2,900</span>
               </div>
             </div>
           </div>
@@ -79,8 +80,8 @@ function PricingCard() {
         <div className="my-8 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
 
         {/* CTA */}
-        <Button 
-          className="relative z-10 w-full h-14 text-lg font-semibold rounded-xl shadow-lg shadow-brand-600/20 hover:shadow-brand-600/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2" 
+        <Button
+          className="relative z-10 w-full h-14 text-lg font-semibold rounded-xl shadow-lg shadow-brand-600/20 hover:shadow-brand-600/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2"
           size="lg"
           onClick={purchase}
           disabled={isLoading}

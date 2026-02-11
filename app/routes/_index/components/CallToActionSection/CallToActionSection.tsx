@@ -64,10 +64,10 @@ function CallToActionSection() {
                   <span className="w-2 h-2 rounded-full bg-green-500" />
                   7 天無條件退款
                 </span>
-                <span className="flex items-center gap-2">
+                {/* <span className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-500" />
                   一次購買終身使用
-                </span>
+                </span> */}
                 <span className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-500" />
                   持續更新內容

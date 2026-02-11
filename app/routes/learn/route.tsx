@@ -16,7 +16,7 @@ import {
   useSidebar,
 } from "~/components/ui/sidebar";
 import logoSrc from "~/assets/logo.png";
-import { Home01Icon, Logout03Icon, PanelLeftOpenIcon, PanelRightCloseIcon, SchoolIcon } from "@hugeicons/core-free-icons";
+import { EnergyIcon, Home01Icon, Logout03Icon, PanelLeftOpenIcon, PanelRightCloseIcon, SchoolIcon, Share07Icon, StarCircleIcon, StarIcon, Target02Icon } from "@hugeicons/core-free-icons";
 import Icon from "~/components/ui/icon";
 import { Button } from "~/components/ui/Button";
 import { Separator } from "~/components/ui/separator";
@@ -35,6 +35,9 @@ export default function Layout() {
   // 基本導航項目
   const navigations = [
     { icon: SchoolIcon, label: "主課程", link: "/learn/content", exact: false },
+    { icon: StarIcon, label: "好題分享", link: "/learn/vault", exact: true },
+    { icon: Share07Icon, label: "歷屆學測試題", link: "/learn/gsat", exact: true },
+    { icon: Target02Icon, label: "仿真模擬考題", link: "/learn/exams", exact: true },
     // { icon: File, label: "模擬試題", link: "/learn/exams" },
     // { icon: LayersTwo, label: "歷屆聯考題", link: "/learn/entrance-exams" },
     // { icon: CheckDone, label: "問答討論區", link: "/learn/curated" },

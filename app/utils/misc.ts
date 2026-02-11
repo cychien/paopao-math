@@ -58,4 +58,25 @@ function getErrorMessage(error: unknown) {
   return "Unknown Error";
 }
 
-export { getChineseNumber, getErrorMessage };
+/**
+ * Get the origin URL with correct protocol (https in production)
+ * Handles cases where app is behind a reverse proxy/load balancer
+ */
+function getOriginUrl(request: Request): string {
+  const url = new URL(request.url);
+
+  return process.env.NODE_ENV === "production" ? "https://paopao-math.com" : `${url.protocol}//${url.host}`;
+  
+  // // Check for forwarded protocol header (set by proxies like Fly.io, nginx, etc.)
+  // const forwardedProto = process.env.NODE_ENV === "production" ? "https" : url.protocol.replace(":", "");
+  // const forwardedHost = request.headers.get("x-forwarded-host");
+  
+  // if (forwardedProto && forwardedHost) {
+  //   return `${forwardedProto}://${forwardedHost}`;
+  // }
+  
+  // // Fallback to request URL origin
+  // return url.origin;
+}
+
+export { getChineseNumber, getErrorMessage, getOriginUrl };

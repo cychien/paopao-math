@@ -9,6 +9,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "~/components/ui/in
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "~/components/ui/input-otp";
 import { createOTPChallenge } from "~/services/auth/otp.server";
 import { sendOTPEmail } from "~/services/email/otp-email";
+import { getOriginUrl } from "~/utils/misc";
 
 // Social Icons
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -38,9 +39,10 @@ export const loader = async ({ request }: { request: Request }) => {
   }
 
   // Build Google OAuth URL for client
-  const url = new URL(request.url);
+  // Use getOriginUrl to ensure correct protocol (https) in production
+  const origin = getOriginUrl(request);
   const googleClientId = process.env.GOOGLE_CLIENT_ID || "";
-  const redirectUri = `${url.origin}/auth/callback/google`;
+  const redirectUri = `${origin}/auth/callback/google`;
 
   return { googleClientId, redirectUri };
 };

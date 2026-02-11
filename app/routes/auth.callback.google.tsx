@@ -9,6 +9,7 @@ import {
   createCustomerSession,
   customerSessionStorage,
 } from "~/services/customer-session.server";
+import { getOriginUrl } from "~/utils/misc";
 
 const DEFAULT_APP_SLUG = "paopao-math";
 
@@ -28,7 +29,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
 
   // Get the redirect URI (must match what was used in the authorization request)
-  const redirectUri = `${url.origin}/auth/callback/google`;
+  // Use getOriginUrl to ensure correct protocol (https) in production
+  const origin = getOriginUrl(request);
+  const redirectUri = `${origin}/auth/callback/google`;
 
   // Exchange code for tokens
   const tokens = await exchangeCodeForTokens(code, redirectUri);

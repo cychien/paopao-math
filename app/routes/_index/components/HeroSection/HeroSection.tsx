@@ -68,7 +68,7 @@ function HeroSection() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-600"></span>
             </span>
             <span className="text-sm font-semibold text-brand-800">
-              2025 學測最新版
+              2026 學測最新版
             </span>
           </div>
 

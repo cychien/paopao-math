@@ -56,6 +56,18 @@ type Pages = {
   "/learn/content": {
     params: {};
   };
+  "/learn/exams": {
+    params: {};
+  };
+  "/learn/vault": {
+    params: {};
+  };
+  "/learn/gsat": {
+    params: {};
+  };
+  "/learn/mock": {
+    params: {};
+  };
   "/terms": {
     params: {};
   };
@@ -69,7 +81,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/api/webhooks/lemon-squeezy" | "/auth/callback/google" | "/api/progress" | "/api/purchase" | "/auth/logout" | "/auth/verify" | "/auth/login" | "/preview" | "/privacy" | "/refund" | "/learn" | "/learn/content/:moduleSlug/:lessonSlug" | "/learn/content" | "/terms" | "/*";
+    page: "/" | "/api/webhooks/lemon-squeezy" | "/auth/callback/google" | "/api/progress" | "/api/purchase" | "/auth/logout" | "/auth/verify" | "/auth/login" | "/preview" | "/privacy" | "/refund" | "/learn" | "/learn/content/:moduleSlug/:lessonSlug" | "/learn/content" | "/learn/exams" | "/learn/vault" | "/learn/gsat" | "/learn/mock" | "/terms" | "/*";
   };
   "routes/api.webhooks.lemon-squeezy.tsx": {
     id: "routes/api.webhooks.lemon-squeezy";
@@ -117,7 +129,7 @@ type RouteFiles = {
   };
   "routes/learn/route.tsx": {
     id: "routes/learn";
-    page: "/learn" | "/learn/content/:moduleSlug/:lessonSlug" | "/learn/content";
+    page: "/learn" | "/learn/content/:moduleSlug/:lessonSlug" | "/learn/content" | "/learn/exams" | "/learn/vault" | "/learn/gsat" | "/learn/mock";
   };
   "routes/learn.content_.$moduleSlug.$lessonSlug._index/route.tsx": {
     id: "routes/learn.content_.$moduleSlug.$lessonSlug._index";
@@ -130,6 +142,22 @@ type RouteFiles = {
   "routes/learn._index/route.tsx": {
     id: "routes/learn._index";
     page: "/learn";
+  };
+  "routes/learn.exams.tsx": {
+    id: "routes/learn.exams";
+    page: "/learn/exams";
+  };
+  "routes/learn.vault.tsx": {
+    id: "routes/learn.vault";
+    page: "/learn/vault";
+  };
+  "routes/learn.gsat.tsx": {
+    id: "routes/learn.gsat";
+    page: "/learn/gsat";
+  };
+  "routes/learn.mock.tsx": {
+    id: "routes/learn.mock";
+    page: "/learn/mock";
   };
   "routes/terms.tsx": {
     id: "routes/terms";
@@ -158,6 +186,10 @@ type RouteModules = {
   "routes/learn.content_.$moduleSlug.$lessonSlug._index": typeof import("./app/routes/learn.content_.$moduleSlug.$lessonSlug._index/route.tsx");
   "routes/learn.content": typeof import("./app/routes/learn.content/route.tsx");
   "routes/learn._index": typeof import("./app/routes/learn._index/route.tsx");
+  "routes/learn.exams": typeof import("./app/routes/learn.exams.tsx");
+  "routes/learn.vault": typeof import("./app/routes/learn.vault.tsx");
+  "routes/learn.gsat": typeof import("./app/routes/learn.gsat.tsx");
+  "routes/learn.mock": typeof import("./app/routes/learn.mock.tsx");
   "routes/terms": typeof import("./app/routes/terms.tsx");
   "routes/$": typeof import("./app/routes/$.tsx");
 };

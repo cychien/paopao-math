@@ -3,3 +3,9 @@ node_modules
 /.cache
 /build
 .env
+
+# Prisma generated files - will be regenerated in Docker
+/.generated/
+.generated/
+/generated/prisma
+app/services/database/.generated/

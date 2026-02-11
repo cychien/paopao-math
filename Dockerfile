@@ -19,25 +19,38 @@ RUN npm install -g yarn@$YARN_VERSION --force
 FROM base AS build
 
 # Install packages needed to build node modules
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
+RUN apt-get update \
+    -o Acquire::ForceIPv4=true \
+    -o Acquire::Retries=3 \
+ && apt-get install -y --no-install-recommends \
+    build-essential node-gyp pkg-config python-is-python3 openssl \
+ && rm -rf /var/lib/apt/lists/*
+
 
 # Install node modules
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --production=false
 
-# Copy application code
+# Copy application code (excluding .generated from .dockerignore)
 COPY . .
 
-# Build application
-RUN yarn run build
+# Generate Prisma Client for Linux in Docker
+RUN yarn prisma generate
 
-# Remove development dependencies
+# Build application
+RUN yarn react-router build
+
+# Remove development dependencies but keep Prisma CLI
 RUN yarn install --production=true
 
 
 # Final stage for app image
 FROM base
+
+# Install OpenSSL for Prisma
+RUN apt-get update -y \
+ && apt-get install -y --no-install-recommends openssl \
+ && rm -rf /var/lib/apt/lists/*
 
 # Copy built application
 COPY --from=build /app /app

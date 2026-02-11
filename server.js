@@ -47,6 +47,7 @@ app.all(
 );
 
 const port = process.env.PORT || 3000;
-app.listen(port, () =>
-  console.log(`Express server listening at http://localhost:${port}`)
+const host = process.env.HOST || "0.0.0.0";
+app.listen(port, host, () =>
+  console.log(`Express server listening at http://${host}:${port}`)
 );
