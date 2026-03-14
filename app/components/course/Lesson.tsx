@@ -91,10 +91,13 @@ export function Lesson({ lesson, index, isPreview = false, completedLessonIds = 
         <div className="space-y-1 bg-gray-50/80 group-hover:bg-gray-50 rounded-lg p-1 border border-gray-200/70">
           {lesson.chapters.map((chapter) => {
             const isCompleted = chapter.id && completedLessonIds.has(chapter.id);
+            const linkPath = isPreview
+              ? `/preview/${lesson.slug}/${chapter.slug}`
+              : `/learn/content/${lesson.slug}/${chapter.slug}`;
             return (
               <Link
                 key={chapter.slug}
-                to={`/learn/content/${lesson.slug}/${chapter.slug}`}
+                to={linkPath}
                 className={cn(
                   "group flex items-center justify-between gap-4 py-2.5 px-3 rounded-md",
                   isCompleted

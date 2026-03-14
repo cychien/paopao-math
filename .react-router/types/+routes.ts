@@ -38,6 +38,12 @@ type Pages = {
   "/preview": {
     params: {};
   };
+  "/preview/:moduleSlug/:lessonSlug": {
+    params: {
+      "moduleSlug": string;
+      "lessonSlug": string;
+    };
+  };
   "/privacy": {
     params: {};
   };
@@ -81,7 +87,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/api/webhooks/lemon-squeezy" | "/auth/callback/google" | "/api/progress" | "/api/purchase" | "/auth/logout" | "/auth/verify" | "/auth/login" | "/preview" | "/privacy" | "/refund" | "/learn" | "/learn/content/:moduleSlug/:lessonSlug" | "/learn/content" | "/learn/exams" | "/learn/vault" | "/learn/gsat" | "/learn/mock" | "/terms" | "/*";
+    page: "/" | "/api/webhooks/lemon-squeezy" | "/auth/callback/google" | "/api/progress" | "/api/purchase" | "/auth/logout" | "/auth/verify" | "/auth/login" | "/preview" | "/preview/:moduleSlug/:lessonSlug" | "/privacy" | "/refund" | "/learn" | "/learn/content/:moduleSlug/:lessonSlug" | "/learn/content" | "/learn/exams" | "/learn/vault" | "/learn/gsat" | "/learn/mock" | "/terms" | "/*";
   };
   "routes/api.webhooks.lemon-squeezy.tsx": {
     id: "routes/api.webhooks.lemon-squeezy";
@@ -113,6 +119,14 @@ type RouteFiles = {
   };
   "routes/preview/route.tsx": {
     id: "routes/preview";
+    page: "/preview" | "/preview/:moduleSlug/:lessonSlug";
+  };
+  "routes/preview.$moduleSlug.$lessonSlug/route.tsx": {
+    id: "routes/preview.$moduleSlug.$lessonSlug";
+    page: "/preview/:moduleSlug/:lessonSlug";
+  };
+  "routes/preview._index/route.tsx": {
+    id: "routes/preview._index";
     page: "/preview";
   };
   "routes/privacy.tsx": {
@@ -179,6 +193,8 @@ type RouteModules = {
   "routes/auth.verify": typeof import("./app/routes/auth.verify.tsx");
   "routes/auth.login": typeof import("./app/routes/auth.login.tsx");
   "routes/preview": typeof import("./app/routes/preview/route.tsx");
+  "routes/preview.$moduleSlug.$lessonSlug": typeof import("./app/routes/preview.$moduleSlug.$lessonSlug/route.tsx");
+  "routes/preview._index": typeof import("./app/routes/preview._index/route.tsx");
   "routes/privacy": typeof import("./app/routes/privacy.tsx");
   "routes/_index": typeof import("./app/routes/_index/route.tsx");
   "routes/refund": typeof import("./app/routes/refund.tsx");

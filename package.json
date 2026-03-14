@@ -7,6 +7,7 @@
     "build": "yarn prisma:generate && react-router build",
     "dev": "react-router dev",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
+    "sync:lesson-duration": "node ./update-durationSec.js",
     "start": "node ./server.js",
     "typecheck": "react-router typegen && tsc",
     "prisma:generate": "prisma generate"
