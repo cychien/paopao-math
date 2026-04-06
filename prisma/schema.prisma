@@ -52,6 +52,7 @@ enum ConfigStatus {
 
 enum PaymentProvider {
   LEMON_SQUEEZY
+  PAYUNI
 }
 
 // ---------------- Identity / Tenant ----------------
@@ -420,6 +421,25 @@ model AppCustomer {
   @@index([appId])
   @@index([email])
   @@index([variantId])
+}
+
+model PayUniOrder {
+  id           String   @id @default(cuid())
+  merTradeNo   String   @unique
+  payUniTradeNo String? @unique
+  appId        String
+  variantId    String
+  email        String?
+  name         String?
+  status       String   @default("PENDING")
+  paidAt       DateTime?
+  rawResult    Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([appId])
+  @@index([variantId])
+  @@index([email])
 }
 
 model LemonSqueezyCustomer {

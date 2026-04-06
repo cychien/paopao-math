@@ -124,6 +124,7 @@ export default function LoginPage() {
   const [otp, setOtp] = useState("");
   const [showOTPInput, setShowOTPInput] = useState(!!urlChallengeId);
   const [challengeId, setChallengeId] = useState(urlChallengeId || "");
+  const [isVerifying, setIsVerifying] = useState(false);
   const isSubmitting = navigation.state === "submitting";
 
   // Map error codes to user-friendly messages
@@ -148,7 +149,7 @@ export default function LoginPage() {
   // Auto-submit when OTP is complete
   useEffect(() => {
     if (otp.length === 6 && challengeId) {
-      // Redirect to verify with OTP and preserve redirectTo
+      setIsVerifying(true);
       const params = new URLSearchParams({
         c: challengeId,
         otp: otp,
@@ -220,53 +221,63 @@ export default function LoginPage() {
             // Step 2: OTP Input
             <div className="space-y-6">
               <div className="flex flex-col items-center space-y-4">
-                <InputOTP
-                  maxLength={6}
-                  value={otp}
-                  onChange={(value) => setOtp(value)}
-                  disabled={isSubmitting}
-                  containerClassName="w-full"
-                >
-                  <InputOTPGroup className="h-12 w-full!">
-                    <InputOTPSlot index={0} className='h-12 w-full!' />
-                    <InputOTPSlot index={1} className='h-12 w-full!' />
-                    <InputOTPSlot index={2} className='h-12 w-full!' />
-                    <InputOTPSlot index={3} className='h-12 w-full!' />
-                    <InputOTPSlot index={4} className='h-12 w-full!' />
-                    <InputOTPSlot index={5} className='h-12 w-full!' />
-                  </InputOTPGroup>
-                </InputOTP>
+                <div className={`w-full transition-opacity duration-200 ${isVerifying ? "pointer-events-none opacity-40" : ""}`}>
+                  <InputOTP
+                    maxLength={6}
+                    value={otp}
+                    onChange={(value) => setOtp(value)}
+                    disabled={isSubmitting || isVerifying}
+                    containerClassName="w-full"
+                  >
+                    <InputOTPGroup className="h-12 w-full!">
+                      <InputOTPSlot index={0} className='h-12 w-full!' />
+                      <InputOTPSlot index={1} className='h-12 w-full!' />
+                      <InputOTPSlot index={2} className='h-12 w-full!' />
+                      <InputOTPSlot index={3} className='h-12 w-full!' />
+                      <InputOTPSlot index={4} className='h-12 w-full!' />
+                      <InputOTPSlot index={5} className='h-12 w-full!' />
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
 
-                {urlError && (
+                {isVerifying && (
+                  <div className="flex items-center gap-2.5 py-1">
+                    <div className="size-4 border-2 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+                    <span className="text-sm font-medium text-brand-600">正在登入...</span>
+                  </div>
+                )}
+
+                {urlError && !isVerifying && (
                   <div className="bg-red-50 border border-red-100 rounded-lg p-3 text-sm text-red-600 flex items-center gap-2 w-full">
                     <Icon icon={CancelCircleIcon} className="size-4 shrink-0" />
                     {getErrorMessage(urlError)}
                   </div>
                 )}
 
-                <div className="text-center space-y-2 w-full">
-                  {/* <p className="text-sm text-gray-500">
-                    驗證碼已發送到 <strong>{email}</strong>
-                  </p> */}
-                  <Button
-                    variant="ghost"
-                    onClick={handleResend}
-                    className="text-brand-600 hover:text-brand-700 text-sm hover:bg-gray-100"
-                    type="button"
-                  >
-                    重新發送驗證碼
-                  </Button>
-                </div>
+                {!isVerifying && (
+                  <div className="text-center space-y-2 w-full">
+                    <Button
+                      variant="ghost"
+                      onClick={handleResend}
+                      className="text-brand-600 hover:text-brand-700 text-sm hover:bg-gray-100"
+                      type="button"
+                    >
+                      重新發送驗證碼
+                    </Button>
+                  </div>
+                )}
               </div>
 
-              <div className="bg-brand-50/50 border border-brand-100 rounded-xl p-4 text-left">
-                <div className="flex gap-3">
-                  <p className="text-sm text-brand-700">
-                    提示：請檢查您的<strong>垃圾郵件</strong>或
-                    <strong>促銷內容</strong>資料夾。驗證碼有效期為 10 分鐘。
-                  </p>
+              {!isVerifying && (
+                <div className="bg-brand-50/50 border border-brand-100 rounded-xl p-4 text-left">
+                  <div className="flex gap-3">
+                    <p className="text-sm text-brand-700">
+                      提示：請檢查您的<strong>垃圾郵件</strong>或
+                      <strong>促銷內容</strong>資料夾。驗證碼有效期為 10 分鐘。
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           ) : (
             // Step 1: Email Input

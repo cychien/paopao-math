@@ -1,8 +1,6 @@
-import { useNavigate } from "react-router";
 import { useState } from "react";
 
 export function usePurchase() {
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -11,8 +9,8 @@ export function usePurchase() {
       setIsLoading(true);
       setError(null);
       
-      // Navigate to the purchase API route which will handle the checkout
-      navigate("/api/purchase");
+      // Use full document navigation so checkout route can return HTML/form directly.
+      window.location.assign("/api/purchase");
     } catch (err) {
       console.error("Purchase error:", err);
       setError(err instanceof Error ? err.message : "購買失敗");

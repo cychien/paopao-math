@@ -47,17 +47,20 @@ export const action = async ({
       );
     }
 
-    // Build the success redirect URL
+    // Build callback URLs
     const url = new URL(request.url);
     const protocol =
       request.headers.get("x-forwarded-proto") || url.protocol.replace(":", "");
-    const successUrl = `${protocol}://${url.host}/login`;
+    const origin = `${protocol}://${url.host}`;
+    const successUrl = `${origin}/api/webhooks/payuni/return`;
+    const notifyUrl = `${origin}/api/webhooks/payuni/notify`;
 
-    // 建立 Lemon Squeezy checkout
+    // 建立 checkout（Lemon Squeezy or PayUni）
     const result = await createCheckout(
       DEFAULT_APP_SLUG,
       variantId,
-      successUrl
+      successUrl,
+      notifyUrl,
     );
 
     if (!result.success) {
@@ -67,8 +70,39 @@ export const action = async ({
       );
     }
 
-    // Redirect to checkout URL
-    throw redirect(result.checkoutUrl);
+    if (result.type === "redirect") {
+      throw redirect(result.checkoutUrl);
+    }
+
+    return new Response(
+      `<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>付款跳轉中...</title>
+  </head>
+  <body onload="document.getElementById('payuni-checkout-form')?.submit()">
+    <form id="payuni-checkout-form" method="post" action="${escapeHtml(result.formAction)}">
+      ${Object.entries(result.formFields)
+        .map(
+          ([name, value]) =>
+            `<input type="hidden" name="${escapeHtml(name)}" value="${escapeHtml(value)}" />`,
+        )
+        .join("\n")}
+    </form>
+    <p>正在導向付款頁面，請稍候...</p>
+    <noscript>
+      <button type="submit" form="payuni-checkout-form">點此前往付款</button>
+    </noscript>
+  </body>
+</html>`,
+      {
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+        },
+      },
+    );
   } catch (error) {
     // If it's a redirect, rethrow it
     if (error instanceof Response) {
@@ -81,6 +115,15 @@ export const action = async ({
     );
   }
 };
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 export default function PurchasePage({
   loaderData,
