@@ -1,5 +1,6 @@
 import { randomInt , createHash as createHashCrypto } from "node:crypto";
 import { prisma } from "~/services/database/prisma.server";
+import { isWhitelistedEmail } from "~/data/whitelist";
 
 const DEFAULT_APP_SLUG = "paopao-math";
 
@@ -42,16 +43,18 @@ export async function createOTPChallenge(
     throw new Error("App not found");
   }
 
-  // Verify email exists in AppCustomer
-  const customer = await prisma.appCustomer.findFirst({
-    where: {
-      appId: app.id,
-      email: email,
-    },
-  });
+  // Verify email exists in AppCustomer (白名單用戶跳過此檢查)
+  if (!isWhitelistedEmail(email)) {
+    const customer = await prisma.appCustomer.findFirst({
+      where: {
+        appId: app.id,
+        email: email,
+      },
+    });
 
-  if (!customer) {
-    throw new Error("此信箱尚未購買課程，請先完成購買才能登入");
+    if (!customer) {
+      throw new Error("此信箱尚未購買課程，請先完成購買才能登入");
+    }
   }
 
   // Generate OTP and hash it
@@ -202,8 +205,8 @@ export async function verifyOTP(
     data: { status: "CONSUMED" },
   });
 
-  // Get the customer
-  const customer = await prisma.appCustomer.findFirst({
+  // Get the customer (白名單用戶自動建立 AppCustomer)
+  let customer = await prisma.appCustomer.findFirst({
     where: {
       appId: challenge.appId!,
       email: challenge.email,
@@ -212,6 +215,10 @@ export async function verifyOTP(
       id: true,
     },
   });
+
+  if (!customer && isWhitelistedEmail(challenge.email)) {
+    customer = await ensureWhitelistCustomer(challenge.appId!, challenge.email);
+  }
 
   if (!customer) {
     return {
@@ -245,4 +252,31 @@ export async function cleanupExpiredOTPChallenges(): Promise<number> {
     console.error("清理過期 OTP challenges 失敗:", error);
     return 0;
   }
+}
+
+/**
+ * 為白名單用戶自動建立 AppCustomer 記錄
+ */
+async function ensureWhitelistCustomer(
+  appId: string,
+  email: string
+): Promise<{ id: string }> {
+  // 取得 app 的第一個 variant
+  const variant = await prisma.appVariant.findFirst({
+    where: { appId },
+    select: { id: true },
+  });
+
+  if (!variant) {
+    throw new Error("找不到可用的 variant");
+  }
+
+  return prisma.appCustomer.create({
+    data: {
+      appId,
+      variantId: variant.id,
+      email,
+    },
+    select: { id: true },
+  });
 }

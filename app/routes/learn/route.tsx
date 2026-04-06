@@ -32,16 +32,17 @@ export const loader = async () => {
 export default function Layout() {
   const location = useLocation();
 
-  // 基本導航項目
-  const navigations = [
+  const courseNavs = [
     { icon: SchoolIcon, label: "主課程", link: "/learn/content", exact: false },
-    { icon: StarIcon, label: "好題分享", link: "/learn/vault", exact: true },
-    { icon: Share07Icon, label: "歷屆學測試題", link: "/learn/gsat", exact: true },
-    { icon: Target02Icon, label: "仿真模擬考題", link: "/learn/exams", exact: true },
-    // { icon: File, label: "模擬試題", link: "/learn/exams" },
-    // { icon: LayersTwo, label: "歷屆聯考題", link: "/learn/entrance-exams" },
-    // { icon: CheckDone, label: "問答討論區", link: "/learn/curated" },
   ];
+
+  const practiceNavs = [
+    { icon: StarIcon, label: "好題分享", link: "/learn/vault", exact: true },
+    { icon: Share07Icon, label: "歷屆學測試題", link: "/learn/gsat", exact: false },
+    { icon: Target02Icon, label: "仿真模擬考題", link: "/learn/exams", exact: false },
+  ];
+
+  const allNavs = [...courseNavs, ...practiceNavs];
 
   const isActive = (link: string, exact?: boolean) => {
     if (exact) {
@@ -80,7 +81,27 @@ export default function Layout() {
                 </SidebarGroupLabel>
                 <SidebarGroupContent>
                   <SidebarMenu>
-                    {navigations.map((nav) => (
+                    {courseNavs.map((nav) => (
+                      <SidebarMenuItem key={nav.label}>
+                        <SidebarItem
+                          icon={nav.icon}
+                          label={nav.label}
+                          link={nav.link}
+                          isActive={isActive(nav.link, nav.exact)}
+                        />
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+
+              <SidebarGroup>
+                <SidebarGroupLabel className="text-xs uppercase tracking-wider text-gray-500 font-semibold">
+                  練習與測驗
+                </SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {practiceNavs.map((nav) => (
                       <SidebarMenuItem key={nav.label}>
                         <SidebarItem
                           icon={nav.icon}
@@ -126,7 +147,7 @@ export default function Layout() {
       <div className="lg:hidden">
         <div className="border-b border-gray-200 overflow-x-auto sticky top-0 bg-white z-10 shadow-sm">
           <div className="container mx-auto flex space-x-3 sm:space-x-4 md:space-x-4">
-            {navigations.map((nav) => (
+            {allNavs.map((nav) => (
               <a
                 key={nav.label}
                 href={nav.link}
@@ -156,9 +177,9 @@ export default function Layout() {
             ))}
           </div>
         </div>
-        <div className="bg-gradient-to-b from-gray-50 to-transparent h-8" />
+        <div className="hidden lg:block bg-gradient-to-b from-gray-50 to-transparent h-8" />
         <main className="isolate">
-          <div className="container mx-auto py-6 px-4">
+          <div className="container mx-auto px-0 lg:py-6 lg:px-4">
             <Outlet />
           </div>
         </main>

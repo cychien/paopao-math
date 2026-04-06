@@ -10,6 +10,7 @@ import {
   customerSessionStorage,
 } from "~/services/customer-session.server";
 import { getOriginUrl } from "~/utils/misc";
+import { isWhitelistedEmail } from "~/data/whitelist";
 
 const DEFAULT_APP_SLUG = "paopao-math";
 
@@ -57,8 +58,8 @@ export async function loader({ request }: Route.LoaderArgs) {
     return redirect("/auth/login?error=app_not_found");
   }
 
-  // Check if the email exists in AppCustomer (i.e., they have purchased)
-  const customer = await prisma.appCustomer.findFirst({
+  // Check if the email exists in AppCustomer (白名單用戶自動建立)
+  let customer = await prisma.appCustomer.findFirst({
     where: {
       appId: app.id,
       email: userInfo.email,
@@ -68,6 +69,27 @@ export async function loader({ request }: Route.LoaderArgs) {
       name: true,
     },
   });
+
+  if (!customer && isWhitelistedEmail(userInfo.email)) {
+    // 白名單用戶：自動建立 AppCustomer
+    const variant = await prisma.appVariant.findFirst({
+      where: { appId: app.id },
+      select: { id: true },
+    });
+
+    if (variant) {
+      customer = await prisma.appCustomer.create({
+        data: {
+          appId: app.id,
+          variantId: variant.id,
+          email: userInfo.email,
+          name: userInfo.name || null,
+        },
+        select: { id: true, name: true },
+      });
+      console.log(`✅ Auto-created AppCustomer for whitelisted user: ${userInfo.email}`);
+    }
+  }
 
   if (!customer) {
     console.log(`❌ Google login failed: ${userInfo.email} has not purchased`);

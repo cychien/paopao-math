@@ -1,0 +1,15 @@
+{
+  "slug": "115-math-a",
+  "title": "115 學測數學 A",
+  "subtitle": "2026 年度學科能力測驗",
+  "description": "完整收錄 115 學年度學測數學 A 考科全部題目與詳細解析，涵蓋多選題、選填題等多元題型，適合考前複習與實力檢測。",
+  "year": 2026,
+  "date": "2026-01-18",
+  "subject": "math-a",
+  "tags": ["數學 A", "學測"],
+  "duration": 100,
+  "assets": {
+    "paper": "paper.pdf",
+    "solution": "solution.pdf"
+  }
+}
