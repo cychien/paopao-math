@@ -23,6 +23,7 @@ export default defineConfig({
       "127.0.0.1",
       ".local", // 允許所有 .local 域名
       ".localcan.dev", // 允許 localcan.dev 域名
+      ".trycloudflare.com", // 允許 cloudflared quick tunnel
     ],
   },
 });

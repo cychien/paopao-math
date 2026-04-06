@@ -1,4 +1,5 @@
 import { prisma } from "~/services/database/prisma.server";
+import { resolvePayUniConfig } from "~/services/payuni";
 
 const LEMON_SQUEEZY_API_BASE = "https://api.lemonsqueezy.com/v1";
 
@@ -39,6 +40,24 @@ type LemonSqueezyApiResponse<T> = {
 type PaymentConfig = {
   apiKey: string;
   storeId?: string;
+};
+
+type PayUniPaymentConfig = {
+  merId?: string;
+  hashKey?: string;
+  hashIv?: string;
+  tradeAmt?: number;
+  variantAmounts?: Record<string, number>;
+  prodDesc?: string;
+  tradeDesc?: string;
+  variantConfigs?: Record<
+    string,
+    {
+      tradeAmt?: number;
+      prodDesc?: string;
+      tradeDesc?: string;
+    }
+  >;
 };
 
 async function fetchLemonSqueezyVariant(
@@ -154,6 +173,60 @@ export async function getAppVariantsBySlug(slug: string) {
   }
 
   const config = paymentIntegration.config as PaymentConfig | null;
+  const provider = paymentIntegration.provider;
+
+  if (provider === "PAYUNI") {
+    const payUniConfig = paymentIntegration.config as PayUniPaymentConfig | null;
+    const resolvedConfig = resolvePayUniConfig(payUniConfig);
+
+    const variantsWithPrice: VariantWithPrice[] = paymentIntegration.variants.map(
+      (variant) => {
+        const variantConfig = payUniConfig?.variantConfigs?.[variant.id];
+        const variantAmount =
+          typeof variantConfig?.tradeAmt === "number"
+            ? variantConfig.tradeAmt
+            : payUniConfig?.variantAmounts &&
+                typeof payUniConfig.variantAmounts[variant.id] === "number"
+              ? payUniConfig.variantAmounts[variant.id]
+            : null;
+
+        const tradeAmt =
+          typeof payUniConfig?.tradeAmt === "number"
+            ? payUniConfig.tradeAmt
+            : null;
+
+        const fallbackAmount = Number(variant.productId);
+        const finalAmount =
+          variantAmount ??
+          tradeAmt ??
+          (Number.isFinite(fallbackAmount) ? fallbackAmount : 0);
+
+        const prodDesc = variantConfig?.prodDesc || payUniConfig?.prodDesc || variant.name;
+        const tradeDesc =
+          variantConfig?.tradeDesc || payUniConfig?.tradeDesc || variant.description;
+
+        return {
+          id: variant.id,
+          variantId: variant.variantId,
+          name: prodDesc,
+          description: tradeDesc,
+          price: finalAmount,
+          currency: "TWD",
+          isSubscription: false,
+          interval: null,
+          intervalCount: null,
+        };
+      },
+    );
+
+    return {
+      appId: app.id,
+      appName: app.name,
+      variants: variantsWithPrice,
+      isPaymentActive: !!resolvedConfig,
+      provider,
+    };
+  }
 
   if (!config?.apiKey) {
     return {
@@ -161,6 +234,7 @@ export async function getAppVariantsBySlug(slug: string) {
       appName: app.name,
       variants: [] as VariantWithPrice[],
       isPaymentActive: false,
+      provider,
     };
   }
 
@@ -200,6 +274,6 @@ export async function getAppVariantsBySlug(slug: string) {
     appName: app.name,
     variants: variantsWithPrice,
     isPaymentActive: true,
-    provider: paymentIntegration.provider,
+    provider,
   };
 }
